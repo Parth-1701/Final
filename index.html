@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrepMatrix | JEE & BITSAT Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-900" x-data="examApp()">
+
+    <header class="bg-white border-b p-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
+        <h1 class="text-2xl font-black text-blue-700 tracking-tighter cursor-pointer" @click="page='home'">PREPMATRIX</h1>
+        <div class="flex gap-4 items-center">
+            <template x-if="user">
+                <span class="text-sm font-medium border-r pr-4" x-text="user.email"></span>
+            </template>
+            <button x-show="user" @click="logout" class="text-red-500 text-sm font-bold">LOGOUT</button>
+            <button x-show="!user" @click="page='login'" class="bg-blue-600 text-white px-4 py-1.5 rounded text-sm font-bold">LOGIN</button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4">
+
+        <div x-show="page === 'home'" class="py-10">
+            <h2 class="text-3xl font-bold mb-8 text-center text-slate-800">Select Exam Category</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <template x-for="exam in categories">
+                    <div @click="selectExam(exam)" class="bg-white p-6 rounded-xl border-2 border-transparent hover:border-blue-500 shadow-sm cursor-pointer transition-all">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-blue-600 font-bold" x-text="exam[0]"></div>
+                        <h3 class="font-bold text-lg" x-text="exam"></h3>
+                        <p class="text-gray-500 text-sm mt-1">Available Tests: 12</p>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div x-show="page === 'test-list'">
+            <div class="mb-6 flex items-center gap-2 text-gray-500 text-sm">
+                <span @click="page='home'" class="cursor-pointer hover:underline">Home</span> / <span x-text="selectedExam"></span>
+            </div>
+            <h2 class="text-2xl font-bold mb-6" x-text="selectedExam + ' Mock Series'"></h2>
+            <div class="space-y-3">
+                <template x-for="i in [1,2,3]">
+                    <div class="bg-white p-5 rounded-lg border flex justify-between items-center">
+                        <div>
+                            <p class="font-bold">Full Syllabus Mock Test - #<span x-text="i"></span></p>
+                            <p class="text-xs text-gray-400">90 Questions • 180 Minutes • +4 / -1</p>
+                        </div>
+                        <button @click="startTest(i)" class="bg-green-600 text-white px-6 py-2 rounded font-bold hover:bg-green-700 transition">START</button>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div x-show="page === 'active-test'" class="fixed inset-0 bg-gray-100 z-[100] flex flex-col">
+            <nav class="bg-blue-800 text-white p-3 flex justify-between font-bold text-sm">
+                <span>PREPMATRIX MOCK PORTAL</span>
+                <span class="bg-red-500 px-3 rounded" x-text="'Time Left: ' + formatTime(timer)"></span>
+            </nav>
+
+            <div class="flex flex-1 overflow-hidden">
+                <div class="flex-1 p-8 overflow-y-auto bg-white">
+                    <div class="border-b pb-4 mb-6 flex justify-between">
+                        <span class="font-bold text-blue-600">Question No. <span x-text="currQ + 1"></span></span>
+                        <span class="text-xs text-gray-400">Marks: <span class="text-green-600 font-bold">+4</span>, <span class="text-red-500 font-bold">-1</span></span>
+                    </div>
+                    <div class="text-xl mb-8 font-medium">
+                        What is the value of the derivative of $f(x) = \sin(x^2)$ at $x = \sqrt{\pi/2}$?
+                    </div>
+                    <div class="space-y-4">
+                        <template x-for="(opt, idx) in ['0', '1', '-1', '2']">
+                            <label class="flex items-center gap-4 p-4 border rounded hover:bg-blue-50 cursor-pointer transition">
+                                <input type="radio" :name="'q'+currQ" :value="idx" x-model="answers[currQ]" class="w-4 h-4">
+                                <span x-text="opt"></span>
+                            </label>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="w-80 bg-white border-l p-4 flex flex-col">
+                    <div class="flex gap-2 items-center mb-6 border-b pb-4">
+                        <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
+                        <div class="text-xs">
+                            <p class="font-bold">Aspirant Name</p>
+                            <p class="text-gray-400">JEE Mains 2026</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-5 gap-2 mb-8">
+                        <template x-for="(n, index) in Array.from({length: 30})">
+                            <button @click="currQ = index" 
+                                :class="currQ === index ? 'border-2 border-blue-600' : ''"
+                                class="w-10 h-10 rounded text-xs font-bold transition flex items-center justify-center border"
+                                :class="answers[index] !== undefined ? 'bg-green-500 text-white' : 'bg-gray-100'"
+                                x-text="index + 1"></button>
+                        </template>
+                    </div>
+                    <button @click="submitTest" class="mt-auto w-full bg-blue-700 text-white py-3 rounded font-bold hover:bg-blue-800">SUBMIT TEST</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        // --- STEP 1: FIREBASE CONFIGURATION ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+            authDomain: "sigmascore300.firebaseapp.com",
+            projectId: "sigmascore300",
+            storageBucket: "sigmascore300.firebasestorage.app",
+            messagingSenderId: "293195338803",
+            appId: "1:293195338803:web:039dd76be85786a799ff46"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- STEP 2: APP LOGIC ---
+        window.examApp = () => ({
+            page: 'home',
+            user: null,
+            selectedExam: '',
+            categories: ['JEE Mains', 'JEE Advanced', 'BITSAT', 'MHT-CET'],
+            currQ: 0,
+            answers: {},
+            timer: 10800, // 3 hours in seconds
+
+            async init() {
+                onAuthStateChanged(auth, (u) => { this.user = u; });
+                setInterval(() => { if(this.page === 'active-test') this.timer--; }, 1000);
+            },
+
+            selectExam(exam) {
+                this.selectedExam = exam;
+                this.page = 'test-list';
+            },
+
+            startTest(id) {
+                if(!this.user) return alert("Please Login First!");
+                this.page = 'active-test';
+            },
+
+            formatTime(s) {
+                return new Date(s * 1000).toISOString().substr(11, 8);
+            },
+
+            async submitTest() {
+                if(!confirm("Are you sure you want to submit?")) return;
+                
+                // Instant Scoring Logic
+                const score = Object.keys(this.answers).length * 4; // Dummy logic
+                
+                await addDoc(collection(db, "submissions"), {
+                    user: this.user.email,
+                    exam: this.selectedExam,
+                    score: score,
+                    timestamp: new Date()
+                });
+
+                alert("Test Submitted! Your Score: " + score);
+                this.page = 'home';
+            }
+        });
+    </script>
+</body>
+</html>
