@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quizable — Mock Test Platform</title>
+  <title>ExamForge — Mock Test Platform</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     :root {
@@ -40,7 +40,7 @@
 
     /* ── NAV ── */
     nav {
-      position: fixed; top:0; lepbTestsssableableot; right:0; z-index:100;
+      position: fixed; top:0; left:0; right:0; z-index:100;
       display:flex; align-items:center; justify-content:space-between;
       padding: 0 2.5rem;
       height: 64px;
@@ -338,7 +338,7 @@
     .pbar-dot {
       width:10px; height:10px; border-radius:50%;
     }
-    .pbTestsssableableot:nth-child(1) { background:#ff5f57; }
+    .pbar-dot:nth-child(1) { background:#ff5f57; }
     .pbar-dot:nth-child(2) { background:#febc2e; }
     .pbar-dot:nth-child(3) { background:#28c840; }
     .pbar-title {
@@ -607,37 +607,6 @@
       footer { flex-direction:column; text-align:center; }
     }
   </style>
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-  // Replace with your config from Firebase Console
-  const firebaseConfig = {
-    apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
-    authDomain: "sigmascore300.firebaseapp.com",
-    projectId: "sigmascore300",
-    storageBucket: "sigmascore300.firebasestorage.app",
-    messagingSenderId: "293195338803",
-    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
-    measurementId: "G-MLZYWG2EEM"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // Hook into your "Log in with Firebase" button
-  window.handleLogin = async () => {
-    const email = document.querySelector('#loginForm input[type="email"]').value;
-    const password = document.querySelector('#loginForm input[type="password"]').value;
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      alert("Logged in as: " + userCredential.user.email);
-      closeModal();
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-  </script>
 </head>
 <body>
 
@@ -645,7 +614,7 @@
 <nav>
   <div class="nav-logo">
     <div class="logo-dot"></div>
-    Quiz<span>able</span>
+    Exam<span>Forge</span>
   </div>
   <div class="nav-links">
     <a href="#exams">Exams</a>
@@ -1005,103 +974,306 @@
       <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Sign up</button>
     </div>
 
+    <!-- LOGIN FORM -->
     <div id="loginForm">
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input class="form-input" type="email" placeholder="you@example.com"/>
+        <input class="form-input" type="email" id="login-email" placeholder="you@example.com"
+               onkeydown="if(event.key==='Enter') handleLogin()"/>
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input class="form-input" type="password" placeholder="••••••••"/>
+        <input class="form-input" type="password" id="login-password" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter') handleLogin()"/>
       </div>
-      <button class="modal-btn" onclick="handleLogin()">Log in with Firebase →</button>
+      <div id="login-error" style="color:#ff6b6b;font-size:0.8rem;min-height:18px;margin-bottom:0.5rem"></div>
+      <button class="modal-btn" id="login-btn" onclick="handleLogin()">Log in →</button>
       <div class="divider-text">or</div>
-      <button class="modal-btn" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);box-shadow:none;">
+      <button class="modal-btn" id="google-login-btn" onclick="handleGoogleAuth()"
+              style="background:var(--surface2);color:var(--text);border:1px solid var(--border);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Continue with Google
       </button>
     </div>
 
+    <!-- SIGNUP FORM -->
     <div id="signupForm" style="display:none">
       <div class="form-group">
         <label class="form-label">Full Name</label>
-        <input class="form-input" type="text" placeholder="Arjun Rao"/>
+        <input class="form-input" type="text" id="signup-name" placeholder="Arjun Rao"/>
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input class="form-input" type="email" placeholder="you@example.com"/>
+        <input class="form-input" type="email" id="signup-email" placeholder="you@example.com"/>
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input class="form-input" type="password" placeholder="Create a strong password"/>
+        <input class="form-input" type="password" id="signup-password" placeholder="At least 6 characters"
+               onkeydown="if(event.key==='Enter') handleSignup()"/>
       </div>
       <div class="form-group">
         <label class="form-label">Target Exam</label>
-        <select class="form-input">
+        <select class="form-input" id="signup-exam">
           <option value="">Select your primary exam</option>
-          <option>JEE Mains</option>
-          <option>JEE Advanced</option>
-          <option>MHT CET</option>
-          <option>BITSAT</option>
+          <option value="JEE Mains">JEE Mains</option>
+          <option value="JEE Advanced">JEE Advanced</option>
+          <option value="MHT CET">MHT CET</option>
+          <option value="BITSAT">BITSAT</option>
         </select>
       </div>
-      <button class="modal-btn">Create Account →</button>
+      <div id="signup-error" style="color:#ff6b6b;font-size:0.8rem;min-height:18px;margin-bottom:0.5rem"></div>
+      <button class="modal-btn" id="signup-btn" onclick="handleSignup()">Create Account →</button>
       <div class="divider-text">or</div>
-      <button class="modal-btn" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);box-shadow:none;">
+      <button class="modal-btn" onclick="handleGoogleAuth()"
+              style="background:var(--surface2);color:var(--text);border:1px solid var(--border);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Sign up with Google
       </button>
     </div>
   </div>
 </div>
 
-<script>
-  // ── Question palette ──
-  const palette = document.getElementById('palette');
-  const states = ['answered','answered','answered','answered','answered','current','skipped','skipped','unmarked','unmarked','unmarked','unmarked','unmarked','unmarked','unmarked','unmarked','unmarked','unmarked','unmarked','unmarked'];
-  for(let i=0;i<20;i++){
-    const d=document.createElement('div');
-    d.className=`palette-item ${states[i]||'unmarked'}`;
-    d.textContent=i+1;
+<!-- Toast notification -->
+<div id="site-toast" style="
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);
+  background:#1a1a26;border:1px solid #2a2a3d;border-radius:10px;
+  padding:0.65rem 1.25rem;font-size:0.875rem;color:#e8e8f0;
+  transition:transform 0.3s ease;z-index:500;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);white-space:nowrap;pointer-events:none;
+" id="toast"></div>
+
+<!-- Firebase SDK + Auth Logic -->
+<script type="module">
+import { initializeApp }          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+         createUserWithEmailAndPassword, GoogleAuthProvider,
+         signInWithPopup, signOut, updateProfile }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+// ──────────────────────────────────────────────────────────────
+
+const app      = initializeApp(firebaseConfig);
+const auth     = getAuth(app);
+const db       = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+// ── Watch auth state — update nav when logged in/out ──────────
+onAuthStateChanged(auth, user => {
+  const navCta = document.querySelector('.nav-cta');
+  if (user) {
+    const initials = (user.displayName || user.email || 'U')
+      .split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    navCta.innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <div style="width:34px;height:34px;border-radius:9px;background:rgba(108,99,255,0.15);
+             border:1px solid rgba(108,99,255,0.3);display:flex;align-items:center;
+             justify-content:center;font-family:'DM Mono',monospace;font-size:0.8rem;
+             color:#6c63ff;font-weight:500;">${initials}</div>
+        <span style="font-size:0.875rem;color:#9999b8">${user.displayName || user.email}</span>
+        <button onclick="handleLogout()" style="background:none;border:1px solid #2a2a3d;
+          color:#6b6b8a;padding:0.35rem 0.8rem;border-radius:7px;font-family:'DM Sans',sans-serif;
+          font-size:0.8rem;cursor:pointer;">Log out</button>
+      </div>`;
+  } else {
+    navCta.innerHTML = `
+      <button class="btn-ghost" onclick="openModal('login')">Log in</button>
+      <button class="btn-primary" onclick="openModal('signup')">Get started</button>`;
+  }
+});
+
+// ── Helpers ───────────────────────────────────────────────────
+function setLoading(btnId, loading, defaultText) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Please wait…' : defaultText;
+  btn.style.opacity = loading ? '0.7' : '1';
+}
+
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  if (el) el.textContent = msg;
+}
+
+function clearErrors() {
+  ['login-error','signup-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+}
+
+function friendlyError(code) {
+  const map = {
+    'auth/user-not-found':      'No account found with this email.',
+    'auth/wrong-password':      'Incorrect password. Please try again.',
+    'auth/invalid-credential':  'Incorrect email or password.',
+    'auth/email-already-in-use':'An account with this email already exists.',
+    'auth/weak-password':       'Password must be at least 6 characters.',
+    'auth/invalid-email':       'Please enter a valid email address.',
+    'auth/too-many-requests':   'Too many attempts. Please try again later.',
+    'auth/popup-closed-by-user':'Sign-in popup was closed. Please try again.',
+    'auth/network-request-failed': 'Network error. Check your connection.',
+  };
+  return map[code] || 'Something went wrong. Please try again.';
+}
+
+async function saveUserProfile(user, extra = {}) {
+  const ref = doc(db, 'users', user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      displayName: user.displayName || extra.displayName || '',
+      email:       user.email,
+      targetExam:  extra.targetExam || '',
+      role:        'student',
+      createdAt:   serverTimestamp(),
+    });
+  }
+}
+
+function onAuthSuccess(user) {
+  closeModal();
+  showToast('👋 Welcome, ' + (user.displayName || user.email.split('@')[0]) + '!');
+}
+
+// ── Login ─────────────────────────────────────────────────────
+window.handleLogin = async () => {
+  clearErrors();
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { showError('login-error', 'Please enter your email and password.'); return; }
+  setLoading('login-btn', true, 'Log in →');
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    onAuthSuccess(cred.user);
+  } catch(e) {
+    showError('login-error', friendlyError(e.code));
+  } finally {
+    setLoading('login-btn', false, 'Log in →');
+  }
+};
+
+// ── Signup ────────────────────────────────────────────────────
+window.handleSignup = async () => {
+  clearErrors();
+  const name     = document.getElementById('signup-name').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const exam     = document.getElementById('signup-exam').value;
+  if (!name)     { showError('signup-error', 'Please enter your full name.'); return; }
+  if (!email)    { showError('signup-error', 'Please enter your email.'); return; }
+  if (!password) { showError('signup-error', 'Please enter a password.'); return; }
+  setLoading('signup-btn', true, 'Create Account →');
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(cred.user, { displayName: name });
+    await saveUserProfile(cred.user, { displayName: name, targetExam: exam });
+    onAuthSuccess(cred.user);
+  } catch(e) {
+    showError('signup-error', friendlyError(e.code));
+  } finally {
+    setLoading('signup-btn', false, 'Create Account →');
+  }
+};
+
+// ── Google Auth ───────────────────────────────────────────────
+window.handleGoogleAuth = async () => {
+  clearErrors();
+  try {
+    const cred = await signInWithPopup(auth, provider);
+    await saveUserProfile(cred.user);
+    onAuthSuccess(cred.user);
+  } catch(e) {
+    const errId = document.getElementById('signupForm').style.display === 'none'
+      ? 'login-error' : 'signup-error';
+    showError(errId, friendlyError(e.code));
+  }
+};
+
+// ── Logout ────────────────────────────────────────────────────
+window.handleLogout = async () => {
+  await signOut(auth);
+  showToast('Logged out successfully.');
+};
+
+// ── Modal controls ────────────────────────────────────────────
+window.openModal = (type) => {
+  clearErrors();
+  document.getElementById('authModal').classList.add('open');
+  switchTab(type);
+};
+window.closeModal = () => {
+  document.getElementById('authModal').classList.remove('open');
+};
+window.closeModalOutside = (e) => {
+  if (e.target === document.getElementById('authModal')) closeModal();
+};
+window.switchTab = (tab) => {
+  clearErrors();
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').style.display  = isLogin ? '' : 'none';
+  document.getElementById('signupForm').style.display = isLogin ? 'none' : '';
+  document.getElementById('tabLogin').className  = 'tab-btn' + (isLogin ? ' active' : '');
+  document.getElementById('tabSignup').className = 'tab-btn' + (!isLogin ? ' active' : '');
+  document.getElementById('modalTitle').textContent = isLogin ? 'Welcome back' : 'Create your account';
+  document.getElementById('modalSub').textContent   = isLogin
+    ? 'Log in to continue your preparation'
+    : 'Join 50,000+ students already preparing';
+};
+
+// ── Toast ─────────────────────────────────────────────────────
+let toastTimer;
+window.showToast = (msg) => {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.style.transform = 'translateX(-50%) translateY(80px)';
+  }, 3000);
+};
+
+// ── Question palette (preview) ────────────────────────────────
+const palette = document.getElementById('palette');
+if (palette) {
+  const states = ['answered','answered','answered','answered','answered',
+    'current','skipped','skipped','unmarked','unmarked',
+    'unmarked','unmarked','unmarked','unmarked','unmarked',
+    'unmarked','unmarked','unmarked','unmarked','unmarked'];
+  for (let i = 0; i < 20; i++) {
+    const d = document.createElement('div');
+    d.className = `palette-item ${states[i] || 'unmarked'}`;
+    d.textContent = i + 1;
     palette.appendChild(d);
   }
+}
 
-  // ── Modal ──
-  function openModal(type){
-    document.getElementById('authModal').classList.add('open');
-    switchTab(type);
-  }
-  function closeModal(){
-    document.getElementById('authModal').classList.remove('open');
-  }
-  function closeModalOutside(e){
-    if(e.target===document.getElementById('authModal')) closeModal();
-  }
-  function switchTab(tab){
-    const isLogin = tab==='login';
-    document.getElementById('loginForm').style.display = isLogin ? '' : 'none';
-    document.getElementById('signupForm').style.display = isLogin ? 'none' : '';
-    document.getElementById('tabLogin').className = 'tab-btn' + (isLogin ? ' active' : '');
-    document.getElementById('tabSignup').className = 'tab-btn' + (!isLogin ? ' active' : '');
-    document.getElementById('modalTitle').textContent = isLogin ? 'Welcome back' : 'Create your account';
-    document.getElementById('modalSub').textContent = isLogin
-      ? 'Log in to continue your preparation'
-      : 'Join 50,000+ students already preparing';
-  }
-
-  // ── Scroll animation ──
-  const obs = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        e.target.style.opacity='1';
-        e.target.style.transform='translateY(0)';
-      }
-    });
-  },{threshold:0.1});
-  document.querySelectorAll('.exam-card,.feat-card,.step').forEach(el=>{
-    el.style.opacity='0';
-    el.style.transform='translateY(24px)';
-    el.style.transition='opacity 0.5s ease, transform 0.5s ease';
-    obs.observe(el);
+// ── Scroll animations ─────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
   });
+}, { threshold: 0.1 });
+document.querySelectorAll('.exam-card,.feat-card,.step').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(24px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  obs.observe(el);
+});
 </script>
 </body>
 </html>
