@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExamForge — Mock Test Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: #2a2a3d;
+      --accent: #6c63ff;
+      --accent2: #ff6b6b;
+      --accent3: #43e97b;
+      --accent4: #f7971e;
+      --text: #e8e8f0;
+      --text-muted: #6b6b8a;
+      --text-dim: #9999b8;
+      --glow: rgba(108,99,255,0.3);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise texture overlay ── */
+    body::before {
+      content:'';
+      position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family:'Syne',sans-serif;
+      font-size:1.3rem; font-weight:800;
+      letter-spacing:-0.02em;
+      display:flex; align-items:center; gap:0.5rem;
+    }
+    .nav-logo span { color:var(--accent); }
+    .logo-dot {
+      width:8px; height:8px; border-radius:50%;
+      background:var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .nav-links { display:flex; gap:2rem; }
+    .nav-links a {
+      color:var(--text-dim); text-decoration:none;
+      font-size:0.875rem; font-weight:500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color:var(--text); }
+
+    .nav-cta {
+      display:flex; gap:1rem; align-items:center;
+    }
+    .btn-ghost {
+      background:none; border:1px solid var(--border);
+      color:var(--text-dim); padding:0.45rem 1.1rem;
+      border-radius:8px; font-family:'DM Sans',sans-serif;
+      font-size:0.875rem; cursor:pointer;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+
+    .btn-primary {
+      background:var(--accent); border:none;
+      color:#fff; padding:0.45rem 1.2rem;
+      border-radius:8px; font-family:'DM Sans',sans-serif;
+      font-size:0.875rem; font-weight:500; cursor:pointer;
+      box-shadow: 0 0 20px var(--glow);
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 0 30px var(--glow); }
+
+    /* ── HERO ── */
+    .hero {
+      position:relative; z-index:1;
+      min-height: 100vh;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center;
+      padding: 6rem 2rem 4rem;
+      overflow:hidden;
+    }
+    .hero-grid {
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(rgba(108,99,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108,99,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+    }
+    .hero-glow {
+      position:absolute;
+      width:600px; height:600px;
+      background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+      top:50%; left:50%; transform:translate(-50%,-60%);
+      pointer-events:none;
+    }
+
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:0.5rem;
+      background:rgba(108,99,255,0.1); border:1px solid rgba(108,99,255,0.3);
+      border-radius:99px; padding:0.3rem 1rem;
+      font-size:0.75rem; font-family:'DM Mono',monospace;
+      color:var(--accent); margin-bottom:1.5rem;
+      animation: fadeUp 0.6s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .hero h1 {
+      font-family:'Syne',sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight:800; line-height:1.05;
+      letter-spacing:-0.03em;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    .hero h1 em {
+      font-style:normal;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .hero p {
+      margin-top:1.2rem;
+      color:var(--text-dim); font-size:1.15rem; max-width:540px;
+      line-height:1.7;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+    .hero-actions {
+      margin-top:2.5rem; display:flex; gap:1rem;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .btn-big {
+      padding: 0.85rem 2.2rem; border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:500;
+      cursor:pointer; transition:all 0.2s;
+    }
+    .btn-big.primary {
+      background:var(--accent); color:#fff; border:none;
+      box-shadow: 0 0 30px var(--glow);
+    }
+    .btn-big.primary:hover { transform:translateY(-2px); box-shadow:0 0 40px var(--glow); }
+    .btn-big.outline {
+      background:none; color:var(--text-dim);
+      border:1px solid var(--border);
+    }
+    .btn-big.outline:hover { border-color:var(--text-dim); color:var(--text); }
+
+    .hero-stats {
+      margin-top:4rem;
+      display:flex; gap:3rem;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    .stat { text-align:center; }
+    .stat-num {
+      font-family:'Syne',sans-serif; font-size:2rem; font-weight:700;
+      color:var(--text);
+    }
+    .stat-label { font-size:0.8rem; color:var(--text-muted); margin-top:2px; }
+
+    /* ── EXAM CARDS ── */
+    .section { position:relative; z-index:1; padding:5rem 2rem; }
+    .section-label {
+      font-family:'DM Mono',monospace; font-size:0.75rem;
+      color:var(--accent); letter-spacing:0.12em; text-transform:uppercase;
+      margin-bottom:0.75rem;
+    }
+    .section-title {
+      font-family:'Syne',sans-serif; font-size:clamp(1.8rem,4vw,2.8rem);
+      font-weight:800; letter-spacing:-0.02em;
+    }
+    .section-sub {
+      color:var(--text-muted); font-size:1rem; margin-top:0.5rem;
+      max-width:480px;
+    }
+
+    .exams-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap:1.5rem; margin-top:3rem;
+      max-width:1200px; margin-left:auto; margin-right:auto;
+    }
+    .exam-card {
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:16px; padding:2rem;
+      cursor:pointer; position:relative; overflow:hidden;
+      transition: all 0.3s ease;
+      text-align:left;
+    }
+    .exam-card::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0; height:2px;
+      background:var(--card-accent, var(--accent));
+      opacity:0; transition:opacity 0.3s;
+    }
+    .exam-card:hover {
+      transform:translateY(-4px);
+      border-color:var(--card-accent, var(--accent));
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .exam-card:hover::before { opacity:1; }
+
+    .card-jee { --card-accent: #6c63ff; }
+    .card-advanced { --card-accent: #ff6b6b; }
+    .card-mhtcet { --card-accent: #43e97b; }
+    .card-bitsat { --card-accent: #f7971e; }
+
+    .exam-icon {
+      width:52px; height:52px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; margin-bottom:1.2rem;
+      background:var(--icon-bg, rgba(108,99,255,0.1));
+    }
+    .card-jee .exam-icon { --icon-bg: rgba(108,99,255,0.12); }
+    .card-advanced .exam-icon { --icon-bg: rgba(255,107,107,0.12); }
+    .card-mhtcet .exam-icon { --icon-bg: rgba(67,233,123,0.12); }
+    .card-bitsat .exam-icon { --icon-bg: rgba(247,151,30,0.12); }
+
+    .exam-name {
+      font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:700;
+    }
+    .exam-full {
+      font-size:0.8rem; color:var(--text-muted); margin-top:2px;
+      font-family:'DM Mono',monospace;
+    }
+    .exam-desc {
+      font-size:0.875rem; color:var(--text-dim); margin-top:0.75rem;
+      line-height:1.6;
+    }
+    .exam-meta {
+      display:flex; gap:1rem; margin-top:1.2rem;
+      flex-wrap:wrap;
+    }
+    .meta-pill {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:6px; padding:0.25rem 0.6rem;
+      font-size:0.75rem; font-family:'DM Mono',monospace;
+      color:var(--text-muted);
+    }
+    .exam-cta {
+      margin-top:1.5rem;
+      display:inline-flex; align-items:center; gap:0.5rem;
+      font-size:0.875rem; font-weight:500;
+      color:var(--card-accent, var(--accent));
+      cursor:pointer; text-decoration:none;
+      transition: gap 0.2s;
+    }
+    .exam-card:hover .exam-cta { gap:0.8rem; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap:1rem; margin-top:3rem;
+      max-width:1200px; margin-left:auto; margin-right:auto;
+    }
+    .feat-card {
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:12px; padding:1.5rem;
+    }
+    .feat-icon {
+      font-size:1.6rem; margin-bottom:0.8rem;
+    }
+    .feat-title {
+      font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;
+      margin-bottom:0.4rem;
+    }
+    .feat-desc {
+      font-size:0.85rem; color:var(--text-muted); line-height:1.6;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display:flex; gap:0;
+      max-width:900px; margin:3rem auto 0;
+      position:relative;
+    }
+    .steps::before {
+      content:'';
+      position:absolute; top:28px; left:60px; right:60px; height:1px;
+      background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
+    }
+    .step {
+      flex:1; text-align:center; padding:0 1.5rem;
+    }
+    .step-num {
+      width:56px; height:56px; border-radius:12px;
+      background:var(--surface); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700;
+      margin:0 auto 1rem; position:relative; z-index:1;
+      color:var(--accent);
+    }
+    .step-title {
+      font-family:'Syne',sans-serif; font-weight:600; margin-bottom:0.4rem;
+    }
+    .step-desc { font-size:0.85rem; color:var(--text-muted); line-height:1.6; }
+
+    /* ── TEST INTERFACE PREVIEW ── */
+    .preview-wrapper {
+      max-width:1000px; margin:3rem auto 0;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:20px; overflow:hidden;
+    }
+    .preview-bar {
+      background:var(--surface2); padding:0.75rem 1.5rem;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:1rem;
+    }
+    .pbar-dots { display:flex; gap:6px; }
+    .pbar-dot {
+      width:10px; height:10px; border-radius:50%;
+    }
+    .pbar-dot:nth-child(1) { background:#ff5f57; }
+    .pbar-dot:nth-child(2) { background:#febc2e; }
+    .pbar-dot:nth-child(3) { background:#28c840; }
+    .pbar-title {
+      font-family:'DM Mono',monospace; font-size:0.8rem;
+      color:var(--text-muted); flex:1; text-align:center;
+    }
+    .pbar-timer {
+      font-family:'DM Mono',monospace; font-size:0.875rem;
+      color:var(--accent2); font-weight:500;
+    }
+
+    .preview-body {
+      display:grid; grid-template-columns:1fr 260px;
+    }
+    .preview-main { padding:2rem; border-right:1px solid var(--border); }
+    .q-section {
+      font-family:'DM Mono',monospace; font-size:0.7rem;
+      color:var(--accent); text-transform:uppercase; letter-spacing:0.1em;
+      margin-bottom:0.5rem;
+    }
+    .q-num {
+      font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;
+    }
+    .q-text {
+      font-size:1rem; line-height:1.7; margin-bottom:1.5rem;
+      color:var(--text);
+    }
+    .q-options { display:flex; flex-direction:column; gap:0.75rem; }
+    .q-option {
+      display:flex; align-items:center; gap:0.75rem;
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:10px; padding:0.75rem 1rem;
+      cursor:pointer; transition:all 0.15s;
+    }
+    .q-option:hover { border-color:var(--accent); }
+    .q-option.selected {
+      background:rgba(108,99,255,0.1); border-color:var(--accent);
+    }
+    .q-option-label {
+      width:28px; height:28px; border-radius:8px;
+      background:var(--border); display:flex; align-items:center;
+      justify-content:center; font-family:'DM Mono',monospace;
+      font-size:0.8rem; font-weight:500; flex-shrink:0;
+    }
+    .q-option.selected .q-option-label {
+      background:var(--accent); color:#fff;
+    }
+    .q-option-text { font-size:0.9rem; }
+    .q-nav { display:flex; gap:0.75rem; margin-top:1.5rem; }
+    .q-btn {
+      padding:0.5rem 1.2rem; border-radius:8px;
+      font-family:'DM Sans',sans-serif; font-size:0.875rem;
+      cursor:pointer; transition:all 0.15s;
+    }
+    .q-btn.primary {
+      background:var(--accent); color:#fff; border:none;
+    }
+    .q-btn.secondary {
+      background:none; color:var(--text-dim); border:1px solid var(--border);
+    }
+
+    .preview-sidebar { padding:1.5rem; }
+    .sidebar-title {
+      font-family:'Syne',sans-serif; font-size:0.85rem; font-weight:700;
+      margin-bottom:1rem; color:var(--text-dim);
+    }
+    .q-palette {
+      display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
+    }
+    .palette-item {
+      aspect-ratio:1; border-radius:6px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.75rem; font-family:'DM Mono',monospace;
+      cursor:pointer; transition:all 0.15s;
+      border:1px solid transparent;
+    }
+    .palette-item.answered {
+      background:rgba(67,233,123,0.15); border-color:var(--accent3);
+      color:var(--accent3);
+    }
+    .palette-item.current {
+      background:rgba(108,99,255,0.2); border-color:var(--accent);
+      color:var(--accent);
+    }
+    .palette-item.skipped {
+      background:rgba(255,107,107,0.1); border-color:rgba(255,107,107,0.4);
+      color:var(--accent2);
+    }
+    .palette-item.unmarked {
+      background:var(--surface2); border-color:var(--border);
+      color:var(--text-muted);
+    }
+    .palette-legend {
+      margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem;
+    }
+    .legend-item {
+      display:flex; align-items:center; gap:0.5rem;
+      font-size:0.75rem; color:var(--text-muted);
+    }
+    .legend-dot {
+      width:10px; height:10px; border-radius:3px; flex-shrink:0;
+    }
+    .sidebar-divider {
+      border:none; border-top:1px solid var(--border);
+      margin:1.2rem 0;
+    }
+    .marking-scheme { font-size:0.8rem; color:var(--text-muted); }
+    .marking-row { display:flex; justify-content:space-between; padding:0.3rem 0; }
+    .mark-pos { color:var(--accent3); font-family:'DM Mono',monospace; }
+    .mark-neg { color:var(--accent2); font-family:'DM Mono',monospace; }
+
+    /* ── LEADERBOARD PREVIEW ── */
+    .leaderboard {
+      max-width:700px; margin:3rem auto 0;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:16px; overflow:hidden;
+    }
+    .lb-header {
+      padding:1.2rem 1.5rem;
+      background:var(--surface2);
+      border-bottom:1px solid var(--border);
+      font-family:'Syne',sans-serif; font-weight:700;
+    }
+    .lb-row {
+      display:flex; align-items:center;
+      padding:1rem 1.5rem; gap:1rem;
+      border-bottom:1px solid var(--border);
+      transition:background 0.15s;
+    }
+    .lb-row:last-child { border-bottom:none; }
+    .lb-row:hover { background:var(--surface2); }
+    .lb-rank {
+      font-family:'DM Mono',monospace; font-size:0.9rem;
+      width:2rem; text-align:center;
+    }
+    .lb-rank.gold { color:#ffd700; }
+    .lb-rank.silver { color:#c0c0c0; }
+    .lb-rank.bronze { color:#cd7f32; }
+    .lb-avatar {
+      width:36px; height:36px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:600; font-size:0.85rem; flex-shrink:0;
+    }
+    .lb-name { flex:1; font-weight:500; }
+    .lb-exam { font-size:0.75rem; color:var(--text-muted); }
+    .lb-score {
+      font-family:'DM Mono',monospace; font-size:1rem;
+      font-weight:500; color:var(--accent);
+    }
+    .lb-time { font-size:0.75rem; color:var(--text-muted); font-family:'DM Mono',monospace; }
+
+    /* ── FOOTER ── */
+    footer {
+      position:relative; z-index:1;
+      border-top:1px solid var(--border);
+      padding:3rem 2rem;
+      display:flex; justify-content:space-between; align-items:center;
+      flex-wrap:wrap; gap:1rem;
+    }
+    .footer-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; }
+    .footer-logo span { color:var(--accent); }
+    .footer-links { display:flex; gap:2rem; }
+    .footer-links a {
+      color:var(--text-muted); font-size:0.875rem;
+      text-decoration:none; transition:color 0.2s;
+    }
+    .footer-links a:hover { color:var(--text); }
+    .footer-copy { color:var(--text-muted); font-size:0.8rem; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; z-index:200;
+      background:rgba(10,10,15,0.85); backdrop-filter:blur(8px);
+      align-items:center; justify-content:center;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal {
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:20px; padding:2.5rem;
+      width:100%; max-width:440px;
+      position:relative;
+      animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform:scale(0.95) translateY(10px); }
+      to   { opacity:1; transform:scale(1) translateY(0); }
+    }
+    .modal-close {
+      position:absolute; top:1.2rem; right:1.2rem;
+      background:none; border:none; cursor:pointer;
+      color:var(--text-muted); font-size:1.2rem; line-height:1;
+    }
+    .modal-title {
+      font-family:'Syne',sans-serif; font-size:1.5rem;
+      font-weight:800; margin-bottom:0.4rem;
+    }
+    .modal-sub { color:var(--text-muted); font-size:0.875rem; margin-bottom:2rem; }
+    .form-group { margin-bottom:1.2rem; }
+    .form-label {
+      font-size:0.8rem; font-weight:500; color:var(--text-dim);
+      display:block; margin-bottom:0.4rem;
+      font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:0.05em;
+    }
+    .form-input {
+      width:100%; background:var(--surface2);
+      border:1px solid var(--border); border-radius:10px;
+      padding:0.75rem 1rem; color:var(--text);
+      font-family:'DM Sans',sans-serif; font-size:0.9rem;
+      outline:none; transition:border-color 0.2s;
+    }
+    .form-input:focus { border-color:var(--accent); }
+    .form-input::placeholder { color:var(--text-muted); }
+    .modal-btn {
+      width:100%; background:var(--accent); color:#fff;
+      border:none; border-radius:10px; padding:0.85rem;
+      font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:500;
+      cursor:pointer; margin-top:0.5rem;
+      box-shadow:0 0 24px var(--glow);
+      transition:all 0.2s;
+    }
+    .modal-btn:hover { transform:translateY(-1px); box-shadow:0 0 32px var(--glow); }
+    .modal-switch {
+      text-align:center; margin-top:1.2rem;
+      font-size:0.875rem; color:var(--text-muted);
+    }
+    .modal-switch a { color:var(--accent); text-decoration:none; cursor:pointer; }
+    .tab-row { display:flex; gap:0.5rem; margin-bottom:1.8rem; }
+    .tab-btn {
+      flex:1; padding:0.5rem; border-radius:8px;
+      font-family:'DM Sans',sans-serif; font-size:0.875rem;
+      font-weight:500; cursor:pointer; border:1px solid var(--border);
+      background:none; color:var(--text-muted);
+      transition:all 0.2s;
+    }
+    .tab-btn.active {
+      background:var(--accent); color:#fff; border-color:var(--accent);
+    }
+    .divider-text {
+      text-align:center; position:relative; margin:1.2rem 0;
+      font-size:0.8rem; color:var(--text-muted);
+    }
+    .divider-text::before, .divider-text::after {
+      content:''; position:absolute; top:50%; width:38%;
+      height:1px; background:var(--border);
+    }
+    .divider-text::before { left:0; }
+    .divider-text::after { right:0; }
+
+    /* ── CENTER WRAPPER ── */
+    .container { max-width:1200px; margin:0 auto; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+    @media(max-width:768px) {
+      .nav-links { display:none; }
+      .hero-stats { gap:2rem; flex-wrap:wrap; justify-content:center; }
+      .steps { flex-direction:column; }
+      .steps::before { display:none; }
+      .preview-body { grid-template-columns:1fr; }
+      .preview-sidebar { display:none; }
+      footer { flex-direction:column; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-dot"></div>
+    Exam<span>Forge</span>
+  </div>
+  <div class="nav-links">
+    <a href="#exams">Exams</a>
+    <a href="#features">Features</a>
+    <a href="#leaderboard">Leaderboard</a>
+    <a href="#how">How it works</a>
+  </div>
+  <div class="nav-cta">
+    <button class="btn-ghost" onclick="openModal('login')">Log in</button>
+    <button class="btn-primary" onclick="openModal('signup')">Get started</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-badge">
+    <span>⚡</span> JEE · MHTCET · BITSAT · ADVANCED
+  </div>
+  <h1>Crack your exam.<br/>Train with <em>real pressure</em>.</h1>
+  <p>Timed mock tests, detailed analytics, and leaderboards — built for serious aspirants who want to go beyond the textbook.</p>
+  <div class="hero-actions">
+    <button class="btn-big primary" onclick="openModal('signup')">Start a Free Test →</button>
+    <button class="btn-big outline" onclick="document.getElementById('exams').scrollIntoView({behavior:'smooth'})">Browse Exams</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">50K+</div>
+      <div class="stat-label">Students enrolled</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">2,400+</div>
+      <div class="stat-label">Mock tests available</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">98%</div>
+      <div class="stat-label">Satisfaction rate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Major exams covered</div>
+    </div>
+  </div>
+</section>
+
+<!-- EXAM CARDS -->
+<section class="section" id="exams">
+  <div class="container">
+    <div class="section-label">// Choose your battleground</div>
+    <h2 class="section-title">Pick Your Exam</h2>
+    <p class="section-sub">Authentic patterns, latest syllabi, and real difficulty levels.</p>
+
+    <div class="exams-grid">
+
+      <div class="exam-card card-jee" onclick="openModal('signup')">
+        <div class="exam-icon">🎯</div>
+        <div class="exam-name">JEE Mains</div>
+        <div class="exam-full">Joint Entrance Examination — Main</div>
+        <div class="exam-desc">Full-length 3-hour CBT tests with Physics, Chemistry & Mathematics. NTA pattern with integer type, MCQ, and numerical questions.</div>
+        <div class="exam-meta">
+          <span class="meta-pill">90 Questions</span>
+          <span class="meta-pill">3 Hours</span>
+          <span class="meta-pill">300 Marks</span>
+        </div>
+        <div class="exam-cta">Start Test →</div>
+      </div>
+
+      <div class="exam-card card-advanced" onclick="openModal('signup')">
+        <div class="exam-icon">🔥</div>
+        <div class="exam-name">JEE Advanced</div>
+        <div class="exam-full">Joint Entrance Examination — Advanced</div>
+        <div class="exam-desc">Paper 1 & 2 combined. Complex multi-correct, paragraph, and matching questions. IIT-level difficulty with negative marking.</div>
+        <div class="exam-meta">
+          <span class="meta-pill">Paper 1 + 2</span>
+          <span class="meta-pill">6 Hours</span>
+          <span class="meta-pill">360 Marks</span>
+        </div>
+        <div class="exam-cta">Start Test →</div>
+      </div>
+
+      <div class="exam-card card-mhtcet" onclick="openModal('signup')">
+        <div class="exam-icon">🌿</div>
+        <div class="exam-name">MHT CET</div>
+        <div class="exam-full">Maharashtra Common Entrance Test</div>
+        <div class="exam-desc">Two separate papers: PCM and PCB. Based on Maharashtra HSC curriculum. No negative marking. 100 questions per paper.</div>
+        <div class="exam-meta">
+          <span class="meta-pill">100 Questions</span>
+          <span class="meta-pill">90 Minutes</span>
+          <span class="meta-pill">200 Marks</span>
+        </div>
+        <div class="exam-cta">Start Test →</div>
+      </div>
+
+      <div class="exam-card card-bitsat" onclick="openModal('signup')">
+        <div class="exam-icon">⚡</div>
+        <div class="exam-name">BITSAT</div>
+        <div class="exam-full">BITS Pilani Aptitude Test</div>
+        <div class="exam-desc">150 questions in 3 hours including English Proficiency & Logical Reasoning. Unique feature: 12 bonus questions if time permits.</div>
+        <div class="exam-meta">
+          <span class="meta-pill">150 Questions</span>
+          <span class="meta-pill">3 Hours</span>
+          <span class="meta-pill">486 Marks</span>
+        </div>
+        <div class="exam-cta">Start Test →</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TEST INTERFACE PREVIEW -->
+<section class="section">
+  <div class="container">
+    <div class="section-label">// What it feels like</div>
+    <h2 class="section-title">Real Exam Interface</h2>
+    <p class="section-sub">Pixel-accurate CBT simulation. No surprises on exam day.</p>
+
+    <div class="preview-wrapper">
+      <div class="preview-bar">
+        <div class="pbar-dots">
+          <div class="pbar-dot"></div>
+          <div class="pbar-dot"></div>
+          <div class="pbar-dot"></div>
+        </div>
+        <div class="pbar-title">JEE Mains Mock Test — Paper 1 — Physics</div>
+        <div class="pbar-timer">01:47:23</div>
+      </div>
+      <div class="preview-body">
+        <div class="preview-main">
+          <div class="q-section">Section A — Single Correct</div>
+          <div class="q-num">Question 7 of 90</div>
+          <div class="q-text">
+            A particle executes simple harmonic motion with amplitude <em>A</em>. At the mean position, its velocity is <em>v₀</em>. What is the kinetic energy of the particle when it is at a distance <em>A/2</em> from the mean position?
+          </div>
+          <div class="q-options">
+            <div class="q-option">
+              <div class="q-option-label">A</div>
+              <div class="q-option-text">½mv₀²</div>
+            </div>
+            <div class="q-option selected">
+              <div class="q-option-label">B</div>
+              <div class="q-option-text">¾ × ½mv₀²</div>
+            </div>
+            <div class="q-option">
+              <div class="q-option-label">C</div>
+              <div class="q-option-text">¼ × ½mv₀²</div>
+            </div>
+            <div class="q-option">
+              <div class="q-option-label">D</div>
+              <div class="q-option-text">½ × ½mv₀²</div>
+            </div>
+          </div>
+          <div class="q-nav">
+            <button class="q-btn secondary">← Previous</button>
+            <button class="q-btn secondary">Mark for Review</button>
+            <button class="q-btn primary">Save & Next →</button>
+          </div>
+        </div>
+        <div class="preview-sidebar">
+          <div class="sidebar-title">Question Palette</div>
+          <div class="q-palette" id="palette"></div>
+          <div class="palette-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(67,233,123,0.3);border:1px solid #43e97b"></div> Answered
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(108,99,255,0.2);border:1px solid #6c63ff"></div> Current
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.4)"></div> Skipped
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#1a1a26;border:1px solid #2a2a3d"></div> Not visited
+            </div>
+          </div>
+          <hr class="sidebar-divider"/>
+          <div class="sidebar-title">Marking Scheme</div>
+          <div class="marking-scheme">
+            <div class="marking-row"><span>Correct</span><span class="mark-pos">+4</span></div>
+            <div class="marking-row"><span>Wrong</span><span class="mark-neg">−1</span></div>
+            <div class="marking-row"><span>Unattempted</span><span>0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-label">// Under the hood</div>
+    <h2 class="section-title">Everything You Need</h2>
+    <p class="section-sub">Built for aspirants, not just test-takers.</p>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Detailed Analytics</div>
+        <div class="feat-desc">Subject-wise, chapter-wise, and difficulty-wise breakdowns after every test. Know exactly where you're losing marks.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⏱️</div>
+        <div class="feat-title">Timed Simulation</div>
+        <div class="feat-desc">Real countdown timer, auto-submit, and time-per-question tracking — just like the actual CBT.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🧠</div>
+        <div class="feat-title">Smart Solutions</div>
+        <div class="feat-desc">Step-by-step solutions with conceptual explanations for every question after test submission.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏆</div>
+        <div class="feat-title">Live Leaderboards</div>
+        <div class="feat-desc">See how you rank among thousands of aspirants in real-time. Filter by exam and test series.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📱</div>
+        <div class="feat-title">Cross-Device</div>
+        <div class="feat-desc">Start on your laptop, continue on your phone. Progress, test history, and analytics sync instantly.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔁</div>
+        <div class="feat-title">Reattempt Mode</div>
+        <div class="feat-desc">Redo any previous test with fresh timer. Track improvement over multiple attempts with side-by-side comparison.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="container">
+    <div class="section-label">// The process</div>
+    <h2 class="section-title">How It Works</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Create Account</div>
+        <div class="step-desc">Sign up with your email. No credit card required to start with free tests.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Choose an Exam</div>
+        <div class="step-desc">Pick from JEE Mains, Advanced, MHTCET or BITSAT. Filter by year or difficulty.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Take the Test</div>
+        <div class="step-desc">Full CBT simulation with authentic interface. No interruptions, no shortcuts.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Analyse & Improve</div>
+        <div class="step-desc">Get your scorecard, review solutions, and see your rank on the leaderboard.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEADERBOARD PREVIEW -->
+<section class="section" id="leaderboard">
+  <div class="container">
+    <div class="section-label">// This week's top scorers</div>
+    <h2 class="section-title">Leaderboard</h2>
+    <p class="section-sub">Compete with the best. See where you stand.</p>
+
+    <div class="leaderboard">
+      <div class="lb-header">🏆 JEE Mains — Weekly Challenge</div>
+      <div class="lb-row">
+        <div class="lb-rank gold">1</div>
+        <div class="lb-avatar" style="background:rgba(108,99,255,0.2);color:#a78bfa">AR</div>
+        <div>
+          <div class="lb-name">Arjun R.</div>
+          <div class="lb-exam">JEE Mains Full Test</div>
+        </div>
+        <div>
+          <div class="lb-score">278/300</div>
+          <div class="lb-time">2h 41m</div>
+        </div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank silver">2</div>
+        <div class="lb-avatar" style="background:rgba(67,233,123,0.15);color:#43e97b">PS</div>
+        <div>
+          <div class="lb-name">Priya S.</div>
+          <div class="lb-exam">JEE Mains Full Test</div>
+        </div>
+        <div>
+          <div class="lb-score">271/300</div>
+          <div class="lb-time">2h 56m</div>
+        </div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank bronze">3</div>
+        <div class="lb-avatar" style="background:rgba(247,151,30,0.15);color:#f7971e">KM</div>
+        <div>
+          <div class="lb-name">Karthik M.</div>
+          <div class="lb-exam">JEE Mains Full Test</div>
+        </div>
+        <div>
+          <div class="lb-score">265/300</div>
+          <div class="lb-time">2h 48m</div>
+        </div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank" style="color:var(--text-muted)">4</div>
+        <div class="lb-avatar" style="background:rgba(255,107,107,0.12);color:#ff6b6b">SA</div>
+        <div>
+          <div class="lb-name">Sneha A.</div>
+          <div class="lb-exam">JEE Mains Full Test</div>
+        </div>
+        <div>
+          <div class="lb-score">258/300</div>
+          <div class="lb-time">2h 59m</div>
+        </div>
+      </div>
+      <div class="lb-row" style="background:rgba(108,99,255,0.04)">
+        <div class="lb-rank" style="color:var(--accent)">—</div>
+        <div class="lb-avatar" style="background:rgba(108,99,255,0.15);color:var(--accent)">You</div>
+        <div>
+          <div class="lb-name">Your Position</div>
+          <div class="lb-exam">Take a test to appear here</div>
+        </div>
+        <div>
+          <div class="lb-score" style="color:var(--text-muted)">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Exam<span>Forge</span></div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+    <a href="#">About</a>
+  </div>
+  <div class="footer-copy">© 2026 ExamForge. All rights reserved.</div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modalTitle">Welcome back</div>
+    <div class="modal-sub" id="modalSub">Log in to continue your preparation</div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Log in</button>
+      <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Sign up</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="login-email" placeholder="you@example.com"
+               onkeydown="if(event.key==='Enter') handleLogin()"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="login-password" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter') handleLogin()"/>
+      </div>
+      <div id="login-error" style="color:#ff6b6b;font-size:0.8rem;min-height:18px;margin-bottom:0.5rem"></div>
+      <button class="modal-btn" id="login-btn" onclick="handleLogin()">Log in →</button>
+      <div class="divider-text">or</div>
+      <button class="modal-btn" id="google-login-btn" onclick="handleGoogleAuth()"
+              style="background:var(--surface2);color:var(--text);border:1px solid var(--border);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="signup-name" placeholder="Arjun Rao"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="signup-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="signup-password" placeholder="At least 6 characters"
+               onkeydown="if(event.key==='Enter') handleSignup()"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Target Exam</label>
+        <select class="form-input" id="signup-exam">
+          <option value="">Select your primary exam</option>
+          <option value="JEE Mains">JEE Mains</option>
+          <option value="JEE Advanced">JEE Advanced</option>
+          <option value="MHT CET">MHT CET</option>
+          <option value="BITSAT">BITSAT</option>
+        </select>
+      </div>
+      <div id="signup-error" style="color:#ff6b6b;font-size:0.8rem;min-height:18px;margin-bottom:0.5rem"></div>
+      <button class="modal-btn" id="signup-btn" onclick="handleSignup()">Create Account →</button>
+      <div class="divider-text">or</div>
+      <button class="modal-btn" onclick="handleGoogleAuth()"
+              style="background:var(--surface2);color:var(--text);border:1px solid var(--border);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Sign up with Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div id="site-toast" style="
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);
+  background:#1a1a26;border:1px solid #2a2a3d;border-radius:10px;
+  padding:0.65rem 1.25rem;font-size:0.875rem;color:#e8e8f0;
+  transition:transform 0.3s ease;z-index:500;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);white-space:nowrap;pointer-events:none;
+" id="toast"></div>
+
+<!-- Firebase SDK + Auth Logic -->
+<script type="module">
+import { initializeApp }          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+         createUserWithEmailAndPassword, GoogleAuthProvider,
+         signInWithPopup, signOut, updateProfile }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+// ──────────────────────────────────────────────────────────────
+
+const app      = initializeApp(firebaseConfig);
+const auth     = getAuth(app);
+const db       = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+// ── Watch auth state — update nav when logged in/out ──────────
+onAuthStateChanged(auth, user => {
+  const navCta = document.querySelector('.nav-cta');
+  if (user) {
+    const initials = (user.displayName || user.email || 'U')
+      .split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    navCta.innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <div style="width:34px;height:34px;border-radius:9px;background:rgba(108,99,255,0.15);
+             border:1px solid rgba(108,99,255,0.3);display:flex;align-items:center;
+             justify-content:center;font-family:'DM Mono',monospace;font-size:0.8rem;
+             color:#6c63ff;font-weight:500;">${initials}</div>
+        <span style="font-size:0.875rem;color:#9999b8">${user.displayName || user.email}</span>
+        <button onclick="handleLogout()" style="background:none;border:1px solid #2a2a3d;
+          color:#6b6b8a;padding:0.35rem 0.8rem;border-radius:7px;font-family:'DM Sans',sans-serif;
+          font-size:0.8rem;cursor:pointer;">Log out</button>
+      </div>`;
+  } else {
+    navCta.innerHTML = `
+      <button class="btn-ghost" onclick="openModal('login')">Log in</button>
+      <button class="btn-primary" onclick="openModal('signup')">Get started</button>`;
+  }
+});
+
+// ── Helpers ───────────────────────────────────────────────────
+function setLoading(btnId, loading, defaultText) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Please wait…' : defaultText;
+  btn.style.opacity = loading ? '0.7' : '1';
+}
+
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  if (el) el.textContent = msg;
+}
+
+function clearErrors() {
+  ['login-error','signup-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+}
+
+function friendlyError(code) {
+  const map = {
+    'auth/user-not-found':      'No account found with this email.',
+    'auth/wrong-password':      'Incorrect password. Please try again.',
+    'auth/invalid-credential':  'Incorrect email or password.',
+    'auth/email-already-in-use':'An account with this email already exists.',
+    'auth/weak-password':       'Password must be at least 6 characters.',
+    'auth/invalid-email':       'Please enter a valid email address.',
+    'auth/too-many-requests':   'Too many attempts. Please try again later.',
+    'auth/popup-closed-by-user':'Sign-in popup was closed. Please try again.',
+    'auth/network-request-failed': 'Network error. Check your connection.',
+  };
+  return map[code] || 'Something went wrong. Please try again.';
+}
+
+async function saveUserProfile(user, extra = {}) {
+  const ref = doc(db, 'users', user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      displayName: user.displayName || extra.displayName || '',
+      email:       user.email,
+      targetExam:  extra.targetExam || '',
+      role:        'student',
+      createdAt:   serverTimestamp(),
+    });
+  }
+}
+
+function onAuthSuccess(user) {
+  closeModal();
+  showToast('👋 Welcome, ' + (user.displayName || user.email.split('@')[0]) + '!');
+}
+
+// ── Login ─────────────────────────────────────────────────────
+window.handleLogin = async () => {
+  clearErrors();
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { showError('login-error', 'Please enter your email and password.'); return; }
+  setLoading('login-btn', true, 'Log in →');
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    onAuthSuccess(cred.user);
+  } catch(e) {
+    showError('login-error', friendlyError(e.code));
+  } finally {
+    setLoading('login-btn', false, 'Log in →');
+  }
+};
+
+// ── Signup ────────────────────────────────────────────────────
+window.handleSignup = async () => {
+  clearErrors();
+  const name     = document.getElementById('signup-name').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const exam     = document.getElementById('signup-exam').value;
+  if (!name)     { showError('signup-error', 'Please enter your full name.'); return; }
+  if (!email)    { showError('signup-error', 'Please enter your email.'); return; }
+  if (!password) { showError('signup-error', 'Please enter a password.'); return; }
+  setLoading('signup-btn', true, 'Create Account →');
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(cred.user, { displayName: name });
+    await saveUserProfile(cred.user, { displayName: name, targetExam: exam });
+    onAuthSuccess(cred.user);
+  } catch(e) {
+    showError('signup-error', friendlyError(e.code));
+  } finally {
+    setLoading('signup-btn', false, 'Create Account →');
+  }
+};
+
+// ── Google Auth ───────────────────────────────────────────────
+window.handleGoogleAuth = async () => {
+  clearErrors();
+  try {
+    const cred = await signInWithPopup(auth, provider);
+    await saveUserProfile(cred.user);
+    onAuthSuccess(cred.user);
+  } catch(e) {
+    const errId = document.getElementById('signupForm').style.display === 'none'
+      ? 'login-error' : 'signup-error';
+    showError(errId, friendlyError(e.code));
+  }
+};
+
+// ── Logout ────────────────────────────────────────────────────
+window.handleLogout = async () => {
+  await signOut(auth);
+  showToast('Logged out successfully.');
+};
+
+// ── Modal controls ────────────────────────────────────────────
+window.openModal = (type) => {
+  clearErrors();
+  document.getElementById('authModal').classList.add('open');
+  switchTab(type);
+};
+window.closeModal = () => {
+  document.getElementById('authModal').classList.remove('open');
+};
+window.closeModalOutside = (e) => {
+  if (e.target === document.getElementById('authModal')) closeModal();
+};
+window.switchTab = (tab) => {
+  clearErrors();
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').style.display  = isLogin ? '' : 'none';
+  document.getElementById('signupForm').style.display = isLogin ? 'none' : '';
+  document.getElementById('tabLogin').className  = 'tab-btn' + (isLogin ? ' active' : '');
+  document.getElementById('tabSignup').className = 'tab-btn' + (!isLogin ? ' active' : '');
+  document.getElementById('modalTitle').textContent = isLogin ? 'Welcome back' : 'Create your account';
+  document.getElementById('modalSub').textContent   = isLogin
+    ? 'Log in to continue your preparation'
+    : 'Join 50,000+ students already preparing';
+};
+
+// ── Toast ─────────────────────────────────────────────────────
+let toastTimer;
+window.showToast = (msg) => {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.style.transform = 'translateX(-50%) translateY(80px)';
+  }, 3000);
+};
+
+// ── Question palette (preview) ────────────────────────────────
+const palette = document.getElementById('palette');
+if (palette) {
+  const states = ['answered','answered','answered','answered','answered',
+    'current','skipped','skipped','unmarked','unmarked',
+    'unmarked','unmarked','unmarked','unmarked','unmarked',
+    'unmarked','unmarked','unmarked','unmarked','unmarked'];
+  for (let i = 0; i < 20; i++) {
+    const d = document.createElement('div');
+    d.className = `palette-item ${states[i] || 'unmarked'}`;
+    d.textContent = i + 1;
+    palette.appendChild(d);
+  }
+}
+
+// ── Scroll animations ─────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.exam-card,.feat-card,.step').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(24px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
