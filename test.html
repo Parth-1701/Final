@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExamForge — JEE Mains Mock Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #18181f;
+      --surface3: #1e1e28;
+      --border: #26263a;
+      --border2: #32324a;
+      --accent: #6c63ff;
+      --accent-soft: rgba(108,99,255,0.12);
+      --accent-glow: rgba(108,99,255,0.25);
+      --green: #3ecf8e;
+      --green-soft: rgba(62,207,142,0.12);
+      --red: #f56565;
+      --red-soft: rgba(245,101,101,0.12);
+      --yellow: #f6c90e;
+      --yellow-soft: rgba(246,201,14,0.12);
+      --purple: #b794f4;
+      --text: #e2e2f0;
+      --text-dim: #9898b8;
+      --text-muted: #52527a;
+      --radius: 10px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; overflow:hidden; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* ─── TOP BAR ─── */
+    #topbar {
+      display: flex;
+      align-items: center;
+      height: 56px;
+      padding: 0 1.25rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+      flex-shrink: 0;
+      z-index: 50;
+    }
+    .tb-logo {
+      font-family:'Syne',sans-serif; font-weight:800; font-size:1rem;
+      color:var(--text); letter-spacing:-0.02em; margin-right:0.5rem;
+    }
+    .tb-logo span { color:var(--accent); }
+    .tb-sep { width:1px; height:24px; background:var(--border); }
+    .tb-exam {
+      font-family:'DM Mono',monospace; font-size:0.75rem;
+      color:var(--text-dim); letter-spacing:0.04em;
+    }
+    .tb-exam strong { color:var(--text); font-weight:500; }
+    .tb-spacer { flex:1; }
+
+    /* Section tabs */
+    .section-tabs {
+      display:flex; gap:4px;
+    }
+    .sec-tab {
+      padding:0.3rem 0.9rem; border-radius:7px;
+      font-size:0.78rem; font-weight:500; cursor:pointer;
+      border:1px solid var(--border);
+      background:none; color:var(--text-dim);
+      transition:all 0.15s;
+      font-family:'DM Sans',sans-serif;
+    }
+    .sec-tab.active {
+      background:var(--accent-soft); border-color:var(--accent);
+      color:var(--accent);
+    }
+    .sec-tab:hover:not(.active) { border-color:var(--border2); color:var(--text); }
+
+    /* Timer */
+    #timer-wrap {
+      display:flex; align-items:center; gap:0.5rem;
+      background:var(--surface2); border:1px solid var(--border2);
+      border-radius:8px; padding:0.3rem 0.9rem;
+    }
+    #timer-icon { font-size:0.9rem; }
+    #timer-display {
+      font-family:'DM Mono',monospace; font-size:1rem; font-weight:500;
+      color:var(--text); min-width:72px; text-align:center;
+      transition:color 0.3s;
+    }
+    #timer-display.warning { color:var(--yellow); }
+    #timer-display.danger  { color:var(--red); animation:blink 1s infinite; }
+    @keyframes blink { 50%{opacity:0.5} }
+
+    .tb-submit-btn {
+      background:var(--accent); color:#fff; border:none;
+      border-radius:8px; padding:0.4rem 1.1rem;
+      font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:500;
+      cursor:pointer;
+      box-shadow:0 0 16px var(--accent-glow);
+      transition:all 0.2s;
+    }
+    .tb-submit-btn:hover { transform:translateY(-1px); box-shadow:0 0 24px var(--accent-glow); }
+
+    /* ─── MAIN LAYOUT ─── */
+    #main {
+      display:grid;
+      grid-template-columns: 1fr 300px;
+      flex:1;
+      overflow:hidden;
+    }
+
+    /* ─── LEFT: QUESTION PANEL ─── */
+    #question-panel {
+      display:flex; flex-direction:column;
+      overflow:hidden; border-right:1px solid var(--border);
+    }
+
+    /* Question header */
+    #q-header {
+      display:flex; align-items:center;
+      padding:0.75rem 1.5rem; gap:1rem;
+      border-bottom:1px solid var(--border);
+      background:var(--surface);
+      flex-shrink:0;
+    }
+    #q-type-badge {
+      font-family:'DM Mono',monospace; font-size:0.7rem;
+      letter-spacing:0.06em; text-transform:uppercase;
+      padding:0.2rem 0.6rem; border-radius:5px;
+      background:var(--accent-soft); color:var(--accent);
+      border:1px solid rgba(108,99,255,0.3);
+    }
+    #q-counter {
+      font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--text-dim);
+    }
+    #q-marks-info {
+      margin-left:auto; display:flex; gap:0.75rem;
+    }
+    .marks-pill {
+      display:flex; align-items:center; gap:0.35rem;
+      font-family:'DM Mono',monospace; font-size:0.72rem;
+      padding:0.2rem 0.55rem; border-radius:5px;
+    }
+    .marks-pill.pos { background:var(--green-soft); color:var(--green); }
+    .marks-pill.neg { background:var(--red-soft); color:var(--red); }
+
+    /* Question body */
+    #q-body {
+      flex:1; overflow-y:auto; padding:2rem 2.5rem;
+    }
+    #q-body::-webkit-scrollbar { width:4px; }
+    #q-body::-webkit-scrollbar-track { background:transparent; }
+    #q-body::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+    #q-text {
+      font-size:1.05rem; line-height:1.8; color:var(--text);
+      margin-bottom:2rem;
+    }
+    #q-text .math { font-style:italic; color:var(--purple); }
+
+    /* Options */
+    #q-options { display:flex; flex-direction:column; gap:0.7rem; }
+    .option {
+      display:flex; align-items:flex-start; gap:1rem;
+      background:var(--surface2); border:1.5px solid var(--border);
+      border-radius:var(--radius); padding:0.9rem 1.1rem;
+      cursor:pointer; transition:all 0.15s ease;
+      position:relative; overflow:hidden;
+    }
+    .option::before {
+      content:''; position:absolute;
+      left:0; top:0; bottom:0; width:3px;
+      background:var(--accent); opacity:0; transition:opacity 0.15s;
+    }
+    .option:hover { border-color:var(--border2); background:var(--surface3); }
+    .option:hover::before { opacity:0.5; }
+    .option.selected { border-color:var(--accent); background:var(--accent-soft); }
+    .option.selected::before { opacity:1; }
+
+    .opt-label {
+      width:30px; height:30px; border-radius:7px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'DM Mono',monospace; font-size:0.8rem; font-weight:500;
+      background:var(--surface3); border:1px solid var(--border2);
+      color:var(--text-dim); transition:all 0.15s;
+    }
+    .option.selected .opt-label {
+      background:var(--accent); border-color:var(--accent);
+      color:#fff; box-shadow:0 0 12px var(--accent-glow);
+    }
+    .opt-text { font-size:0.95rem; line-height:1.6; padding-top:2px; }
+
+    /* Integer input */
+    #integer-input-wrap { display:none; }
+    #integer-input-wrap.show { display:block; }
+    #options-wrap.hide { display:none; }
+    .int-label {
+      font-size:0.85rem; color:var(--text-dim); margin-bottom:0.75rem;
+      font-family:'DM Mono',monospace;
+    }
+    #integer-input {
+      background:var(--surface2); border:1.5px solid var(--border2);
+      border-radius:var(--radius); padding:0.9rem 1.2rem;
+      font-family:'DM Mono',monospace; font-size:1.5rem; font-weight:500;
+      color:var(--text); width:200px; outline:none;
+      transition:border-color 0.15s;
+    }
+    #integer-input:focus { border-color:var(--accent); }
+    #integer-input::placeholder { color:var(--text-muted); font-size:1rem; }
+
+    /* ─── BOTTOM ACTION BAR ─── */
+    #action-bar {
+      display:flex; align-items:center; gap:0.75rem;
+      padding:0.9rem 1.5rem;
+      border-top:1px solid var(--border);
+      background:var(--surface);
+      flex-shrink:0;
+    }
+    .action-btn {
+      display:flex; align-items:center; gap:0.45rem;
+      padding:0.55rem 1.1rem; border-radius:8px;
+      font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:500;
+      cursor:pointer; border:1px solid var(--border);
+      transition:all 0.15s;
+    }
+    .action-btn.primary {
+      background:var(--accent); color:#fff; border-color:var(--accent);
+      box-shadow:0 0 16px var(--accent-glow);
+    }
+    .action-btn.primary:hover { transform:translateY(-1px); }
+    .action-btn.secondary { background:none; color:var(--text-dim); }
+    .action-btn.secondary:hover { border-color:var(--border2); color:var(--text); }
+    .action-btn.review {
+      background:var(--yellow-soft); color:var(--yellow);
+      border-color:rgba(246,201,14,0.3);
+    }
+    .action-btn.clear {
+      background:var(--red-soft); color:var(--red);
+      border-color:rgba(245,101,101,0.3);
+    }
+    .action-spacer { flex:1; }
+    .nav-arrows { display:flex; gap:0.5rem; }
+    .nav-btn {
+      width:36px; height:36px; border-radius:8px;
+      background:var(--surface2); border:1px solid var(--border);
+      color:var(--text-dim); cursor:pointer; font-size:1rem;
+      display:flex; align-items:center; justify-content:center;
+      transition:all 0.15s;
+    }
+    .nav-btn:hover { border-color:var(--border2); color:var(--text); }
+
+    /* ─── RIGHT: SIDEBAR ─── */
+    #sidebar {
+      display:flex; flex-direction:column;
+      overflow:hidden; background:var(--surface);
+    }
+
+    /* Profile strip */
+    #profile-strip {
+      padding:0.9rem 1rem;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:0.75rem;
+    }
+    .profile-avatar {
+      width:36px; height:36px; border-radius:9px;
+      background:var(--accent-soft); border:1px solid rgba(108,99,255,0.3);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--accent);
+      font-weight:500; flex-shrink:0;
+    }
+    .profile-name { font-size:0.875rem; font-weight:500; }
+    .profile-roll { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--text-muted); }
+
+    /* Stats row */
+    #stats-row {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      border-bottom:1px solid var(--border);
+    }
+    .stat-cell {
+      padding:0.6rem 0.5rem; text-align:center;
+      border-right:1px solid var(--border);
+    }
+    .stat-cell:last-child { border-right:none; }
+    .sc-num {
+      font-family:'DM Mono',monospace; font-size:1.1rem; font-weight:500;
+    }
+    .sc-label { font-size:0.65rem; color:var(--text-muted); margin-top:1px; }
+    .sc-green { color:var(--green); }
+    .sc-red   { color:var(--red); }
+    .sc-yellow{ color:var(--yellow); }
+    .sc-dim   { color:var(--text-dim); }
+
+    /* Palette */
+    #palette-wrap {
+      flex:1; overflow-y:auto; padding:0.9rem 1rem;
+    }
+    #palette-wrap::-webkit-scrollbar { width:4px; }
+    #palette-wrap::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+    .palette-section-title {
+      font-family:'DM Mono',monospace; font-size:0.65rem;
+      text-transform:uppercase; letter-spacing:0.08em;
+      color:var(--text-muted); margin-bottom:0.5rem;
+      display:flex; justify-content:space-between;
+    }
+    .palette-grid {
+      display:grid; grid-template-columns:repeat(6,1fr);
+      gap:5px; margin-bottom:1.2rem;
+    }
+    .pq {
+      aspect-ratio:1; border-radius:6px; border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'DM Mono',monospace; font-size:0.72rem;
+      cursor:pointer; transition:all 0.12s;
+      background:var(--surface2); color:var(--text-muted);
+    }
+    .pq:hover { border-color:var(--border2); color:var(--text); transform:scale(1.05); }
+    .pq.answered  { background:var(--green-soft); border-color:var(--green); color:var(--green); }
+    .pq.current   { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); box-shadow:0 0 8px var(--accent-glow); }
+    .pq.review    { background:var(--yellow-soft); border-color:var(--yellow); color:var(--yellow); }
+    .pq.ans-review{ background:var(--yellow-soft); border-color:var(--yellow); color:var(--yellow); position:relative; }
+    .pq.ans-review::after {
+      content:''; position:absolute; bottom:2px; right:2px;
+      width:5px; height:5px; border-radius:50%; background:var(--green);
+    }
+    .pq.skipped   { background:var(--red-soft); border-color:rgba(245,101,101,0.4); color:var(--red); }
+
+    /* Legend */
+    #legend {
+      border-top:1px solid var(--border);
+      padding:0.75rem 1rem;
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:0.4rem; flex-shrink:0;
+    }
+    .leg-item {
+      display:flex; align-items:center; gap:0.4rem;
+      font-size:0.72rem; color:var(--text-muted);
+    }
+    .leg-dot {
+      width:10px; height:10px; border-radius:3px; flex-shrink:0; border:1px solid;
+    }
+    .leg-dot.answered  { background:var(--green-soft); border-color:var(--green); }
+    .leg-dot.skipped   { background:var(--red-soft); border-color:rgba(245,101,101,0.4); }
+    .leg-dot.review    { background:var(--yellow-soft); border-color:var(--yellow); }
+    .leg-dot.unmarked  { background:var(--surface2); border-color:var(--border2); }
+    .leg-dot.current   { background:var(--accent-soft); border-color:var(--accent); }
+
+    /* ─── CONFIRM MODAL ─── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; z-index:1000;
+      background:rgba(10,10,15,0.88); backdrop-filter:blur(10px);
+      align-items:center; justify-content:center;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal {
+      background:var(--surface); border:1px solid var(--border2);
+      border-radius:18px; padding:2rem; width:100%; max-width:420px;
+      animation: mIn 0.25s ease;
+    }
+    @keyframes mIn { from{opacity:0;transform:scale(0.96)} to{opacity:1;transform:scale(1)} }
+    .modal-icon { font-size:2.5rem; margin-bottom:0.75rem; }
+    .modal-title {
+      font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800;
+      margin-bottom:0.4rem;
+    }
+    .modal-desc { color:var(--text-dim); font-size:0.9rem; line-height:1.6; margin-bottom:1.5rem; }
+    .modal-summary {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:10px; padding:1rem; margin-bottom:1.5rem;
+    }
+    .ms-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:0.35rem 0; font-size:0.875rem;
+    }
+    .ms-row + .ms-row { border-top:1px solid var(--border); }
+    .ms-label { color:var(--text-dim); }
+    .ms-val { font-family:'DM Mono',monospace; font-weight:500; }
+    .modal-btns { display:flex; gap:0.75rem; }
+    .mbtn {
+      flex:1; padding:0.7rem; border-radius:9px;
+      font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:500;
+      cursor:pointer; transition:all 0.15s;
+    }
+    .mbtn.cancel {
+      background:none; border:1px solid var(--border);
+      color:var(--text-dim);
+    }
+    .mbtn.cancel:hover { border-color:var(--border2); color:var(--text); }
+    .mbtn.submit-final {
+      background:var(--accent); color:#fff; border:none;
+      box-shadow:0 0 20px var(--accent-glow);
+    }
+    .mbtn.submit-final:hover { transform:translateY(-1px); }
+
+    /* ─── INSTRUCTIONS SCREEN ─── */
+    #instructions-screen {
+      position:fixed; inset:0; z-index:200;
+      background:var(--bg);
+      display:flex; flex-direction:column;
+      overflow-y:auto;
+    }
+    .ins-header {
+      background:var(--surface); border-bottom:1px solid var(--border);
+      padding:1rem 2rem; display:flex; align-items:center; gap:1rem;
+    }
+    .ins-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; }
+    .ins-logo span { color:var(--accent); }
+    .ins-body { max-width:800px; margin:0 auto; padding:2.5rem 2rem; width:100%; }
+    .ins-title {
+      font-family:'Syne',sans-serif; font-size:2rem; font-weight:800;
+      margin-bottom:0.4rem;
+    }
+    .ins-subtitle { color:var(--text-dim); margin-bottom:2rem; }
+    .ins-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:14px; padding:1.5rem; margin-bottom:1.2rem;
+    }
+    .ins-card-title {
+      font-family:'Syne',sans-serif; font-weight:700; font-size:1rem;
+      margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;
+    }
+    .ins-grid {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:0.75rem;
+    }
+    .ins-row {
+      display:flex; gap:0.75rem; align-items:flex-start;
+      font-size:0.875rem; color:var(--text-dim); line-height:1.5;
+    }
+    .ins-row .dot {
+      width:6px; height:6px; border-radius:50%;
+      background:var(--accent); margin-top:7px; flex-shrink:0;
+    }
+    .ins-marking {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;
+    }
+    .mk-cell {
+      background:var(--surface2); border-radius:10px;
+      padding:1rem; text-align:center;
+    }
+    .mk-val {
+      font-family:'DM Mono',monospace; font-size:1.8rem; font-weight:500;
+      margin-bottom:0.25rem;
+    }
+    .mk-label { font-size:0.78rem; color:var(--text-muted); }
+    .ins-agree {
+      display:flex; align-items:center; gap:0.75rem;
+      margin:1.5rem 0;
+      font-size:0.9rem; cursor:pointer;
+    }
+    #agree-check {
+      width:18px; height:18px; accent-color:var(--accent); cursor:pointer;
+    }
+    .ins-start-btn {
+      width:100%; padding:1rem; border-radius:12px;
+      background:var(--accent); color:#fff; border:none;
+      font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700;
+      cursor:pointer; box-shadow:0 0 30px var(--accent-glow);
+      transition:all 0.2s; opacity:0.5; pointer-events:none;
+    }
+    .ins-start-btn.ready { opacity:1; pointer-events:auto; }
+    .ins-start-btn.ready:hover { transform:translateY(-2px); box-shadow:0 0 40px var(--accent-glow); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+    /* Toast */
+    #toast {
+      position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(80px);
+      background:var(--surface3); border:1px solid var(--border2);
+      border-radius:10px; padding:0.65rem 1.25rem;
+      font-size:0.875rem; color:var(--text);
+      transition:transform 0.3s ease; z-index:500;
+      box-shadow:0 4px 20px rgba(0,0,0,0.4);
+      white-space:nowrap;
+    }
+    #toast.show { transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ INSTRUCTIONS SCREEN ═══════════════════════ -->
+<div id="instructions-screen">
+  <div class="ins-header">
+    <div class="ins-logo">Exam<span>Forge</span></div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--text-muted);">
+      JEE MAINS — MOCK TEST 01
+    </div>
+  </div>
+  <div class="ins-body">
+    <div class="ins-title">General Instructions</div>
+    <div class="ins-subtitle">Please read carefully before beginning the test.</div>
+
+    <div class="ins-card">
+      <div class="ins-card-title">📋 Test Details</div>
+      <div class="ins-grid">
+        <div class="ins-row"><div class="dot"></div><div>Duration: <strong>3 hours (180 minutes)</strong></div></div>
+        <div class="ins-row"><div class="dot"></div><div>Total questions: <strong>90</strong></div></div>
+        <div class="ins-row"><div class="dot"></div><div>Maximum marks: <strong>300</strong></div></div>
+        <div class="ins-row"><div class="dot"></div><div>3 sections: Physics, Chemistry, Maths</div></div>
+        <div class="ins-row"><div class="dot"></div><div>Section A: 20 MCQ per subject</div></div>
+        <div class="ins-row"><div class="dot"></div><div>Section B: 10 Numerical per subject (attempt 5)</div></div>
+      </div>
+    </div>
+
+    <div class="ins-card">
+      <div class="ins-card-title">📊 Marking Scheme</div>
+      <div class="ins-marking">
+        <div class="mk-cell">
+          <div class="mk-val" style="color:var(--green)">+4</div>
+          <div class="mk-label">Correct answer</div>
+        </div>
+        <div class="mk-cell">
+          <div class="mk-val" style="color:var(--red)">−1</div>
+          <div class="mk-label">Wrong answer (MCQ)</div>
+        </div>
+        <div class="mk-cell">
+          <div class="mk-val" style="color:var(--text-dim)">0</div>
+          <div class="mk-label">Unattempted</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ins-card">
+      <div class="ins-card-title">🎨 Question Status Colors</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+        <div class="ins-row"><div style="width:14px;height:14px;border-radius:4px;background:var(--green-soft);border:1px solid var(--green);flex-shrink:0"></div><div>Answered</div></div>
+        <div class="ins-row"><div style="width:14px;height:14px;border-radius:4px;background:var(--red-soft);border:1px solid rgba(245,101,101,0.4);flex-shrink:0"></div><div>Not answered / Skipped</div></div>
+        <div class="ins-row"><div style="width:14px;height:14px;border-radius:4px;background:var(--yellow-soft);border:1px solid var(--yellow);flex-shrink:0"></div><div>Marked for review</div></div>
+        <div class="ins-row"><div style="width:14px;height:14px;border-radius:4px;background:var(--surface2);border:1px solid var(--border2);flex-shrink:0"></div><div>Not visited</div></div>
+      </div>
+    </div>
+
+    <div class="ins-card">
+      <div class="ins-card-title">⚠️ Important Notes</div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <div class="ins-row"><div class="dot"></div><div>Do not refresh the browser — your progress is saved automatically.</div></div>
+        <div class="ins-row"><div class="dot"></div><div>Once time expires, the test is auto-submitted with current answers.</div></div>
+        <div class="ins-row"><div class="dot"></div><div>You can navigate freely between questions and sections at any time.</div></div>
+        <div class="ins-row"><div class="dot"></div><div>Marking for review does NOT affect your score — it is a reminder tool.</div></div>
+        <div class="ins-row"><div class="dot"></div><div>For Section B (Numerical), enter the exact integer or decimal value.</div></div>
+      </div>
+    </div>
+
+    <label class="ins-agree">
+      <input type="checkbox" id="agree-check" onchange="toggleStartBtn()"/>
+      I have read and understood all instructions, and I am ready to begin the test.
+    </label>
+    <button class="ins-start-btn" id="start-btn" onclick="startTest()">
+      Begin Test →
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MAIN TEST UI ═══════════════════════ -->
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="tb-logo">Exam<span>Forge</span></div>
+  <div class="tb-sep"></div>
+  <div class="tb-exam"><strong>JEE Mains</strong> &nbsp;·&nbsp; Mock Test 01</div>
+  <div class="tb-spacer"></div>
+  <div class="section-tabs" id="section-tabs">
+    <button class="sec-tab active" onclick="jumpToSection(0)">Physics</button>
+    <button class="sec-tab" onclick="jumpToSection(30)">Chemistry</button>
+    <button class="sec-tab" onclick="jumpToSection(60)">Maths</button>
+  </div>
+  <div class="tb-spacer"></div>
+  <div id="timer-wrap">
+    <div id="timer-icon">⏱</div>
+    <div id="timer-display">03:00:00</div>
+  </div>
+  <button class="tb-submit-btn" onclick="openSubmitModal()">Submit Test</button>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- LEFT: QUESTION -->
+  <div id="question-panel">
+    <div id="q-header">
+      <div id="q-type-badge">Single Correct</div>
+      <div id="q-counter">Question 1 of 90</div>
+      <div id="q-marks-info">
+        <div class="marks-pill pos">✓ +4</div>
+        <div class="marks-pill neg">✗ −1</div>
+      </div>
+    </div>
+
+    <div id="q-body">
+      <div id="q-text"></div>
+
+      <div id="options-wrap">
+        <div id="q-options"></div>
+      </div>
+
+      <div id="integer-input-wrap">
+        <div class="int-label">// Enter your answer (integer/decimal):</div>
+        <input type="number" id="integer-input" placeholder="0" step="any"
+               oninput="saveIntegerAnswer()"/>
+      </div>
+    </div>
+
+    <div id="action-bar">
+      <button class="action-btn review" onclick="markForReview()">🔖 Mark for Review</button>
+      <button class="action-btn clear" onclick="clearResponse()">✕ Clear</button>
+      <div class="action-spacer"></div>
+      <button class="action-btn secondary" onclick="saveAndNext()">Save & Next ›</button>
+      <div class="nav-arrows">
+        <button class="nav-btn" onclick="prevQuestion()" title="Previous">‹</button>
+        <button class="nav-btn" onclick="nextQuestion()" title="Next">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: SIDEBAR -->
+  <div id="sidebar">
+    <div id="profile-strip">
+      <div class="profile-avatar">AR</div>
+      <div>
+        <div class="profile-name">Arjun Rao</div>
+        <div class="profile-roll">Roll: 24JM00145</div>
+      </div>
+    </div>
+
+    <div id="stats-row">
+      <div class="stat-cell">
+        <div class="sc-num sc-green" id="stat-answered">0</div>
+        <div class="sc-label">Answered</div>
+      </div>
+      <div class="stat-cell">
+        <div class="sc-num sc-red" id="stat-skipped">0</div>
+        <div class="sc-label">Skipped</div>
+      </div>
+      <div class="stat-cell">
+        <div class="sc-num sc-yellow" id="stat-review">0</div>
+        <div class="sc-label">Review</div>
+      </div>
+      <div class="stat-cell">
+        <div class="sc-num sc-dim" id="stat-unvisited">90</div>
+        <div class="sc-label">Not visited</div>
+      </div>
+    </div>
+
+    <div id="palette-wrap">
+      <div id="physics-palette">
+        <div class="palette-section-title"><span>Physics — Section A</span><span>1–20</span></div>
+        <div class="palette-grid" id="pgrid-phy-a"></div>
+        <div class="palette-section-title" style="margin-top:0.5rem"><span>Physics — Section B</span><span>21–30</span></div>
+        <div class="palette-grid" id="pgrid-phy-b"></div>
+      </div>
+      <div id="chem-palette">
+        <div class="palette-section-title"><span>Chemistry — Section A</span><span>31–50</span></div>
+        <div class="palette-grid" id="pgrid-chem-a"></div>
+        <div class="palette-section-title" style="margin-top:0.5rem"><span>Chemistry — Section B</span><span>51–60</span></div>
+        <div class="palette-grid" id="pgrid-chem-b"></div>
+      </div>
+      <div id="maths-palette">
+        <div class="palette-section-title"><span>Maths — Section A</span><span>61–80</span></div>
+        <div class="palette-grid" id="pgrid-math-a"></div>
+        <div class="palette-section-title" style="margin-top:0.5rem"><span>Maths — Section B</span><span>81–90</span></div>
+        <div class="palette-grid" id="pgrid-math-b"></div>
+      </div>
+    </div>
+
+    <div id="legend">
+      <div class="leg-item"><div class="leg-dot answered"></div> Answered</div>
+      <div class="leg-item"><div class="leg-dot skipped"></div> Not answered</div>
+      <div class="leg-item"><div class="leg-dot review"></div> Marked for review</div>
+      <div class="leg-item"><div class="leg-dot unmarked"></div> Not visited</div>
+      <div class="leg-item"><div class="leg-dot current"></div> Current</div>
+    </div>
+  </div>
+</div>
+
+<!-- Submit Confirm Modal -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <div class="modal-icon">📋</div>
+    <div class="modal-title">Submit Test?</div>
+    <div class="modal-desc">Once submitted, you cannot change your answers. Make sure you've attempted all questions.</div>
+    <div class="modal-summary" id="modal-summary"></div>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeSubmitModal()">Go Back</button>
+      <button class="mbtn submit-final" onclick="finalSubmit()">Submit Now →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+
+// ═══════════════════════════════════════════════════════
+// QUESTION BANK (sample — replace with Firebase fetch)
+// ═══════════════════════════════════════════════════════
+const SECTIONS = [
+  { name:'Physics', short:'PHY', color:'#6c63ff' },
+  { name:'Chemistry', short:'CHM', color:'#3ecf8e' },
+  { name:'Mathematics', short:'MTH', color:'#f7971e' }
+];
+
+function genQuestions() {
+  const qs = [];
+  const phyA = [
+    { text: 'A particle executes simple harmonic motion with amplitude <em class="math">A</em> and angular frequency <em class="math">ω</em>. The velocity of the particle when it is at distance <em class="math">A/2</em> from the mean position is:', opts:['<em class="math">ω√(3A²/4)</em>','<em class="math">ωA/2</em>','<em class="math">ω√(A²/2)</em>','<em class="math">ωA√3/4</em>'], ans:0 },
+    { text: 'A body of mass <em class="math">m</em> is placed on a rough inclined plane of inclination <em class="math">θ</em>. If the coefficient of static friction is <em class="math">μ</em>, the maximum angle of inclination for which the body does not slide is:', opts:['<em class="math">tan⁻¹(μ)</em>','<em class="math">sin⁻¹(μ)</em>','<em class="math">cos⁻¹(μ)</em>','<em class="math">tan⁻¹(1/μ)</em>'], ans:0 },
+    { text: 'Two spheres of radii <em class="math">r₁</em> and <em class="math">r₂</em> are charged to the same surface charge density. The ratio of their electric potential is:', opts:['<em class="math">r₁ : r₂</em>','<em class="math">r₁² : r₂²</em>','<em class="math">r₂ : r₁</em>','1 : 1'], ans:0 },
+    { text: 'The de Broglie wavelength of an electron accelerated through a potential of <em class="math">V</em> volts is proportional to:', opts:['<em class="math">V</em>','<em class="math">1/√V</em>','<em class="math">√V</em>','<em class="math">1/V</em>'], ans:1 },
+    { text: 'A ray of light passes from a denser medium to a rarer medium. Critical angle is <em class="math">C</em>. The angle of deviation of the refracted ray when the angle of incidence is <em class="math">2C/3</em> is:', opts:['<em class="math">C/3</em>','<em class="math">2C/3</em>','refracted at <em class="math">r = sin⁻¹(sinC × sin(2C/3))</em>','Total internal reflection occurs'], ans:2 },
+    { text: 'In a series LCR circuit, the impedance at resonance is equal to:', opts:['Zero','<em class="math">√(L/C)</em>','<em class="math">R</em>','<em class="math">L/CR</em>'], ans:2 },
+    { text: 'A projectile is launched at angle <em class="math">θ</em> with the horizontal. The ratio of the range to the maximum height is:', opts:['<em class="math">4 tan θ</em>','<em class="math">4 cot θ</em>','<em class="math">4/tan θ</em>','<em class="math">tan θ / 4</em>'], ans:1 },
+    { text: 'The work done by a force <strong>F</strong> = (3î + 4ĵ) N in displacing a body through <strong>d</strong> = (2î − 3ĵ) m is:', opts:['−6 J','6 J','−18 J','18 J'], ans:0 },
+    { text: 'A wire of length <em class="math">L</em>, area <em class="math">A</em> and Young modulus <em class="math">Y</em> is stretched by a force <em class="math">F</em>. The elastic potential energy stored is:', opts:['<em class="math">F²L/2AY</em>','<em class="math">F²/2AYL</em>','<em class="math">2F²L/AY</em>','<em class="math">FL/2AY</em>'], ans:0 },
+    { text: 'A Carnot engine operates between temperatures 500 K and 300 K. Its efficiency is:', opts:['40%','60%','30%','50%'], ans:0 },
+    { text: 'The photoelectric threshold frequency of a metal is <em class="math">ν₀</em>. The work function of the metal is:', opts:['<em class="math">hν₀</em>','<em class="math">hν₀/2</em>','<em class="math">2hν₀</em>','<em class="math">hν₀²</em>'], ans:0 },
+    { text: 'In hydrogen atom, the ratio of the radius of the 3rd orbit to the 1st orbit (Bohr model) is:', opts:['3','6','9','1/3'], ans:2 },
+    { text: 'A magnetic field <em class="math">B</em> exists along the z-axis. A proton moves in the x-y plane. The time period of circular motion is:', opts:['Independent of velocity','Proportional to velocity','Inversely proportional to velocity','Proportional to B'], ans:0 },
+    { text: 'Two wires of the same material have lengths in ratio 1:2 and diameters in ratio 2:1. The ratio of their resistances is:', opts:['1:8','8:1','2:1','1:2'], ans:0 },
+    { text: 'A sound source moves towards a stationary observer with speed <em class="math">v</em>. If the speed of sound is <em class="math">c</em>, the observed frequency compared to source frequency is:', opts:['Increased','Decreased','Same','Zero'], ans:0 },
+    { text: 'The binding energy per nucleon is maximum for:', opts:['Hydrogen','Iron (Fe-56)','Uranium','Carbon'], ans:1 },
+    { text: 'A convex lens of focal length 20 cm forms a real image. The minimum distance between the object and its image is:', opts:['20 cm','40 cm','80 cm','60 cm'], ans:2 },
+    { text: 'In Young\'s double slit experiment, if the wavelength of light is doubled, the fringe width:', opts:['Doubles','Halves','Remains same','Quadruples'], ans:0 },
+    { text: 'The moment of inertia of a solid sphere of mass M and radius R about its diameter is:', opts:['<em class="math">2MR²/5</em>','<em class="math">MR²/2</em>','<em class="math">MR²</em>','<em class="math">2MR²/3</em>'], ans:0 },
+    { text: 'For an ideal gas undergoing isothermal expansion, which quantity remains constant?', opts:['Pressure','Volume','Temperature and internal energy','Entropy'], ans:2 },
+  ];
+  const chemA = [
+    { text: 'The IUPAC name of <em class="math">CH₃-CH(OH)-COOH</em> is:', opts:['2-hydroxypropanoic acid','3-hydroxypropanoic acid','lactic acid','propionic acid'], ans:0 },
+    { text: 'Which of the following has the highest first ionization energy?', opts:['Na','Mg','Al','Si'], ans:1 },
+    { text: 'The hybridization of central atom in <em class="math">SF₆</em> is:', opts:['sp³','sp³d','sp³d²','sp²'], ans:2 },
+    { text: 'Which of the following is an example of a lyophilic colloid?', opts:['Gold sol','Starch in water','Arsenic sulphide sol','Ferric hydroxide sol'], ans:1 },
+    { text: 'The product of the reaction of benzene with chlorine in presence of FeCl₃ is:', opts:['Cyclohexyl chloride','Chlorobenzene','Benzyl chloride','Benzal chloride'], ans:1 },
+    { text: 'The rate constant of a first order reaction is <em class="math">0.693 min⁻¹</em>. The half life is:', opts:['0.693 min','1 min','2 min','0.5 min'], ans:1 },
+    { text: 'Which of the following is the strongest acid?', opts:['HF','HCl','HBr','HI'], ans:3 },
+    { text: '<em class="math">Cr₂O₇²⁻</em> in acidic medium oxidises <em class="math">Fe²⁺</em> to <em class="math">Fe³⁺</em>. The n-factor of <em class="math">K₂Cr₂O₇</em> is:', opts:['2','3','6','1'], ans:2 },
+    { text: 'The crystal system of NaCl is:', opts:['Hexagonal','Monoclinic','Cubic','Tetragonal'], ans:2 },
+    { text: 'Which of the following has zero dipole moment?', opts:['NH₃','H₂O','CO₂','SO₂'], ans:2 },
+    { text: 'The number of sigma bonds in 2-butyne is:', opts:['7','8','9','10'], ans:2 },
+    { text: 'Henry\'s law constant for CO₂ in water is <em class="math">K_H = 1.67 × 10⁸ Pa</em>. At 1 atm partial pressure, the mole fraction of CO₂ dissolved is:', opts:['<em class="math">6.0 × 10⁻⁴</em>','<em class="math">1.0 × 10⁻³</em>','<em class="math">6.0 × 10⁻⁶</em>','<em class="math">1.67 × 10⁻³</em>'], ans:2 },
+    { text: 'The complex [Co(en)₂Cl₂]⁺ shows which type of isomerism?', opts:['Ionisation','Linkage','Geometric and Optical','Coordination'], ans:2 },
+    { text: 'Which of the following polymers is formed by addition polymerization?', opts:['Nylon-6,6','Bakelite','PVC','Terylene'], ans:2 },
+    { text: 'The pH of a 0.01 M HCl solution is:', opts:['1','2','3','0.01'], ans:1 },
+    { text: 'Glucose on reacting with Tollens\' reagent gives a silver mirror. This confirms the presence of:', opts:['Hydroxyl group','Aldehyde group','Keto group','Ether group'], ans:1 },
+    { text: 'Which of the following is an amphoteric oxide?', opts:['Na₂O','CaO','Al₂O₃','SO₃'], ans:2 },
+    { text: 'The rate of a reaction triples when temperature increases from 300 K to 310 K. The activation energy is approximately:', opts:['100 kJ/mol','75 kJ/mol','50 kJ/mol','25 kJ/mol'], ans:0 },
+    { text: 'Which of the following correctly represents the order of electronegativity?', opts:['F > O > N > Cl','F > O > Cl > N','F > N > Cl > O','Cl > F > O > N'], ans:1 },
+    { text: 'The product formed when acetaldehyde reacts with excess methanol in presence of dry HCl is:', opts:['Acetal','Hemiacetal','Aldol','Ester'], ans:0 },
+  ];
+  const mathA = [
+    { text: 'The value of <em class="math">lim(x→0) [sin(3x)/x]</em> is:', opts:['0','1','3','∞'], ans:2 },
+    { text: 'The number of real solutions of <em class="math">x² − |x| − 2 = 0</em> is:', opts:['0','1','2','3'], ans:2 },
+    { text: 'If <em class="math">A</em> is a square matrix of order 3 and <em class="math">|A| = 5</em>, then <em class="math">|adj A|</em> is:', opts:['5','15','25','125'], ans:2 },
+    { text: 'The area of the region bounded by <em class="math">y = x²</em> and <em class="math">y = x</em> is:', opts:['1/2','1/3','1/6','1/4'], ans:2 },
+    { text: 'The sum of the infinite geometric series <em class="math">1 + 1/3 + 1/9 + ...</em> is:', opts:['3/2','2/3','3','2'], ans:0 },
+    { text: 'The eccentricity of the conic <em class="math">x²/9 + y²/4 = 1</em> is:', opts:['<em class="math">√5/3</em>','<em class="math">√5/9</em>','<em class="math">2/3</em>','<em class="math">√13/3</em>'], ans:0 },
+    { text: 'The derivative of <em class="math">log(sin x)</em> with respect to <em class="math">x</em> is:', opts:['<em class="math">cos x</em>','<em class="math">cot x</em>','<em class="math">-cot x</em>','<em class="math">tan x</em>'], ans:1 },
+    { text: 'How many ways can 5 boys and 3 girls be seated in a row such that no two girls sit adjacent?', opts:['720','14400','1440','2880'], ans:1 },
+    { text: 'The value of <em class="math">i⁹⁷ + i⁹⁸ + i⁹⁹ + i¹⁰⁰</em> is:', opts:['0','1','−1','i'], ans:0 },
+    { text: 'If <em class="math">sin A = 3/5</em>, <em class="math">cos B = 12/13</em>, then <em class="math">cos(A−B)</em> equals:', opts:['<em class="math">33/65</em>','<em class="math">56/65</em>','<em class="math">16/65</em>','<em class="math">63/65</em>'], ans:1 },
+    { text: 'The equation of the tangent to the curve <em class="math">y = x³ − 3x</em> at the point (2, 2) is:', opts:['<em class="math">y = 9x − 16</em>','<em class="math">y = 9x + 16</em>','<em class="math">y = 3x − 4</em>','<em class="math">y = 12x − 22</em>'], ans:0 },
+    { text: 'The probability that at least one head appears in 3 tosses of a fair coin is:', opts:['1/8','3/8','7/8','5/8'], ans:2 },
+    { text: 'The range of <em class="math">f(x) = sin x + cos x</em> is:', opts:['[−1, 1]','[−√2, √2]','[0, √2]','[−2, 2]'], ans:1 },
+    { text: 'The general solution of <em class="math">dy/dx = e^(x+y)</em> is:', opts:['<em class="math">e^x + e^(−y) = C</em>','<em class="math">e^x − e^y = C</em>','<em class="math">e^x + e^y = C</em>','<em class="math">e^(−x) + e^y = C</em>'], ans:0 },
+    { text: 'The number of 4-digit numbers that can be formed using digits 0-9 with no digit repeating is:', opts:['3024','4536','9000','5040'], ans:1 },
+    { text: '<em class="math">∫₀^π sin²x dx</em> equals:', opts:['0','π/2','π','2π'], ans:1 },
+    { text: 'The distance between the parallel lines <em class="math">3x − 4y + 7 = 0</em> and <em class="math">3x − 4y − 8 = 0</em> is:', opts:['1','2','3','5'], ans:2 },
+    { text: 'If <em class="math">a⃗ · b⃗ = 0</em> and <em class="math">a⃗ × b⃗ = 0</em>, then:', opts:['Either a⃗ or b⃗ is null vector','a⃗ and b⃗ are parallel','a⃗ and b⃗ are perpendicular','None of these'], ans:0 },
+    { text: 'The coefficient of <em class="math">x⁵</em> in the expansion of <em class="math">(x + 3)⁸</em> is:', opts:['1512','1728','4032','3024'], ans:0 },
+    { text: 'The value of <em class="math">tan⁻¹(1) + tan⁻¹(2) + tan⁻¹(3)</em> is:', opts:['π','π/2','3π/4','2π'], ans:0 },
+  ];
+
+  // Section A questions
+  [...phyA, ...chemA, ...mathA].forEach((q, i) => {
+    const sec = Math.floor(i / 20);
+    qs.push({
+      id: i + 1,
+      section: sec,
+      sectionName: SECTIONS[sec].name,
+      sectionSub: i < 20 ? 'A' : i < 30 ? 'B' : i < 50 ? 'A' : i < 60 ? 'B' : i < 80 ? 'A' : 'B',
+      type: 'mcq',
+      text: q.text,
+      options: q.opts,
+      correctAns: q.ans,
+      posMarks: 4,
+      negMarks: -1
+    });
+  });
+
+  // Section B (numerical) — 10 per subject
+  const numQs = [
+    // Physics B (21-30)
+    'A uniform rod of length 2 m and mass 4 kg is pivoted at one end. The moment of inertia (in kg·m²) about the pivot is _____.',
+    'A capacitor of capacitance 10 μF is charged to 200 V. The energy stored (in mJ) is _____.',
+    'The work function of a metal is 2 eV. The threshold wavelength (in nm) is _____. [Use h = 6.6×10⁻³⁴, c = 3×10⁸]',
+    'A wire of resistance 8 Ω is bent into a circle. The effective resistance between two diametrically opposite points (in Ω) is _____.',
+    'A bullet of mass 50 g moving at 400 m/s embeds into a block of mass 450 g. The velocity of the combined system (in m/s) is _____.',
+    'In a transformer, the primary has 500 turns and secondary has 100 turns. If input voltage is 2200 V, the output voltage (in V) is _____.',
+    'The time period of a simple pendulum of length 1 m (in seconds, use g = 10 m/s²) is approximately _____.',
+    'A gas expands from 2L to 6L at constant pressure of 3 atm. Work done by the gas (in L·atm) is _____.',
+    'The half-life of a radioactive substance is 2 years. After 6 years, the fraction remaining is _____/8.',
+    'Velocity of sound in air at 0°C is 332 m/s. The velocity at 100°C (approx, in m/s) is _____.',
+    // Chemistry B (51-60)
+    'The molarity of pure water (density = 1 g/mL) is _____ M.',
+    'For the reaction 2A → B, if rate = k[A]², and k = 0.1 L/mol·s and [A] = 2 mol/L, rate = _____ mol/L·s.',
+    'The Van\'t Hoff factor for Na₂SO₄ (complete dissociation) is _____.',
+    'The equivalent weight of H₂SO₄ in neutralization reactions is _____ g/eq.',
+    'The number of atoms in 0.5 mol of CO₂ is _____ × 10²³. [Use Nₐ = 6×10²³]',
+    'The pH of a 10⁻⁴ M NaOH solution at 25°C is _____.',
+    'For the combustion of methane: CH₄ + 2O₂ → CO₂ + 2H₂O. Moles of O₂ needed for 4 mol CH₄ = _____.',
+    'The oxidation state of Mn in KMnO₄ is _____.',
+    'At STP, 1 mole of gas occupies _____ litres.',
+    'The freezing point depression constant (Kf) of water is 1.86 K·kg/mol. Dissolving 18 g of glucose (MW=180) in 1 kg water depresses FP by _____ K.',
+    // Maths B (81-90)
+    'The value of lim(x→2) [(x²−4)/(x−2)] is _____.',
+    'If f(x) = 3x² − 2x + 1, then f\'(2) = _____.',
+    'The sum of first 20 terms of AP: 5, 8, 11, ... is _____.',
+    'The number of ways to arrange letters of MISSISSIPPI is _____. (Enter in terms of 34650)',
+    'If det of matrix [[2,k],[3,5]] = 1, then k = _____.',
+    'The value of ∫(x² + 1)dx from 0 to 3 is _____.',
+    '|3î − 4ĵ| = _____.',
+    'The area of triangle with vertices (0,0), (4,0), (0,3) is _____ sq units.',
+    'If tan x = 4/3, then sin x = _____ /5.',
+    'The 10th term of GP: 2, 6, 18, ... is _____ (express as 2 × 3^n, n=?).'
+  ];
+
+  const numAnswers = [
+    // Physics
+    '5.33','200','621','2','40',
+    '440','2','12','1','363',
+    // Chemistry
+    '55.5','0.4','3','49','9',
+    '10','8','7','22.4','0.186',
+    // Maths
+    '4','10','650','34650','7/3',
+    '12','5','6','4','39366'
+  ];
+
+  for (let i = 0; i < 30; i++) {
+    const globalIdx = (i < 10 ? 20 : i < 20 ? 50 : 80) + (i % 10);
+    const sec = Math.floor(i / 10);
+    qs.splice(globalIdx, 0, {
+      id: globalIdx + 1,
+      section: sec,
+      sectionName: SECTIONS[sec].name,
+      sectionSub: 'B',
+      type: 'integer',
+      text: numQs[i],
+      options: [],
+      correctAns: numAnswers[i],
+      posMarks: 4,
+      negMarks: 0
+    });
+  }
+
+  // Re-index
+  return qs.map((q, i) => ({ ...q, id: i + 1 }));
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const questions = genQuestions();
+const TOTAL = questions.length; // 90
+const DURATION = 3 * 60 * 60; // 3 hours in seconds
+
+const state = {
+  currentIdx: 0,
+  timeLeft: DURATION,
+  timerInterval: null,
+  // Per question: null = unvisited, { ans, flagged, visited }
+  responses: Array.from({ length: TOTAL }, () => ({
+    ans: null,        // selected option index or integer string
+    flagged: false,   // marked for review
+    visited: false,
+  }))
+};
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function buildPalette() {
+  const grids = {
+    'pgrid-phy-a': [0, 20],
+    'pgrid-phy-b': [20, 30],
+    'pgrid-chem-a': [30, 50],
+    'pgrid-chem-b': [50, 60],
+    'pgrid-math-a': [60, 80],
+    'pgrid-math-b': [80, 90],
+  };
+  for (const [id, [start, end]] of Object.entries(grids)) {
+    const grid = document.getElementById(id);
+    grid.innerHTML = '';
+    for (let i = start; i < end; i++) {
+      const btn = document.createElement('div');
+      btn.className = 'pq';
+      btn.id = `pq-${i}`;
+      btn.textContent = i + 1;
+      btn.onclick = () => goTo(i);
+      grid.appendChild(btn);
+    }
+  }
+}
+
+function renderQuestion() {
+  const q = questions[state.currentIdx];
+  const r = state.responses[state.currentIdx];
+  r.visited = true;
+
+  // Header
+  const typeName = q.type === 'integer' ? 'Numerical (Integer)' : 'Single Correct (MCQ)';
+  document.getElementById('q-type-badge').textContent = typeName;
+  document.getElementById('q-counter').textContent = `Question ${state.currentIdx + 1} of ${TOTAL}`;
+
+  const marksInfo = document.getElementById('q-marks-info');
+  marksInfo.innerHTML = `
+    <div class="marks-pill pos">✓ +${q.posMarks}</div>
+    ${q.negMarks < 0 ? `<div class="marks-pill neg">✗ ${q.negMarks}</div>` : ''}
+  `;
+
+  // Question text
+  document.getElementById('q-text').innerHTML = q.text;
+
+  // Options vs integer input
+  const optWrap = document.getElementById('options-wrap');
+  const intWrap = document.getElementById('integer-input-wrap');
+  const intInput = document.getElementById('integer-input');
+
+  if (q.type === 'integer') {
+    optWrap.classList.add('hide');
+    intWrap.classList.add('show');
+    intInput.value = r.ans !== null ? r.ans : '';
+  } else {
+    optWrap.classList.remove('hide');
+    intWrap.classList.remove('show');
+    renderOptions(q, r);
+  }
+
+  updatePalette();
+  updateStats();
+  updateSectionTabs();
+}
+
+function renderOptions(q, r) {
+  const container = document.getElementById('q-options');
+  container.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option' + (r.ans === i ? ' selected' : '');
+    div.innerHTML = `
+      <div class="opt-label">${String.fromCharCode(65 + i)}</div>
+      <div class="opt-text">${opt}</div>
+    `;
+    div.onclick = () => selectOption(i);
+    container.appendChild(div);
+  });
+}
+
+function selectOption(idx) {
+  const q = questions[state.currentIdx];
+  if (q.type !== 'mcq') return;
+  state.responses[state.currentIdx].ans = idx;
+  renderOptions(q, state.responses[state.currentIdx]);
+  updatePalette();
+  updateStats();
+}
+
+function saveIntegerAnswer() {
+  const val = document.getElementById('integer-input').value;
+  state.responses[state.currentIdx].ans = val !== '' ? val : null;
+  updatePalette();
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function goTo(idx) {
+  if (idx < 0 || idx >= TOTAL) return;
+  state.currentIdx = idx;
+  renderQuestion();
+}
+function nextQuestion() { goTo(state.currentIdx + 1); }
+function prevQuestion() { goTo(state.currentIdx - 1); }
+function saveAndNext() {
+  showToast('Answer saved');
+  nextQuestion();
+}
+function jumpToSection(idx) { goTo(idx); }
+
+function markForReview() {
+  const r = state.responses[state.currentIdx];
+  r.flagged = !r.flagged;
+  showToast(r.flagged ? '🔖 Marked for review' : 'Review mark removed');
+  updatePalette();
+  updateStats();
+}
+
+function clearResponse() {
+  const r = state.responses[state.currentIdx];
+  r.ans = null;
+  r.flagged = false;
+  const intInput = document.getElementById('integer-input');
+  intInput.value = '';
+  renderOptions(questions[state.currentIdx], r);
+  updatePalette();
+  updateStats();
+  showToast('Response cleared');
+}
+
+// ═══════════════════════════════════════════════════════
+// PALETTE & STATS
+// ═══════════════════════════════════════════════════════
+function getStatus(r, isCurrent) {
+  if (isCurrent) return 'current';
+  if (!r.visited) return '';
+  if (r.flagged && r.ans !== null) return 'ans-review';
+  if (r.flagged) return 'review';
+  if (r.ans !== null) return 'answered';
+  return 'skipped';
+}
+
+function updatePalette() {
+  for (let i = 0; i < TOTAL; i++) {
+    const btn = document.getElementById(`pq-${i}`);
+    if (!btn) continue;
+    const status = getStatus(state.responses[i], i === state.currentIdx);
+    btn.className = 'pq' + (status ? ' ' + status : '');
+  }
+}
+
+function updateStats() {
+  let answered = 0, skipped = 0, review = 0, unvisited = 0;
+  state.responses.forEach((r, i) => {
+    if (i === state.currentIdx) return; // count current separately
+    if (!r.visited) { unvisited++; return; }
+    if (r.ans !== null) answered++;
+    else skipped++;
+    if (r.flagged) review++;
+  });
+  // include current
+  const cr = state.responses[state.currentIdx];
+  if (cr.ans !== null) answered++; else if (cr.visited) skipped++;
+  if (cr.flagged) review++;
+
+  document.getElementById('stat-answered').textContent = answered;
+  document.getElementById('stat-skipped').textContent = skipped;
+  document.getElementById('stat-review').textContent = review;
+  document.getElementById('stat-unvisited').textContent = unvisited;
+}
+
+function updateSectionTabs() {
+  const tabs = document.querySelectorAll('.sec-tab');
+  const idx = state.currentIdx;
+  const secIdx = idx < 30 ? 0 : idx < 60 ? 1 : 2;
+  tabs.forEach((t, i) => t.classList.toggle('active', i === secIdx));
+}
+
+// ═══════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════
+function startTimer() {
+  state.timerInterval = setInterval(() => {
+    state.timeLeft--;
+    updateTimerDisplay();
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerInterval);
+      finalSubmit(true);
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const h = Math.floor(state.timeLeft / 3600);
+  const m = Math.floor((state.timeLeft % 3600) / 60);
+  const s = state.timeLeft % 60;
+  const str = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const el = document.getElementById('timer-display');
+  el.textContent = str;
+  el.className = '';
+  if (state.timeLeft <= 300) el.classList.add('danger');
+  else if (state.timeLeft <= 900) el.classList.add('warning');
+}
+
+// ═══════════════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════════════
+function openSubmitModal() {
+  let answered = 0, skipped = 0, review = 0;
+  state.responses.forEach(r => {
+    if (r.ans !== null) answered++;
+    else if (r.visited) skipped++;
+    if (r.flagged) review++;
+  });
+  const unvisited = TOTAL - state.responses.filter(r => r.visited || r.ans !== null).length;
+  document.getElementById('modal-summary').innerHTML = `
+    <div class="ms-row"><span class="ms-label">✅ Answered</span><span class="ms-val" style="color:var(--green)">${answered}</span></div>
+    <div class="ms-row"><span class="ms-label">⏭ Not answered</span><span class="ms-val" style="color:var(--red)">${skipped}</span></div>
+    <div class="ms-row"><span class="ms-label">🔖 Marked for review</span><span class="ms-val" style="color:var(--yellow)">${review}</span></div>
+    <div class="ms-row"><span class="ms-label">👁 Not visited</span><span class="ms-val" style="color:var(--text-muted)">${unvisited}</span></div>
+    <div class="ms-row"><span class="ms-label">⏱ Time left</span><span class="ms-val">${document.getElementById('timer-display').textContent}</span></div>
+  `;
+  document.getElementById('submit-modal').classList.add('open');
+}
+
+function closeSubmitModal() {
+  document.getElementById('submit-modal').classList.remove('open');
+}
+
+function finalSubmit(autoSubmit = false) {
+  clearInterval(state.timerInterval);
+  closeSubmitModal();
+
+  // Calculate score
+  let score = 0;
+  state.responses.forEach((r, i) => {
+    const q = questions[i];
+    if (r.ans === null) return;
+    if (q.type === 'mcq') {
+      if (r.ans === q.correctAns) score += q.posMarks;
+      else score += q.negMarks;
+    } else {
+      // Numerical — basic check (in real app, compare with Firebase value)
+      score += q.posMarks; // placeholder
+    }
+  });
+
+  // Store in sessionStorage for results page
+  sessionStorage.setItem('examResult', JSON.stringify({
+    score,
+    responses: state.responses,
+    totalQuestions: TOTAL,
+    timeTaken: DURATION - state.timeLeft
+  }));
+
+  // TODO: Save to Firebase
+  // db.collection('results').add({ userId, score, responses, timeTaken, submittedAt: new Date() })
+
+  // Redirect to results
+  showToast(autoSubmit ? '⏱ Time up! Submitting...' : '✅ Submitting your test...');
+  setTimeout(() => {
+    window.location.href = 'results.html';
+  }, 1500);
+}
+
+// ═══════════════════════════════════════════════════════
+// INSTRUCTIONS
+// ═══════════════════════════════════════════════════════
+function toggleStartBtn() {
+  const checked = document.getElementById('agree-check').checked;
+  const btn = document.getElementById('start-btn');
+  btn.classList.toggle('ready', checked);
+}
+
+function startTest() {
+  document.getElementById('instructions-screen').style.display = 'none';
+  buildPalette();
+  renderQuestion();
+  startTimer();
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (document.getElementById('instructions-screen').style.display !== 'none') return;
+  if (e.target.tagName === 'INPUT') return;
+  switch(e.key) {
+    case 'ArrowRight': case 'n': nextQuestion(); break;
+    case 'ArrowLeft':  case 'p': prevQuestion(); break;
+    case 'r': markForReview(); break;
+    case 'c': clearResponse(); break;
+    case '1': case '2': case '3': case '4':
+      const optIdx = parseInt(e.key) - 1;
+      const q = questions[state.currentIdx];
+      if (q.type === 'mcq' && optIdx < q.options.length) selectOption(optIdx);
+      break;
+  }
+});
+
+// Prevent accidental navigation
+window.addEventListener('beforeunload', e => {
+  e.preventDefault();
+  e.returnValue = '';
+});
+</script>
+
+<!-- Firebase auth guard — runs separately so it doesn't block the test JS above -->
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, addDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+// ──────────────────────────────────────────────────────────────
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// Auth guard — wait for Firebase to resolve auth state before doing anything
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    // Not logged in — redirect to home with a flag so the modal auto-opens
+    window.location.href = 'index.html?auth=required';
+    return;
+  }
+
+  // ── Populate profile strip with real user data ──────────────
+  const initials = (user.displayName || user.email || 'U')
+    .split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const nameEl = document.querySelector('.profile-name');
+  const rollEl = document.querySelector('.profile-roll');
+  const avatarEl = document.querySelector('.profile-avatar');
+  if (nameEl)   nameEl.textContent   = user.displayName || user.email.split('@')[0];
+  if (rollEl)   rollEl.textContent   = user.email;
+  if (avatarEl) avatarEl.textContent = initials;
+
+  // ── Wire up Firebase result saving ──────────────────────────
+  // Patch finalSubmit to save to Firestore instead of just sessionStorage
+  const originalFinalSubmit = window.finalSubmit;
+  window.finalSubmit = async function(autoSubmit = false) {
+    clearInterval(state.timerInterval);
+    document.getElementById('submit-modal')?.classList.remove('open');
+
+    const testId = new URLSearchParams(window.location.search).get('testId') || 'demo';
+    const timeTaken = DURATION - state.timeLeft;
+
+    // Score calculation
+    let score = 0, correct = 0, wrong = 0, unattempted = 0;
+    state.responses.forEach((r, i) => {
+      const q = questions[i];
+      if (r.ans === null || r.ans === undefined) { unattempted++; return; }
+      if (q.type === 'mcq') {
+        if (r.ans === q.correctAns) { score += q.posMarks; correct++; }
+        else { score += q.negMarks; wrong++; }
+      } else {
+        if (String(r.ans).trim() === String(q.correctAns).trim()) { score += q.posMarks; correct++; }
+        else wrong++;
+      }
+    });
+
+    // Save to sessionStorage for results page
+    sessionStorage.setItem('examResult', JSON.stringify({
+      score, correct, wrong, unattempted,
+      responses: state.responses,
+      totalQuestions: TOTAL,
+      timeTaken, testId,
+      userName: user.displayName || user.email
+    }));
+
+    // Save to Firestore
+    try {
+      await addDoc(collection(db, 'results'), {
+        userId:      user.uid,
+        userEmail:   user.email,
+        displayName: user.displayName || '',
+        testId,
+        score, correct, wrong, unattempted,
+        timeTaken,
+        responses: state.responses.map(r => ({ ans: r.ans ?? null, flagged: r.flagged })),
+        submittedAt: serverTimestamp()
+      });
+    } catch(e) {
+      console.error('Failed to save result to Firestore:', e);
+    }
+
+    showToast(autoSubmit ? '⏱ Time up! Submitting...' : '✅ Test submitted!');
+    setTimeout(() => { window.location.href = 'results.html'; }, 1500);
+  };
+});
+</script>
+</body>
+</html>
