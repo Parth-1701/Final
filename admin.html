@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExamForge — Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0c0c12; --surface: #13131c; --surface2: #1a1a25; --surface3: #20202e;
+      --border: #28283c; --border2: #35355a;
+      --accent: #6c63ff; --accent-soft: rgba(108,99,255,0.1); --accent-glow: rgba(108,99,255,0.2);
+      --green: #3ecf8e; --green-soft: rgba(62,207,142,0.1);
+      --red: #f56565; --red-soft: rgba(245,101,101,0.1);
+      --yellow: #f6c90e; --yellow-soft: rgba(246,201,14,0.1);
+      --orange: #f97316; --orange-soft: rgba(249,115,22,0.1);
+      --text: #e2e2f0; --text-dim: #9898b8; --text-muted: #52527a;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+    /* ── NAV ── */
+    nav {
+      position:sticky; top:0; z-index:100;
+      background:var(--surface); border-bottom:1px solid var(--border);
+      display:flex; align-items:center; padding:0 1.5rem; height:56px; gap:1rem;
+    }
+    .nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; }
+    .nav-logo span { color:var(--accent); }
+    .admin-badge {
+      background:var(--orange-soft); border:1px solid rgba(249,115,22,0.3);
+      color:var(--orange); border-radius:5px; padding:0.15rem 0.5rem;
+      font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.06em;
+    }
+    .nav-spacer { flex:1; }
+    .nav-user { font-size:0.85rem; color:var(--text-dim); }
+    #logout-btn {
+      background:none; border:1px solid var(--border); color:var(--text-muted);
+      border-radius:7px; padding:0.3rem 0.8rem;
+      font-family:'DM Sans',sans-serif; font-size:0.8rem; cursor:pointer;
+      transition:all 0.15s;
+    }
+    #logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+    /* ── LAYOUT ── */
+    .container { max-width:1100px; margin:0 auto; padding:2rem 1.5rem; }
+
+    /* ── TABS ── */
+    .page-tabs { display:flex; gap:6px; margin-bottom:2rem; }
+    .page-tab {
+      padding:0.5rem 1.2rem; border-radius:8px;
+      font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:500;
+      cursor:pointer; border:1px solid var(--border);
+      background:none; color:var(--text-dim); transition:all 0.15s;
+    }
+    .page-tab.active {
+      background:var(--accent-soft); border-color:var(--accent); color:var(--accent);
+    }
+    .page-tab:hover:not(.active) { border-color:var(--border2); color:var(--text); }
+
+    /* ── TAB PAGES ── */
+    .tab-page { display:none; }
+    .tab-page.active { display:block; }
+
+    /* ── CARDS ── */
+    .card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:14px; padding:1.5rem; margin-bottom:1.5rem;
+    }
+    .card-title {
+      font-family:'Syne',sans-serif; font-weight:700; font-size:1.05rem;
+      margin-bottom:1.2rem; display:flex; align-items:center; gap:0.5rem;
+    }
+    .card-title span { font-size:1.2rem; }
+
+    /* ── FORM ── */
+    .form-row { display:grid; gap:1rem; margin-bottom:1rem; }
+    .form-row.cols-2 { grid-template-columns:1fr 1fr; }
+    .form-row.cols-3 { grid-template-columns:1fr 1fr 1fr; }
+    .form-row.cols-4 { grid-template-columns:1fr 1fr 1fr 1fr; }
+    .form-group { display:flex; flex-direction:column; gap:0.35rem; }
+    label {
+      font-family:'DM Mono',monospace; font-size:0.7rem;
+      text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted);
+    }
+    input, select, textarea {
+      background:var(--surface2); border:1px solid var(--border2);
+      border-radius:8px; padding:0.65rem 0.9rem;
+      color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.9rem;
+      outline:none; transition:border-color 0.15s; width:100%;
+    }
+    input:focus, select:focus, textarea:focus { border-color:var(--accent); }
+    input::placeholder, textarea::placeholder { color:var(--text-muted); }
+    select option { background:var(--surface2); }
+    textarea { resize:vertical; min-height:80px; line-height:1.6; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      padding:0.6rem 1.3rem; border-radius:8px;
+      font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:500;
+      cursor:pointer; border:none; transition:all 0.15s;
+    }
+    .btn-primary {
+      background:var(--accent); color:#fff;
+      box-shadow:0 0 16px var(--accent-glow);
+    }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 0 24px var(--accent-glow); }
+    .btn-secondary {
+      background:var(--surface2); color:var(--text-dim);
+      border:1px solid var(--border2);
+    }
+    .btn-secondary:hover { color:var(--text); border-color:var(--accent); }
+    .btn-danger {
+      background:var(--red-soft); color:var(--red);
+      border:1px solid rgba(245,101,101,0.3);
+    }
+    .btn-success {
+      background:var(--green-soft); color:var(--green);
+      border:1px solid rgba(62,207,142,0.3);
+    }
+    .btn-sm { padding:0.35rem 0.8rem; font-size:0.8rem; }
+
+    /* ── QUESTION BUILDER ── */
+    #questions-list { display:flex; flex-direction:column; gap:1rem; }
+    .q-item {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:12px; overflow:hidden;
+    }
+    .q-item-header {
+      display:flex; align-items:center; gap:0.75rem;
+      padding:0.75rem 1rem; cursor:pointer;
+      border-bottom:1px solid var(--border);
+      user-select:none;
+    }
+    .q-item-header:hover { background:var(--surface3); }
+    .q-num-badge {
+      width:28px; height:28px; border-radius:7px; flex-shrink:0;
+      background:var(--accent-soft); border:1px solid rgba(108,99,255,0.2);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent);
+    }
+    .q-item-preview {
+      flex:1; font-size:0.875rem; color:var(--text-dim);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .q-type-tag {
+      font-family:'DM Mono',monospace; font-size:0.65rem;
+      padding:0.15rem 0.45rem; border-radius:4px;
+      text-transform:uppercase; letter-spacing:0.05em;
+    }
+    .q-type-tag.mcq { background:var(--accent-soft); color:var(--accent); }
+    .q-type-tag.integer { background:var(--orange-soft); color:var(--orange); }
+    .q-item-body { padding:1rem; display:none; }
+    .q-item-body.open { display:block; }
+    .options-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.5rem; }
+    .opt-row {
+      display:flex; align-items:center; gap:0.5rem;
+    }
+    .opt-letter {
+      width:26px; height:26px; border-radius:6px; flex-shrink:0;
+      background:var(--surface3); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--text-dim);
+    }
+    .correct-radio { accent-color:var(--green); cursor:pointer; }
+    .q-item-actions { display:flex; gap:0.5rem; margin-top:0.75rem; justify-content:flex-end; }
+
+    /* ── JSON UPLOAD ── */
+    .upload-zone {
+      border:2px dashed var(--border2); border-radius:12px;
+      padding:2.5rem; text-align:center;
+      cursor:pointer; transition:all 0.2s;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color:var(--accent); background:var(--accent-soft);
+    }
+    .upload-icon { font-size:2rem; margin-bottom:0.75rem; }
+    .upload-title { font-family:'Syne',sans-serif; font-weight:700; margin-bottom:0.3rem; }
+    .upload-sub { font-size:0.85rem; color:var(--text-muted); }
+    #file-input { display:none; }
+
+    /* ── JSON PREVIEW ── */
+    #json-preview {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:10px; padding:1rem;
+      font-family:'DM Mono',monospace; font-size:0.78rem;
+      color:var(--text-dim); max-height:300px; overflow-y:auto;
+      white-space:pre; line-height:1.6; margin-top:1rem; display:none;
+    }
+
+    /* ── TEST LIST ── */
+    .test-list { display:flex; flex-direction:column; gap:0.75rem; }
+    .test-item {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; padding:1rem 1.2rem;
+      display:flex; align-items:center; gap:1rem;
+    }
+    .test-item:hover { border-color:var(--border2); }
+    .test-info { flex:1; }
+    .test-name { font-weight:500; margin-bottom:2px; }
+    .test-meta {
+      font-family:'DM Mono',monospace; font-size:0.72rem;
+      color:var(--text-muted); display:flex; gap:1rem;
+    }
+    .test-badge {
+      padding:0.2rem 0.55rem; border-radius:5px;
+      font-family:'DM Mono',monospace; font-size:0.7rem;
+      letter-spacing:0.04em;
+    }
+    .badge-jee   { background:var(--accent-soft); color:var(--accent); }
+    .badge-adv   { background:var(--red-soft); color:var(--red); }
+    .badge-mht   { background:var(--green-soft); color:var(--green); }
+    .badge-bit   { background:var(--orange-soft); color:var(--orange); }
+    .published-dot {
+      width:8px; height:8px; border-radius:50%; background:var(--green);
+      box-shadow:0 0 6px var(--green);
+    }
+    .draft-dot { width:8px; height:8px; border-radius:50%; background:var(--text-muted); }
+
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:1rem; margin-bottom:2rem;
+    }
+    .stat-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; padding:1.2rem;
+    }
+    .stat-val {
+      font-family:'Syne',sans-serif; font-size:2rem; font-weight:700;
+    }
+    .stat-lbl { font-size:0.8rem; color:var(--text-muted); margin-top:2px; }
+
+    /* ── TOAST ── */
+    #toast {
+      position:fixed; bottom:1.5rem; right:1.5rem;
+      background:var(--surface2); border:1px solid var(--border2);
+      border-radius:10px; padding:0.75rem 1.2rem;
+      font-size:0.875rem; transform:translateY(80px); opacity:0;
+      transition:all 0.3s; z-index:999;
+      box-shadow:0 4px 24px rgba(0,0,0,0.4);
+    }
+    #toast.show { transform:translateY(0); opacity:1; }
+    #toast.success { border-color:rgba(62,207,142,0.4); color:var(--green); }
+    #toast.error   { border-color:rgba(245,101,101,0.4); color:var(--red); }
+
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
+      position:fixed; inset:0; background:var(--bg);
+      display:flex; align-items:center; justify-content:center;
+      z-index:500;
+    }
+    .login-box {
+      background:var(--surface); border:1px solid var(--border2);
+      border-radius:18px; padding:2.5rem; width:360px;
+    }
+    .login-title { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; margin-bottom:0.3rem; }
+    .login-sub { color:var(--text-muted); font-size:0.875rem; margin-bottom:1.8rem; }
+    .login-btn {
+      width:100%; padding:0.75rem; border-radius:9px;
+      background:var(--accent); color:#fff; border:none;
+      font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:500;
+      cursor:pointer; margin-top:0.5rem;
+      box-shadow:0 0 20px var(--accent-glow); transition:all 0.2s;
+    }
+    .login-btn:hover { transform:translateY(-1px); }
+    .login-err { color:var(--red); font-size:0.8rem; margin-top:0.5rem; min-height:18px; }
+
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+    @media(max-width:768px) {
+      .form-row.cols-2, .form-row.cols-3, .form-row.cols-4 { grid-template-columns:1fr; }
+      .stats-strip { grid-template-columns:1fr 1fr; }
+      .options-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">Admin Login</div>
+    <div class="login-sub">ExamForge · Admin Panel</div>
+    <div class="form-group" style="margin-bottom:1rem">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="admin@examforge.com"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••"
+             onkeydown="if(event.key==='Enter') adminLogin()"/>
+    </div>
+    <div class="login-err" id="login-err"></div>
+    <button class="login-btn" onclick="adminLogin()">Login →</button>
+    <p style="font-size:0.75rem;color:var(--text-muted);margin-top:1rem;text-align:center">
+      Your account must have <code style="color:var(--accent)">role: "admin"</code> in Firestore users collection.
+    </p>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Exam<span>Forge</span></div>
+  <div class="admin-badge">ADMIN</div>
+  <div class="nav-spacer"></div>
+  <div class="nav-user" id="nav-user-email"></div>
+  <button id="logout-btn" onclick="adminLogout()">Logout</button>
+</nav>
+
+<!-- MAIN -->
+<div class="container">
+  <div class="page-tabs">
+    <button class="page-tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+    <button class="page-tab" onclick="showTab('create-test')">➕ Create Test</button>
+    <button class="page-tab" onclick="showTab('add-questions')">❓ Add Questions</button>
+    <button class="page-tab" onclick="showTab('json-upload')">📁 JSON Upload</button>
+    <button class="page-tab" onclick="showTab('manage')">📋 Manage Tests</button>
+  </div>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="tab-page active" id="tab-dashboard">
+    <div class="stats-strip">
+      <div class="stat-card">
+        <div class="stat-val" id="ds-tests">—</div>
+        <div class="stat-lbl">Total Tests</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="ds-published">—</div>
+        <div class="stat-lbl">Published</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="ds-results">—</div>
+        <div class="stat-lbl">Submissions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="ds-users">—</div>
+        <div class="stat-lbl">Students</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>🚀</span> Quick Start Guide</div>
+      <div style="display:flex;flex-direction:column;gap:0.9rem;font-size:0.9rem;color:var(--text-dim);line-height:1.7">
+        <div><strong style="color:var(--text)">Step 1 — Set up Firebase</strong><br/>
+          Edit <code style="color:var(--accent)">firebase.js</code> and paste your Firebase config. Enable <strong>Email/Password</strong> and <strong>Google</strong> auth in your Firebase console under Authentication → Sign-in methods.
+        </div>
+        <div><strong style="color:var(--text)">Step 2 — Apply Firestore Rules</strong><br/>
+          Open <code style="color:var(--accent)">firebase.js</code>, scroll to the bottom, copy the security rules, and paste them into <strong>Firestore → Rules</strong> in your Firebase console.
+        </div>
+        <div><strong style="color:var(--text)">Step 3 — Make yourself admin</strong><br/>
+          After registering on the site, go to <strong>Firestore → users → your UID document</strong> and change the <code style="color:var(--accent)">role</code> field from <code>"student"</code> to <code>"admin"</code>.
+        </div>
+        <div><strong style="color:var(--text)">Step 4 — Create a test</strong><br/>
+          Click <strong>"Create Test"</strong> to fill in test metadata. Then click <strong>"Add Questions"</strong> to add questions one by one, or use <strong>"JSON Upload"</strong> to bulk-upload from a file.
+        </div>
+        <div><strong style="color:var(--text)">Step 5 — Publish</strong><br/>
+          In <strong>"Manage Tests"</strong>, toggle a test to Published so students can see it on the homepage.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CREATE TEST ══ -->
+  <div class="tab-page" id="tab-create-test">
+    <div class="card">
+      <div class="card-title"><span>📝</span> Create New Test</div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label>Test Title</label>
+          <input type="text" id="ct-title" placeholder="JEE Mains 2024 — Mock Test 01"/>
+        </div>
+        <div class="form-group">
+          <label>Exam Type</label>
+          <select id="ct-type">
+            <option value="jee_mains">JEE Mains</option>
+            <option value="jee_advanced">JEE Advanced</option>
+            <option value="mht_cet">MHT CET</option>
+            <option value="bitsat">BITSAT</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-4">
+        <div class="form-group">
+          <label>Duration (minutes)</label>
+          <input type="number" id="ct-duration" value="180" min="30"/>
+        </div>
+        <div class="form-group">
+          <label>Total Questions</label>
+          <input type="number" id="ct-questions" value="90"/>
+        </div>
+        <div class="form-group">
+          <label>Total Marks</label>
+          <input type="number" id="ct-marks" value="300"/>
+        </div>
+        <div class="form-group">
+          <label>Year / Series</label>
+          <input type="text" id="ct-year" placeholder="2024 / Set A"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Description (optional)</label>
+          <textarea id="ct-desc" placeholder="Full syllabus mock — includes questions from all chapters..."></textarea>
+        </div>
+      </div>
+
+      <div class="card-title" style="margin-top:0.5rem"><span>📚</span> Sections</div>
+      <div id="sections-list">
+        <div class="form-row cols-3" style="margin-bottom:0.5rem" id="section-row-0">
+          <div class="form-group"><label>Section Name</label><input type="text" placeholder="Physics" value="Physics" class="sec-name"/></div>
+          <div class="form-group"><label>Question Start (0-indexed)</label><input type="number" value="0" class="sec-start"/></div>
+          <div class="form-group"><label>Question End (inclusive)</label><input type="number" value="29" class="sec-end"/></div>
+        </div>
+        <div class="form-row cols-3" style="margin-bottom:0.5rem" id="section-row-1">
+          <div class="form-group"><label>Section Name</label><input type="text" placeholder="Chemistry" value="Chemistry" class="sec-name"/></div>
+          <div class="form-group"><label>Question Start</label><input type="number" value="30" class="sec-start"/></div>
+          <div class="form-group"><label>Question End</label><input type="number" value="59" class="sec-end"/></div>
+        </div>
+        <div class="form-row cols-3" id="section-row-2">
+          <div class="form-group"><label>Section Name</label><input type="text" placeholder="Mathematics" value="Mathematics" class="sec-name"/></div>
+          <div class="form-group"><label>Question Start</label><input type="number" value="60" class="sec-start"/></div>
+          <div class="form-group"><label>Question End</label><input type="number" value="89" class="sec-end"/></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.75rem;margin-top:1rem;align-items:center">
+        <button class="btn btn-secondary btn-sm" onclick="addSection()">+ Add Section</button>
+        <span style="font-size:0.8rem;color:var(--text-muted)">Created Test ID will appear here after saving</span>
+        <div class="nav-spacer"></div>
+        <button class="btn btn-primary" onclick="createTest()">💾 Save Test to Firebase</button>
+      </div>
+      <div id="ct-result" style="margin-top:1rem;font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--green);display:none"></div>
+    </div>
+  </div>
+
+  <!-- ══ ADD QUESTIONS ══ -->
+  <div class="tab-page" id="tab-add-questions">
+    <div class="card">
+      <div class="card-title"><span>🎯</span> Add Questions to Test</div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label>Target Test ID</label>
+          <input type="text" id="aq-test-id" placeholder="Paste Test ID from Create Test step"/>
+        </div>
+        <div class="form-group">
+          <label>Question Type</label>
+          <select id="aq-type" onchange="toggleQType()">
+            <option value="mcq">MCQ (Single Correct)</option>
+            <option value="integer">Numerical (Integer/Decimal)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-4">
+        <div class="form-group">
+          <label>Section (0=Phy, 1=Chem, 2=Math)</label>
+          <input type="number" id="aq-section" value="0" min="0"/>
+        </div>
+        <div class="form-group">
+          <label>Section Sub (A or B)</label>
+          <select id="aq-sub">
+            <option value="A">A (MCQ)</option>
+            <option value="B">B (Numerical)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>+Marks for Correct</label>
+          <input type="number" id="aq-pos" value="4"/>
+        </div>
+        <div class="form-group">
+          <label>−Marks for Wrong</label>
+          <input type="number" id="aq-neg" value="-1"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Question Text (HTML allowed: &lt;em&gt;, &lt;strong&gt;)</label>
+          <textarea id="aq-text" placeholder="A particle executes SHM with amplitude A..."></textarea>
+        </div>
+      </div>
+
+      <div id="mcq-opts">
+        <label style="margin-bottom:0.5rem;display:block">Options (mark correct answer with the radio button)</label>
+        <div class="options-grid">
+          <div class="opt-row"><div class="opt-letter">A</div><input type="text" id="opt-0" placeholder="Option A"/><input type="radio" name="correct-opt" value="0" class="correct-radio" checked/></div>
+          <div class="opt-row"><div class="opt-letter">B</div><input type="text" id="opt-1" placeholder="Option B"/><input type="radio" name="correct-opt" value="1" class="correct-radio"/></div>
+          <div class="opt-row"><div class="opt-letter">C</div><input type="text" id="opt-2" placeholder="Option C"/><input type="radio" name="correct-opt" value="2" class="correct-radio"/></div>
+          <div class="opt-row"><div class="opt-letter">D</div><input type="text" id="opt-3" placeholder="Option D"/><input type="radio" name="correct-opt" value="3" class="correct-radio"/></div>
+        </div>
+      </div>
+
+      <div id="integer-ans" style="display:none">
+        <div class="form-group" style="max-width:250px">
+          <label>Correct Answer (integer or decimal)</label>
+          <input type="text" id="aq-int-ans" placeholder="e.g. 42 or 3.14"/>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;margin-top:1.2rem;align-items:center">
+        <button class="btn btn-primary" onclick="addQuestion()">➕ Add Question</button>
+        <button class="btn btn-secondary" onclick="clearQForm()">Clear</button>
+        <span id="aq-counter" style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--text-muted)">0 questions added this session</span>
+      </div>
+    </div>
+
+    <!-- Added questions preview -->
+    <div class="card">
+      <div class="card-title"><span>📋</span> Questions Added This Session
+        <div class="nav-spacer"></div>
+        <button class="btn btn-danger btn-sm" onclick="clearSessionQuestions()">Clear All</button>
+      </div>
+      <div id="questions-list">
+        <div style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem">
+          No questions added yet. Fill the form above and click "Add Question".
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ JSON UPLOAD ══ -->
+  <div class="tab-page" id="tab-json-upload">
+    <div class="card">
+      <div class="card-title"><span>📁</span> Bulk Upload via JSON</div>
+      <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.2rem;line-height:1.6">
+        Upload a JSON file containing an entire test with all questions and answers. This is the fastest way to add a full 90-question mock test.
+      </p>
+
+      <div class="form-group" style="margin-bottom:1.2rem;max-width:340px">
+        <label>Target Test ID (create test first)</label>
+        <input type="text" id="ju-test-id" placeholder="Paste Test ID here"/>
+      </div>
+
+      <div class="upload-zone" id="upload-zone"
+           onclick="document.getElementById('file-input').click()"
+           ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+        <div class="upload-icon">📄</div>
+        <div class="upload-title">Drop your JSON file here</div>
+        <div class="upload-sub">or click to browse · .json files only</div>
+      </div>
+      <input type="file" id="file-input" accept=".json" onchange="fileSelected(event)"/>
+
+      <pre id="json-preview"></pre>
+
+      <div style="display:flex;gap:0.75rem;margin-top:1.2rem">
+        <button class="btn btn-primary" id="upload-btn" onclick="uploadJSON()" style="display:none">
+          🚀 Upload to Firebase
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="downloadTemplate()">⬇ Download Template JSON</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>📖</span> JSON Format Reference</div>
+      <pre style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1.2rem;font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--text-dim);overflow-x:auto;line-height:1.7">{
+  "questions": [
+    {
+      "order": 1,
+      "section": 0,
+      "sectionSub": "A",
+      "type": "mcq",
+      "text": "A particle executes SHM with amplitude &lt;em&gt;A&lt;/em&gt;...",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctAns": 0,
+      "posMarks": 4,
+      "negMarks": -1
+    },
+    {
+      "order": 21,
+      "section": 0,
+      "sectionSub": "B",
+      "type": "integer",
+      "text": "The moment of inertia of a solid sphere...",
+      "options": [],
+      "correctAns": "5.33",
+      "posMarks": 4,
+      "negMarks": 0
+    }
+  ]
+}</pre>
+      <div style="margin-top:0.75rem;font-size:0.82rem;color:var(--text-muted);line-height:1.7">
+        <strong style="color:var(--text)">Fields:</strong>
+        <code style="color:var(--accent)">order</code> = question number (1–90) ·
+        <code style="color:var(--accent)">section</code> = 0 (Physics) / 1 (Chem) / 2 (Maths) ·
+        <code style="color:var(--accent)">sectionSub</code> = "A" (MCQ) or "B" (Numerical) ·
+        <code style="color:var(--accent)">type</code> = "mcq" or "integer" ·
+        <code style="color:var(--accent)">correctAns</code> = index (0–3) for MCQ, string value for integer ·
+        HTML tags allowed in <code style="color:var(--accent)">text</code> and <code style="color:var(--accent)">options</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MANAGE TESTS ══ -->
+  <div class="tab-page" id="tab-manage">
+    <div class="card">
+      <div class="card-title"><span>📋</span> All Tests
+        <div class="nav-spacer"></div>
+        <button class="btn btn-secondary btn-sm" onclick="loadTests()">🔄 Refresh</button>
+      </div>
+      <div class="test-list" id="test-list">
+        <div style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem">
+          Loading tests...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Firebase SDK (v10 modular, via CDN) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc,
+         updateDoc, query, orderBy, where, serverTimestamp, writeBatch }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─── PASTE YOUR FIREBASE CONFIG HERE ────────────────────────────
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+// ────────────────────────────────────────────────────────────────
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let sessionQuestions = [];
+let sessionQCount    = 0;
+let currentTests     = [];
+let parsedJSON       = null;
+
+// ── Auth ──────────────────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+  if (!user) { document.getElementById('login-screen').style.display = 'flex'; return; }
+  // Verify admin role
+  const snap = await getDoc(doc(db, 'users', user.uid));
+  if (!snap.exists() || snap.data().role !== 'admin') {
+    showToast('Access denied: not an admin.', 'error');
+    signOut(auth);
+    document.getElementById('login-screen').style.display = 'flex';
+    return;
+  }
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('nav-user-email').textContent = user.email;
+  loadDashboard();
+  loadTests();
+});
+
+window.adminLogin = async () => {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl    = document.getElementById('login-err');
+  errEl.textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(e) {
+    errEl.textContent = e.message.replace('Firebase: ', '');
+  }
+};
+
+window.adminLogout = () => signOut(auth);
+
+// ── Dashboard ─────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [testsSnap, resultsSnap, usersSnap] = await Promise.all([
+      getDocs(collection(db, 'tests')),
+      getDocs(collection(db, 'results')),
+      getDocs(collection(db, 'users')),
+    ]);
+    const published = testsSnap.docs.filter(d => d.data().isPublished).length;
+    document.getElementById('ds-tests').textContent     = testsSnap.size;
+    document.getElementById('ds-published').textContent = published;
+    document.getElementById('ds-results').textContent   = resultsSnap.size;
+    document.getElementById('ds-users').textContent     = usersSnap.size;
+  } catch(e) { console.error(e); }
+}
+
+// ── Create Test ───────────────────────────────────────────────
+window.createTest = async () => {
+  const title    = document.getElementById('ct-title').value.trim();
+  const examType = document.getElementById('ct-type').value;
+  const duration = parseInt(document.getElementById('ct-duration').value) * 60;
+  const totalQ   = parseInt(document.getElementById('ct-questions').value);
+  const totalM   = parseInt(document.getElementById('ct-marks').value);
+  const year     = document.getElementById('ct-year').value.trim();
+  const desc     = document.getElementById('ct-desc').value.trim();
+
+  if (!title) { showToast('Please enter a test title.', 'error'); return; }
+
+  const sections = [];
+  document.querySelectorAll('[id^=section-row-]').forEach(row => {
+    const name  = row.querySelector('.sec-name').value.trim();
+    const start = parseInt(row.querySelector('.sec-start').value);
+    const end   = parseInt(row.querySelector('.sec-end').value);
+    if (name) sections.push({ name, start, end });
+  });
+
+  try {
+    const ref = await addDoc(collection(db, 'tests'), {
+      title, examType, duration, totalQuestions: totalQ,
+      totalMarks: totalM, year, description: desc,
+      sections, isPublished: false, createdAt: serverTimestamp()
+    });
+    const resultEl = document.getElementById('ct-result');
+    resultEl.style.display = 'block';
+    resultEl.textContent = `✅ Test created! Test ID: ${ref.id}  (copy this for adding questions)`;
+    showToast('Test created successfully!', 'success');
+    loadTests();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+};
+
+window.addSection = () => {
+  const list = document.getElementById('sections-list');
+  const idx  = list.children.length;
+  const div  = document.createElement('div');
+  div.className = 'form-row cols-3';
+  div.id = `section-row-${idx}`;
+  div.style.marginBottom = '0.5rem';
+  div.innerHTML = `
+    <div class="form-group"><label>Section Name</label><input type="text" placeholder="Section ${idx+1}" class="sec-name"/></div>
+    <div class="form-group"><label>Question Start</label><input type="number" value="0" class="sec-start"/></div>
+    <div class="form-group"><label>Question End</label><input type="number" value="0" class="sec-end"/></div>
+  `;
+  list.appendChild(div);
+};
+
+// ── Add Questions ─────────────────────────────────────────────
+window.toggleQType = () => {
+  const type = document.getElementById('aq-type').value;
+  document.getElementById('mcq-opts').style.display = type === 'mcq' ? '' : 'none';
+  document.getElementById('integer-ans').style.display = type === 'integer' ? '' : 'none';
+};
+
+window.addQuestion = async () => {
+  const testId  = document.getElementById('aq-test-id').value.trim();
+  const type    = document.getElementById('aq-type').value;
+  const section = parseInt(document.getElementById('aq-section').value);
+  const sub     = document.getElementById('aq-sub').value;
+  const posM    = parseInt(document.getElementById('aq-pos').value);
+  const negM    = parseInt(document.getElementById('aq-neg').value);
+  const text    = document.getElementById('aq-text').value.trim();
+
+  if (!testId) { showToast('Please enter a Test ID.', 'error'); return; }
+  if (!text)   { showToast('Please enter the question text.', 'error'); return; }
+
+  let options = [], correctAns;
+
+  if (type === 'mcq') {
+    options = [0,1,2,3].map(i => document.getElementById(`opt-${i}`).value.trim());
+    if (options.some(o => !o)) { showToast('Please fill all 4 options.', 'error'); return; }
+    correctAns = parseInt(document.querySelector('input[name=correct-opt]:checked').value);
+  } else {
+    correctAns = document.getElementById('aq-int-ans').value.trim();
+    if (!correctAns) { showToast('Please enter the correct answer.', 'error'); return; }
+  }
+
+  sessionQCount++;
+  const qData = {
+    order: sessionQCount, section, sectionSub: sub,
+    type, text, options, correctAns, posMarks: posM, negMarks: negM
+  };
+
+  try {
+    await addDoc(collection(db, 'tests', testId, 'questions'), qData);
+    sessionQuestions.push(qData);
+    renderSessionQuestions();
+    document.getElementById('aq-counter').textContent = `${sessionQCount} question(s) added`;
+    showToast(`Q${sessionQCount} saved to Firebase!`, 'success');
+    // Keep test ID, clear rest
+    document.getElementById('aq-text').value = '';
+    [0,1,2,3].forEach(i => { const el=document.getElementById(`opt-${i}`); if(el) el.value=''; });
+    document.getElementById('aq-int-ans').value = '';
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+};
+
+window.clearQForm = () => {
+  document.getElementById('aq-text').value = '';
+  [0,1,2,3].forEach(i => { const el=document.getElementById(`opt-${i}`); if(el) el.value=''; });
+  document.getElementById('aq-int-ans').value = '';
+};
+
+window.clearSessionQuestions = () => {
+  sessionQuestions = []; sessionQCount = 0;
+  renderSessionQuestions();
+  document.getElementById('aq-counter').textContent = '0 questions added this session';
+};
+
+function renderSessionQuestions() {
+  const container = document.getElementById('questions-list');
+  if (sessionQuestions.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem">No questions added yet.</div>';
+    return;
+  }
+  container.innerHTML = sessionQuestions.map((q, i) => `
+    <div class="q-item">
+      <div class="q-item-header" onclick="toggleQ(${i})">
+        <div class="q-num-badge">${i+1}</div>
+        <div class="q-item-preview">${q.text.replace(/<[^>]+>/g,'')}</div>
+        <div class="q-type-tag ${q.type}">${q.type === 'mcq' ? 'MCQ' : 'NUM'}</div>
+        <span style="color:var(--text-muted);font-size:0.8rem">▸</span>
+      </div>
+      <div class="q-item-body" id="qbody-${i}">
+        ${q.type === 'mcq' ? q.options.map((o,j)=>`
+          <div class="opt-row" style="margin-bottom:4px">
+            <div class="opt-letter" style="${j===q.correctAns?'background:var(--green-soft);border-color:var(--green);color:var(--green)':''}">
+              ${String.fromCharCode(65+j)}
+            </div>
+            <span style="font-size:0.875rem">${o}</span>
+            ${j===q.correctAns?'<span style="color:var(--green);font-size:0.75rem;margin-left:4px">✓ correct</span>':''}
+          </div>`).join('') :
+          `<div style="font-size:0.875rem">Answer: <code style="color:var(--green)">${q.correctAns}</code></div>`
+        }
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem">
+          Section ${q.section} · Sub ${q.sectionSub} · +${q.posMarks} / ${q.negMarks}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.toggleQ = (i) => {
+  const body = document.getElementById(`qbody-${i}`);
+  body.classList.toggle('open');
+};
+
+// ── JSON Upload ───────────────────────────────────────────────
+window.dragOver  = e => { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); };
+window.dragLeave = () => document.getElementById('upload-zone').classList.remove('drag-over');
+window.dropFile  = e => {
+  e.preventDefault(); dragLeave();
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+};
+window.fileSelected = e => { if (e.target.files[0]) processFile(e.target.files[0]); };
+
+function processFile(file) {
+  if (!file.name.endsWith('.json')) { showToast('Please upload a .json file.', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      parsedJSON = JSON.parse(e.target.result);
+      const preview = document.getElementById('json-preview');
+      preview.style.display = 'block';
+      preview.textContent = JSON.stringify(parsedJSON, null, 2).slice(0, 2000) + '...';
+      document.getElementById('upload-btn').style.display = 'inline-flex';
+      showToast(`Loaded ${parsedJSON.questions?.length || 0} questions.`, 'success');
+    } catch(err) {
+      showToast('Invalid JSON file.', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+window.uploadJSON = async () => {
+  const testId = document.getElementById('ju-test-id').value.trim();
+  if (!testId) { showToast('Please enter a Test ID.', 'error'); return; }
+  if (!parsedJSON?.questions?.length) { showToast('No questions found in JSON.', 'error'); return; }
+
+  showToast('Uploading...', 'success');
+
+  // Batch write in chunks of 500 (Firestore limit)
+  const questions = parsedJSON.questions;
+  const chunkSize = 490;
+  for (let i = 0; i < questions.length; i += chunkSize) {
+    const batch = writeBatch(db);
+    const chunk = questions.slice(i, i + chunkSize);
+    chunk.forEach(q => {
+      const ref = doc(collection(db, 'tests', testId, 'questions'));
+      batch.set(ref, q);
+    });
+    await batch.commit();
+  }
+
+  showToast(`✅ ${questions.length} questions uploaded!`, 'success');
+  document.getElementById('upload-btn').style.display = 'none';
+  parsedJSON = null;
+};
+
+window.downloadTemplate = () => {
+  const template = {
+    questions: [
+      { order:1, section:0, sectionSub:"A", type:"mcq",
+        text:"A particle executes SHM with amplitude <em>A</em>. Its velocity at mean position is:",
+        options:["ωA","ω²A","A/ω","zero"], correctAns:0, posMarks:4, negMarks:-1 },
+      { order:2, section:0, sectionSub:"A", type:"mcq",
+        text:"The work done by gravity on a body moving in a horizontal plane is:",
+        options:["Positive","Negative","Zero","Cannot determine"], correctAns:2, posMarks:4, negMarks:-1 },
+      { order:21, section:0, sectionSub:"B", type:"integer",
+        text:"A wire of resistance 8 Ω is bent into a circle. Resistance between diametrically opposite points (in Ω) is:",
+        options:[], correctAns:"2", posMarks:4, negMarks:0 }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(template, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'examforge-questions-template.json';
+  a.click();
+};
+
+// ── Manage Tests ──────────────────────────────────────────────
+async function loadTests() {
+  const container = document.getElementById('test-list');
+  try {
+    const snap = await getDocs(query(collection(db, 'tests'), orderBy('createdAt', 'desc')));
+    currentTests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (currentTests.length === 0) {
+      container.innerHTML = '<div style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem">No tests yet. Create one!</div>';
+      return;
+    }
+    const badgeClass = { jee_mains:'badge-jee', jee_advanced:'badge-adv', mht_cet:'badge-mht', bitsat:'badge-bit' };
+    const examLabel  = { jee_mains:'JEE Mains', jee_advanced:'JEE Advanced', mht_cet:'MHT CET', bitsat:'BITSAT' };
+    container.innerHTML = currentTests.map(t => `
+      <div class="test-item">
+        <div class="${t.isPublished ? 'published-dot' : 'draft-dot'}" title="${t.isPublished?'Published':'Draft'}"></div>
+        <div class="test-info">
+          <div class="test-name">${t.title}</div>
+          <div class="test-meta">
+            <span>${t.totalQuestions || '?'} questions</span>
+            <span>${t.totalMarks || '?'} marks</span>
+            <span>${Math.round((t.duration||0)/60)} min</span>
+            <span style="font-family:'DM Mono',monospace">${t.id}</span>
+          </div>
+        </div>
+        <div class="test-badge ${badgeClass[t.examType] || 'badge-jee'}">${examLabel[t.examType] || t.examType}</div>
+        <button class="btn btn-sm ${t.isPublished ? 'btn-danger' : 'btn-success'}"
+                onclick="togglePublish('${t.id}', ${t.isPublished})">
+          ${t.isPublished ? '⬇ Unpublish' : '🚀 Publish'}
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="copyId('${t.id}')">📋 Copy ID</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="color:var(--red);font-size:0.875rem;padding:1rem">Error loading tests: ${e.message}</div>`;
+  }
+}
+
+window.togglePublish = async (testId, current) => {
+  try {
+    await updateDoc(doc(db, 'tests', testId), { isPublished: !current });
+    showToast(current ? 'Test unpublished.' : '🚀 Test published!', 'success');
+    loadTests(); loadDashboard();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};
+
+window.copyId = id => {
+  navigator.clipboard.writeText(id);
+  showToast('Test ID copied!', 'success');
+};
+
+window.loadTests = loadTests;
+
+// ── UI helpers ────────────────────────────────────────────────
+window.showTab = (tab) => {
+  document.querySelectorAll('.tab-page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  event.target.classList.add('active');
+};
+
+let toastTimer;
+window.showToast = (msg, type = '') => {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3000);
+};
+</script>
+</body>
+</html>
