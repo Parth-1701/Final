@@ -125,14 +125,18 @@
     /* Loading overlay */
     #loading-overlay {
       position: fixed; inset: 0; background: white; z-index: 1000;
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px;
       font-size: 1.5rem; font-weight: bold; color: var(--nta-blue);
     }
+    #loading-error { font-size: 1rem; color: #eb4242; font-weight: normal; }
   </style>
 </head>
 <body>
 
-  <div id="loading-overlay">Loading Exam Environment...</div>
+  <div id="loading-overlay">
+    <div>Loading Exam Environment...</div>
+    <div id="loading-error"></div>
+  </div>
 
   <div class="top-header">
     <div class="exam-title" id="display-test-title">ExamForge Mock Test</div>
@@ -196,12 +200,12 @@
       </div>
 
       <div class="submit-bar">
-        <button class="btn btn-blue" style="width: 100%; padding: 10px;" onclick="submitExam()">Submit Test</button>
+        <button class="btn btn-blue" style="width: 100%; padding: 12px; font-size: 1.05rem;" onclick="submitExam()">Submit Test</button>
       </div>
     </div>
   </div>
-  
-<script type="module">
+
+  <script type="module">
     import { db, auth } from './firebase.js';
     import { doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -228,11 +232,14 @@
       try {
         // 1. Fetch Test Details
         const testSnap = await getDoc(doc(db, 'tests', testId));
-        if (!testSnap.exists()) throw new Error("Test not found");
-        testData = { id: testSnap.id, ...testSnap.data() };
+        if (!testSnap.exists()) throw new Error("Test not found in Database");
+        const rawData = testSnap.data();
+        
+        // Handle nested MHTCET test_info structure if present
+        testData = { id: testSnap.id, ...(rawData.test_info || {}), ...rawData };
 
-        // Normalize Sections for MHTCET JSON format
-        if (testData.sections && testData.sections[0].start === undefined) {
+        // Normalize Sections
+        if (testData.sections && testData.sections.length > 0 && testData.sections[0].start === undefined) {
           let cur = 0;
           testData.sections = testData.sections.map(sec => {
             const count = sec.questions || 50;
@@ -242,16 +249,22 @@
           });
         }
 
-        // 2. Fetch Questions
+        // 2. Safely Fetch Questions (Detects subcollection OR array)
+        let rawQuestions = [];
         const qSnap = await getDocs(collection(db, 'tests', testId, 'questions'));
+        if (!qSnap.empty) {
+          rawQuestions = qSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        } else if (Array.isArray(rawData.questions)) {
+          rawQuestions = rawData.questions; // Pulled from main doc if admin uploaded JSON directly
+        } else {
+           throw new Error("No questions array or subcollection found in this test");
+        }
         
         // Smart JSON Adapter: Converts your MHTCET JSON layout into the UI format
-        questions = qSnap.docs.map(d => {
-          const raw = d.data();
+        questions = rawQuestions.map((raw, idx) => {
           const text = raw.text || raw.question || 'Missing Text';
           const type = raw.type || 'mcq';
           
-          // Handle Options: Converts {"A": "val", "B": "val"} into an Array
           let options = raw.options || [];
           let isObj = false;
           if (!Array.isArray(options) && typeof options === 'object') {
@@ -259,33 +272,30 @@
             isObj = true;
           }
 
-          // Handle Correct Answer: Converts "B" into index 1
           let correctAns = raw.correctAns !== undefined ? raw.correctAns : raw.answer;
           if (isObj && typeof correctAns === 'string') {
             const map = { 'A':0, 'B':1, 'C':2, 'D':3 };
             if (map[correctAns] !== undefined) correctAns = map[correctAns];
           }
 
-          // Handle Missing Marks
           let posMarks = raw.posMarks || 1;
           let negMarks = raw.negMarks || 0;
           if (raw.posMarks === undefined && testData.sections) {
              const secInfo = testData.sections.find(s => s.name === raw.section);
              if (secInfo) { 
-               posMarks = secInfo.marks_per_correct || 1; 
-               negMarks = secInfo.negative_marking || 0; 
+               posMarks = secInfo.marks_per_correct !== undefined ? secInfo.marks_per_correct : 1; 
+               negMarks = secInfo.negative_marking !== undefined ? secInfo.negative_marking : 0; 
              }
           }
 
-          return { id: d.id, order: raw.order || raw.id || 0, text, type, options, correctAns, posMarks, negMarks };
+          return { order: raw.order || raw.id || idx, text, type, options, correctAns, posMarks, negMarks };
         });
 
         // Sort properly
         questions.sort((a, b) => a.order - b.order);
-
-        if (questions.length === 0) throw new Error("No questions found in this test");
+        if (questions.length === 0) throw new Error("Question list is empty");
         
-        document.getElementById('display-test-title').innerText = testData.title || 'Mock Exam';
+        document.getElementById('display-test-title').innerText = testData.title || testData.name || 'Mock Exam';
         document.getElementById('cand-exam').innerText = testData.examType ? testData.examType.replace('_', ' ').toUpperCase() : 'Mock Session';
         
         const durMins = testData.duration_minutes || (testData.duration ? testData.duration / 60 : 180);
@@ -304,7 +314,7 @@
         document.getElementById('loading-overlay').style.display = 'none';
       } catch (err) {
         console.error(err);
-        document.getElementById('loading-overlay').innerText = "Failed to load test data. Please check connection.";
+        document.getElementById('loading-error').innerText = "Error: " + err.message;
       }
     });
 
@@ -449,7 +459,7 @@
       }
       
       clearInterval(timerInterval);
-      document.getElementById('loading-overlay').innerText = "Calculating Score and Submitting...";
+      document.getElementById('loading-overlay').innerHTML = "<div>Calculating Score and Submitting...</div>";
       document.getElementById('loading-overlay').style.display = 'flex';
 
       const durMins = testData.duration_minutes || (testData.duration ? testData.duration / 60 : 180);
@@ -489,6 +499,6 @@
         document.getElementById('loading-overlay').style.display = 'none';
       }
     };
-</script>
+  </script>
 </body>
 </html>
