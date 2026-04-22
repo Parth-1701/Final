@@ -202,17 +202,19 @@
   </div>
 
   <script type="module">
-    import { auth, getTest, getQuestions, saveResult, onAuthChange } from './firebase.js';
+    import { db, auth } from './firebase.js';
+    import { doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     let testData = null;
     let questions = [];
-    let responses = []; // Array of { ans, status, flagged }
+    let responses = []; 
     let currentQIdx = 0;
     let timeLeft = 0;
     let timerInterval = null;
 
     // --- Initialization ---
-    onAuthChange(async (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = 'index.html?auth=required'; return; }
       
       document.getElementById('cand-name').innerText = user.displayName || user.email.split('@')[0];
@@ -224,11 +226,22 @@
       if (!testId) { alert("No test ID provided!"); window.location.href = 'index.html'; return; }
 
       try {
-        testData = await getTest(testId);
-        questions = await getQuestions(testId);
+        // 1. Fetch Test Details
+        const testSnap = await getDoc(doc(db, 'tests', testId));
+        if (!testSnap.exists()) throw new Error("Test not found");
+        testData = { id: testSnap.id, ...testSnap.data() };
+
+        // 2. Fetch Questions (from subcollection)
+        const qSnap = await getDocs(collection(db, 'tests', testId, 'questions'));
+        questions = qSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        // Sort questions by their order field
+        questions.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        if (questions.length === 0) throw new Error("No questions found in this test");
         
         document.getElementById('display-test-title').innerText = testData.title;
-        document.getElementById('cand-exam').innerText = testData.year || 'Mock Session';
+        document.getElementById('cand-exam').innerText = testData.examType ? testData.examType.replace('_', ' ').toUpperCase() : 'Mock Session';
         timeLeft = testData.duration || 10800; // default 3 hours
 
         // Initialize state
@@ -243,13 +256,13 @@
         document.getElementById('loading-overlay').style.display = 'none';
       } catch (err) {
         console.error(err);
-        alert("Failed to load exam data. Please check connection.");
+        alert("Failed to load exam data: " + err.message);
       }
     });
 
     // --- UI Rendering ---
     function buildTabs() {
-      if(!testData.sections) return;
+      if(!testData.sections || testData.sections.length === 0) return;
       const tabContainer = document.getElementById('section-tabs');
       tabContainer.innerHTML = testData.sections.map((sec, i) => 
         `<div class="sec-tab ${i===0?'active':''}" id="tab-${i}" onclick="jumpToSection(${i}, ${sec.start})">${sec.name}</div>`
@@ -269,26 +282,28 @@
 
       // Update Options
       const optContainer = document.getElementById('options-container');
-      if (q.type === 'mcq') {
+      if (q.type === 'mcq' && q.options) {
         optContainer.innerHTML = q.options.map((optText, idx) => `
           <label class="option-row">
-            <input type="radio" name="opt" value="${idx}" ${res.ans == idx ? 'checked' : ''}> 
+            <input type="radio" name="opt" value="${idx}" ${String(res.ans) === String(idx) ? 'checked' : ''}> 
             <span>${optText}</span>
           </label>
         `).join('');
       } else {
         optContainer.innerHTML = `
-          <input type="number" class="int-input" id="int-ans" placeholder="Enter numerical value..." value="${res.ans || ''}">
+          <input type="number" class="int-input" id="int-ans" placeholder="Enter numerical value..." value="${res.ans !== null ? res.ans : ''}">
         `;
       }
 
       // Update Tabs styling
-      if(testData.sections) {
+      if(testData.sections && testData.sections.length > 0) {
         const activeSecIdx = testData.sections.findIndex(sec => currentQIdx >= sec.start && currentQIdx <= sec.end);
-        document.querySelectorAll('.sec-tab').forEach((el, i) => {
-          el.classList.toggle('active', i === activeSecIdx);
-        });
-        document.getElementById('palette-title').innerText = testData.sections[activeSecIdx].name;
+        if (activeSecIdx !== -1) {
+          document.querySelectorAll('.sec-tab').forEach((el, i) => {
+            el.classList.toggle('active', i === activeSecIdx);
+          });
+          document.getElementById('palette-title').innerText = testData.sections[activeSecIdx].name;
+        }
       }
 
       renderPalette();
@@ -299,7 +314,7 @@
       
       // Determine range to show based on section
       let startIdx = 0; let endIdx = questions.length - 1;
-      if (testData.sections) {
+      if (testData.sections && testData.sections.length > 0) {
         const activeSecIdx = testData.sections.findIndex(sec => currentQIdx >= sec.start && currentQIdx <= sec.end);
         if (activeSecIdx !== -1) {
           startIdx = testData.sections[activeSecIdx].start;
@@ -319,13 +334,10 @@
     window.jumpToSection = (secIdx, startQIdx) => { jumpTo(startQIdx); }
 
     window.jumpTo = (idx) => {
-      // If leaving without saving, ensure status updates from not-visited to not-answered
       if (responses[currentQIdx].status === 'not-visited') {
         responses[currentQIdx].status = 'not-answered';
       }
-      
       currentQIdx = idx;
-      
       if (responses[currentQIdx].status === 'not-visited') {
         responses[currentQIdx].status = 'not-answered';
       }
@@ -364,7 +376,6 @@
     };
 
     window.markReviewNext = () => {
-      // NTA logic: "Mark for review and next" usually drops the unsaved answer. 
       responses[currentQIdx].ans = null;
       responses[currentQIdx].flagged = true;
       responses[currentQIdx].status = 'review';
@@ -409,23 +420,56 @@
       }
       
       clearInterval(timerInterval);
-      document.getElementById('loading-overlay').innerText = "Submitting Exam...";
+      document.getElementById('loading-overlay').innerText = "Calculating Score and Submitting...";
       document.getElementById('loading-overlay').style.display = 'flex';
 
       const timeTaken = (testData.duration || 10800) - timeLeft;
       
-      // Clean up responses array for Firebase (it expects {ans, flagged})
-      const finalResponses = responses.map(r => ({
-        ans: r.ans,
-        flagged: r.flagged
-      }));
+      // Calculate Score
+      let score = 0, correct = 0, wrong = 0, unattempted = 0;
+      responses.forEach((r, i) => {
+        const q = questions[i];
+        if (r.ans === null || r.ans === undefined) { unattempted++; return; }
+        
+        if (q.type === 'mcq') {
+          if (String(r.ans) === String(q.correctAns)) { score += q.posMarks; correct++; }
+          else { score += (q.negMarks || 0); wrong++; }
+        } else {
+          if (String(r.ans).trim() === String(q.correctAns).trim()) { score += q.posMarks; correct++; }
+          else { score += (q.negMarks || 0); wrong++; }
+        }
+      });
+
+      const finalResponses = responses.map(r => ({ ans: r.ans ?? null, flagged: r.flagged }));
 
       try {
-        await saveResult(testData.id, finalResponses, timeTaken);
-        window.location.href = 'results.html'; // Redirect to your results page
+        const user = auth.currentUser;
+        
+        // Save to Session Storage for Results Page
+        sessionStorage.setItem('examResult', JSON.stringify({
+          score, correct, wrong, unattempted,
+          responses: finalResponses,
+          totalQuestions: questions.length,
+          timeTaken, testId: testData.id,
+          userName: user.displayName || user.email
+        }));
+
+        // Save to Firestore Database
+        await addDoc(collection(db, 'results'), {
+          userId: user.uid,
+          userEmail: user.email,
+          displayName: user.displayName || '',
+          testId: testData.id,
+          score, correct, wrong, unattempted,
+          timeTaken,
+          responses: finalResponses,
+          submittedAt: serverTimestamp()
+        });
+
+        window.location.href = 'results.html'; // Assuming this is where you want them to go
       } catch (err) {
         console.error("Submission failed", err);
-        alert("Failed to submit exam. Please do not close the window and check your connection.");
+        alert("Failed to submit exam. Please check your connection.");
         document.getElementById('loading-overlay').style.display = 'none';
       }
     };
