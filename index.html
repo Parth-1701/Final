@@ -642,15 +642,16 @@
     <button class="btn-big primary" onclick="openModal('signup')">Start a Free Test →</button>
     <button class="btn-big outline" onclick="document.getElementById('exams').scrollIntoView({behavior:'smooth'})">Browse Exams</button>
   </div>
-  <div class="hero-stats">
-    <div class="stat">
-      <div class="stat-num">50K+</div>
-      <div class="stat-label">Students enrolled</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">2,400+</div>
-      <div class="stat-label">Mock tests available</div>
-    </div>
+
+    <div class="hero-stats">
+  <div class="stat-card">
+  <h2 id="stat-students">--</h2> 
+  <p>Students Enrolled</p>
+</div>
+<div class="stat-card">
+  <h2 id="stat-tests">--</h2>
+  <p>Mock Tests Available</p>
+</div>
     <div class="stat">
       <div class="stat-num">98%</div>
       <div class="stat-label">Satisfaction rate</div>
@@ -1293,5 +1294,41 @@ document.querySelectorAll('.exam-card,.feat-card,.step').forEach(el => {
   obs.observe(el);
 });
 </script>
+  <script type="module">
+  // 1. Import your database from your existing firebase.js file
+  import { db } from './firebase.js'; 
+  
+  // 2. Import required Firestore functions
+  import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  async function loadHomePageStats() {
+    try {
+      // --- Fetch Total Students ---
+      // This grabs all documents inside the 'users' collection
+      const usersSnap = await getDocs(collection(db, 'users'));
+      const studentCount = usersSnap.size;
+      
+      // Update the HTML (adding a '+' for a nice visual touch)
+      const studentsEl = document.getElementById('stat-students');
+      if (studentsEl) studentsEl.textContent = studentCount + "+";
+
+      // --- Fetch Published Tests ---
+      // This queries the 'tests' collection specifically for tests marked as published
+      const testsQuery = query(collection(db, 'tests'), where('isPublished', '==', true));
+      const testsSnap = await getDocs(testsQuery);
+      const testCount = testsSnap.size;
+
+      // Update the HTML
+      const testsEl = document.getElementById('stat-tests');
+      if (testsEl) testsEl.textContent = testCount;
+
+    } catch (error) {
+      console.error("Failed to load home page statistics:", error);
+    }
+  }
+
+  // 3. Execute the function when the script loads
+  loadHomePageStats();
+  </script>
 </body>
 </html>
