@@ -452,27 +452,372 @@
           totalQuestions: questions.length,
           timeTaken, testId: testData.id,
           userName: user.displayName || user.email
-        }));
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, doc, getDoc, getDocs, addDoc, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Save to Firestore Database
-        await addDoc(collection(db, 'results'), {
-          userId: user.uid,
-          userEmail: user.email,
-          displayName: user.displayName || '',
-          testId: testData.id,
-          score, correct, wrong, unattempted,
-          timeTaken,
-          responses: finalResponses,
-          submittedAt: serverTimestamp()
+  // ─── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────
+  const firebaseConfig = {
+    apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+    authDomain: "sigmascore300.firebaseapp.com",
+    projectId: "sigmascore300",
+    storageBucket: "sigmascore300.firebasestorage.app",
+    messagingSenderId: "293195338803",
+    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
+    measurementId: "G-MLZYWG2EEM"
+  };
+  // ──────────────────────────────────────────────────────────────
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // --- Global State ---
+  let testData = null;
+  let questions = [];
+  let TOTAL = 0;
+  let DURATION = 0;
+  
+  const state = {
+    currentIdx: 0,
+    timeLeft: 0,
+    timerInterval: null,
+    responses: []
+  };
+
+  // --- Auth & Data Fetching ---
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = 'index.html?auth=required'; return; }
+
+    // Populate user profile
+    const initials = (user.displayName || user.email || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const nameEl = document.querySelector('.profile-name');
+    const rollEl = document.querySelector('.profile-roll');
+    const avatarEl = document.querySelector('.profile-avatar');
+    if (nameEl) nameEl.textContent = user.displayName || user.email.split('@')[0];
+    if (rollEl) rollEl.textContent = user.email;
+    if (avatarEl) avatarEl.textContent = initials;
+
+    // Fetch Test ID
+    const testId = new URLSearchParams(window.location.search).get('testId');
+    if (!testId) { alert("No test ID provided!"); window.location.href = 'index.html'; return; }
+
+    const startBtn = document.getElementById('start-btn');
+    startBtn.textContent = 'Loading Exam Data...';
+
+    try {
+      // 1. Fetch Test Meta
+      const tSnap = await getDoc(doc(db, 'tests', testId));
+      if (!tSnap.exists()) throw new Error("Test not found");
+      testData = tSnap.data();
+
+      // Normalize Sections (converts "questions: 50" to "start: 0, end: 49")
+      if (testData.sections && testData.sections[0].start === undefined) {
+        let cur = 0;
+        testData.sections = testData.sections.map(sec => {
+          const count = sec.questions || 50;
+          const res = { ...sec, start: cur, end: cur + count - 1 };
+          cur += count;
+          return res;
         });
-
-        window.location.href = 'results.html'; // Assuming this is where you want them to go
-      } catch (err) {
-        console.error("Submission failed", err);
-        alert("Failed to submit exam. Please check your connection.");
-        document.getElementById('loading-overlay').style.display = 'none';
       }
-    };
-  </script>
+
+      // 2. Fetch Questions
+      const qSnap = await getDocs(collection(db, 'tests', testId, 'questions'));
+      
+      // Smart Adapter: Normalizes mhtcet_mock_test.json to the UI standard
+      questions = qSnap.docs.map(d => {
+        const raw = d.data();
+        const text = raw.text || raw.question || 'Missing Text';
+        const type = raw.type || 'mcq';
+        
+        // Handle Options Object ({"A": "val", "B": "val"}) -> Array
+        let options = raw.options || [];
+        let isObj = false;
+        if (!Array.isArray(options) && typeof options === 'object') {
+          options = [options.A, options.B, options.C, options.D].filter(Boolean);
+          isObj = true;
+        }
+
+        // Handle Correct Answer ("B" -> 1)
+        let correctAns = raw.correctAns !== undefined ? raw.correctAns : raw.answer;
+        if (isObj && typeof correctAns === 'string') {
+          const map = { 'A':0, 'B':1, 'C':2, 'D':3 };
+          if (map[correctAns] !== undefined) correctAns = map[correctAns];
+        }
+
+        // Handle Marks
+        let posMarks = raw.posMarks || 1;
+        let negMarks = raw.negMarks || 0;
+        if (raw.posMarks === undefined && testData.sections) {
+           const secInfo = testData.sections.find(s => s.name === raw.section);
+           if (secInfo) { posMarks = secInfo.marks_per_correct; negMarks = secInfo.negative_marking; }
+        }
+
+        return { id: d.id, order: raw.order || raw.id || 0, text, type, options, correctAns, posMarks, negMarks };
+      });
+
+      questions.sort((a, b) => a.order - b.order);
+
+      // Setup State
+      TOTAL = questions.length;
+      const durMins = testData.duration_minutes || (testData.duration ? testData.duration / 60 : 180);
+      DURATION = durMins * 60;
+      state.timeLeft = DURATION;
+      state.responses = Array.from({ length: TOTAL }, () => ({ ans: null, flagged: false, visited: false }));
+
+      // Setup UI
+      buildTabs();
+      buildPalette();
+      renderQuestion();
+      
+      startBtn.textContent = 'Begin Test →';
+      window.toggleStartBtn(); // Re-check if checkbox is already checked
+
+    } catch (err) {
+      console.error(err);
+      startBtn.textContent = 'Error Loading Test';
+      alert("Failed to load test: " + err.message);
+    }
+  });
+
+  // --- Dynamic UI Builders ---
+  function buildTabs() {
+    const tabs = document.getElementById('section-tabs');
+    tabs.innerHTML = '';
+    if (!testData.sections) return;
+    testData.sections.forEach((sec, i) => {
+      const btn = document.createElement('button');
+      btn.className = `sec-tab ${i === 0 ? 'active' : ''}`;
+      btn.textContent = sec.name;
+      btn.onclick = () => window.jumpToSection(sec.start);
+      tabs.appendChild(btn);
+    });
+  }
+
+  function buildPalette() {
+    const wrap = document.getElementById('palette-wrap');
+    wrap.innerHTML = '';
+    if (!testData.sections) return;
+    
+    testData.sections.forEach((sec, i) => {
+      const secDiv = document.createElement('div');
+      secDiv.innerHTML = `
+        <div class="palette-section-title" style="margin-top:${i > 0 ? '1rem' : '0'}">
+          <span>${sec.name}</span><span>${sec.start + 1}–${sec.end + 1}</span>
+        </div>
+        <div class="palette-grid" id="pgrid-sec-${i}"></div>
+      `;
+      wrap.appendChild(secDiv);
+      const grid = secDiv.querySelector('.palette-grid');
+      for (let q = sec.start; q <= sec.end; q++) {
+        const btn = document.createElement('div');
+        btn.className = 'pq';
+        btn.id = `pq-${q}`;
+        btn.textContent = q + 1;
+        btn.onclick = () => window.goTo(q);
+        grid.appendChild(btn);
+      }
+    });
+  }
+
+  // --- Rendering ---
+  window.goTo = (idx) => {
+    if (idx < 0 || idx >= TOTAL) return;
+    state.currentIdx = idx;
+    renderQuestion();
+  };
+
+  function renderQuestion() {
+    const q = questions[state.currentIdx];
+    const r = state.responses[state.currentIdx];
+    r.visited = true;
+
+    document.getElementById('q-type-badge').textContent = q.type === 'integer' ? 'Numerical' : 'Multiple Choice';
+    document.getElementById('q-counter').textContent = `Question ${state.currentIdx + 1} of ${TOTAL}`;
+    document.getElementById('q-marks-info').innerHTML = `
+      <div class="marks-pill pos">✓ +${q.posMarks}</div>
+      ${q.negMarks ? `<div class="marks-pill neg">✗ -${Math.abs(q.negMarks)}</div>` : ''}
+    `;
+
+    document.getElementById('q-text').innerHTML = q.text;
+
+    const optWrap = document.getElementById('options-wrap');
+    const intWrap = document.getElementById('integer-input-wrap');
+    
+    if (q.type === 'integer') {
+      optWrap.classList.add('hide'); intWrap.classList.add('show');
+      document.getElementById('integer-input').value = r.ans !== null ? r.ans : '';
+    } else {
+      optWrap.classList.remove('hide'); intWrap.classList.remove('show');
+      const container = document.getElementById('q-options');
+      container.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const div = document.createElement('div');
+        div.className = 'option' + (r.ans == i ? ' selected' : '');
+        div.innerHTML = `<div class="opt-label">${String.fromCharCode(65 + i)}</div><div class="opt-text">${opt}</div>`;
+        div.onclick = () => window.selectOption(i);
+        container.appendChild(div);
+      });
+    }
+
+    updatePalette(); updateStats(); updateSectionTabs();
+  }
+
+  // --- Actions ---
+  window.selectOption = (idx) => {
+    state.responses[state.currentIdx].ans = idx;
+    renderQuestion();
+  };
+
+  window.saveIntegerAnswer = () => {
+    const val = document.getElementById('integer-input').value;
+    state.responses[state.currentIdx].ans = val !== '' ? val : null;
+    updatePalette(); updateStats();
+  };
+
+  window.nextQuestion = () => window.goTo(state.currentIdx + 1);
+  window.prevQuestion = () => window.goTo(state.currentIdx - 1);
+  window.jumpToSection = (startIdx) => window.goTo(startIdx);
+
+  window.saveAndNext = () => { window.showToast('Answer saved'); window.nextQuestion(); };
+  
+  window.markForReview = () => {
+    const r = state.responses[state.currentIdx];
+    r.flagged = !r.flagged;
+    window.showToast(r.flagged ? '🔖 Marked for review' : 'Review mark removed');
+    updatePalette(); updateStats();
+  };
+
+  window.clearResponse = () => {
+    const r = state.responses[state.currentIdx];
+    r.ans = null; r.flagged = false;
+    document.getElementById('integer-input').value = '';
+    renderQuestion();
+    window.showToast('Response cleared');
+  };
+
+  // --- UI Updaters ---
+  function updatePalette() {
+    for (let i = 0; i < TOTAL; i++) {
+      const btn = document.getElementById(`pq-${i}`);
+      if (!btn) continue;
+      const r = state.responses[i];
+      let status = '';
+      if (i === state.currentIdx) status = 'current';
+      else if (!r.visited) status = '';
+      else if (r.flagged && r.ans !== null) status = 'ans-review';
+      else if (r.flagged) status = 'review';
+      else if (r.ans !== null) status = 'answered';
+      else status = 'skipped';
+      btn.className = 'pq ' + status;
+    }
+  }
+
+  function updateStats() {
+    let answered = 0, skipped = 0, review = 0, unvisited = 0;
+    state.responses.forEach(r => {
+      if (!r.visited) unvisited++;
+      else if (r.ans !== null) answered++;
+      else skipped++;
+      if (r.flagged) review++;
+    });
+    document.getElementById('stat-answered').textContent = answered;
+    document.getElementById('stat-skipped').textContent = skipped;
+    document.getElementById('stat-review').textContent = review;
+    document.getElementById('stat-unvisited').textContent = unvisited;
+  }
+
+  function updateSectionTabs() {
+    if (!testData.sections) return;
+    const tabs = document.querySelectorAll('.sec-tab');
+    const secIdx = testData.sections.findIndex(s => state.currentIdx >= s.start && state.currentIdx <= s.end);
+    tabs.forEach((t, i) => t.classList.toggle('active', i === secIdx));
+  }
+
+  // --- Timer & Control ---
+  window.startTest = () => {
+    document.getElementById('instructions-screen').style.display = 'none';
+    state.timerInterval = setInterval(() => {
+      state.timeLeft--;
+      const h = Math.floor(state.timeLeft / 3600), m = Math.floor((state.timeLeft % 3600) / 60), s = state.timeLeft % 60;
+      const el = document.getElementById('timer-display');
+      el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      el.className = state.timeLeft <= 300 ? 'danger' : state.timeLeft <= 900 ? 'warning' : '';
+      if (state.timeLeft <= 0) window.finalSubmit(true);
+    }, 1000);
+  };
+
+  window.toggleStartBtn = () => {
+    const checked = document.getElementById('agree-check').checked;
+    const btn = document.getElementById('start-btn');
+    if (questions.length > 0) btn.classList.toggle('ready', checked);
+  };
+
+  window.openSubmitModal = () => document.getElementById('submit-modal').classList.add('open');
+  window.closeSubmitModal = () => document.getElementById('submit-modal').classList.remove('open');
+
+  window.finalSubmit = async (autoSubmit = false) => {
+    clearInterval(state.timerInterval);
+    window.closeSubmitModal();
+    const testId = new URLSearchParams(window.location.search).get('testId') || 'demo';
+    const timeTaken = DURATION - state.timeLeft;
+
+    // Calculate score based on actual dynamic marks
+    let score = 0, correct = 0, wrong = 0, unattempted = 0;
+    state.responses.forEach((r, i) => {
+      const q = questions[i];
+      if (r.ans === null || r.ans === undefined) { unattempted++; return; }
+      if (q.type === 'mcq') {
+        if (String(r.ans) === String(q.correctAns)) { score += q.posMarks; correct++; }
+        else { score -= Math.abs(q.negMarks || 0); wrong++; }
+      } else {
+        if (String(r.ans).trim() === String(q.correctAns).trim()) { score += q.posMarks; correct++; }
+        else { wrong++; }
+      }
+    });
+
+    sessionStorage.setItem('examResult', JSON.stringify({
+      score, correct, wrong, unattempted, responses: state.responses,
+      totalQuestions: TOTAL, timeTaken, testId, userName: auth.currentUser?.displayName || ''
+    }));
+
+    try {
+      await addDoc(collection(db, 'results'), {
+        userId: auth.currentUser.uid, userEmail: auth.currentUser.email, testId,
+        score, correct, wrong, unattempted, timeTaken,
+        responses: state.responses.map(r => ({ ans: r.ans ?? null, flagged: r.flagged })),
+        submittedAt: serverTimestamp()
+      });
+    } catch(e) { console.error('Failed to save result to Firestore:', e); }
+
+    window.showToast(autoSubmit ? '⏱ Time up! Submitting...' : '✅ Test submitted!');
+    setTimeout(() => { window.location.href = 'results.html'; }, 1500);
+  };
+
+  // --- Keyboard & Toast ---
+  let toastTimeout;
+  window.showToast = (msg) => {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => t.classList.remove('show'), 2000);
+  };
+
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('instructions-screen').style.display !== 'none' || e.target.tagName === 'INPUT') return;
+    switch(e.key) {
+      case 'ArrowRight': case 'n': window.nextQuestion(); break;
+      case 'ArrowLeft':  case 'p': window.prevQuestion(); break;
+      case 'r': window.markForReview(); break;
+      case 'c': window.clearResponse(); break;
+      case '1': case '2': case '3': case '4':
+        if (questions[state.currentIdx].type === 'mcq') window.selectOption(parseInt(e.key) - 1);
+        break;
+    }
+  });
+</script>
 </body>
 </html>
