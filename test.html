@@ -346,10 +346,13 @@
     function startTimer() { setInterval(() => { if (timeLeft <= 0) { submitExam(true); return; } timeLeft--; document.getElementById('timer').innerText = `${String(Math.floor(timeLeft / 3600)).padStart(2, '0')}:${String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0')}:${String(timeLeft % 60).padStart(2, '0')}`; }, 1000); }
 
     window.submitExam = async (autoSubmit = false) => {
-      if (!autoSubmit) if (!confirm("Are you sure you want to submit the exam?")) return;
+      if (!autoSubmit) {
+        if (!confirm("Are you sure you want to submit the exam?")) return;
+      }
+      
       clearInterval(timerInterval);
       const loadingEl = document.getElementById('loading-overlay');
-      loadingEl.innerHTML = "<div class='spinner'></div><div style='margin-top: 15px;'>Calculating Score and Submitting...</div>";
+      loadingEl.innerHTML = "<div class='spinner'></div><div style='margin-top: 15px; color: var(--nta-blue); font-weight: bold;'>Calculating Score and Submitting...</div>";
       loadingEl.style.display = 'flex';
 
       const durMins = testData.duration_minutes || (testData.duration ? testData.duration / 60 : 180);
@@ -367,11 +370,29 @@
         const user = auth.currentUser;
         const finalResponses = responses.map(r => ({ ans: r.ans ?? null, flagged: r.flagged }));
 
-        sessionStorage.setItem('examResult', JSON.stringify({ score, correct, wrong, unattempted, responses: finalResponses, totalQuestions: questions.length, timeTaken, testId: testData.id, userName: user.displayName || user.email }));
-        await db.collection('results').add({ userId: user.uid, userEmail: user.email, displayName: user.displayName || '', testId: testData.id, score, correct, wrong, unattempted, timeTaken, responses: finalResponses, submittedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        // 1. SAVE LOCALLY FIRST (This guarantees the results page will have the data)
+        sessionStorage.setItem('examResult', JSON.stringify({ 
+          score, correct, wrong, unattempted, responses: finalResponses, 
+          totalQuestions: questions.length, timeTaken, testId: testData.id, 
+          userName: user ? (user.displayName || user.email) : "Student" 
+        }));
 
+        // 2. SAVE TO DATABASE IN THE BACKGROUND (Using .catch so it doesn't block the redirect if Firebase rules are strict)
+        if (user) {
+          db.collection('results').add({ 
+            userId: user.uid, userEmail: user.email, displayName: user.displayName || '', 
+            testId: testData.id, score, correct, wrong, unattempted, timeTaken, 
+            responses: finalResponses, submittedAt: firebase.firestore.FieldValue.serverTimestamp() 
+          }).catch(err => console.error("Silent DB Save Error:", err));
+        }
+
+        // 3. FORCE REDIRECT IMMEDIATELY
         window.location.href = 'results.html';
-      } catch (err) { console.error(err); document.getElementById('loading-overlay').innerHTML = `<div class="err-text">Failed to submit exam. Check connection.</div>`; }
+
+      } catch (err) { 
+        console.error(err); 
+        document.getElementById('loading-overlay').innerHTML = `<div class="err-text" style="color: red; font-weight: bold;">Critical Error: Failed to redirect.</div>`; 
+      }
     };
   </script>
 </body>
