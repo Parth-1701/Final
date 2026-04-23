@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExamForge | NTA Mock Test Interface</title>
+  <style>
+    :root {
+      --nta-blue: #23527c;
+      --nta-light-blue: #337ab7;
+      --border-color: #ddd;
+      --bg-color: #f3f3f3;
+      --not-visited: #ececec;
+      --not-answered: #eb4242; 
+      --answered: #5cb85c;     
+      --review: #5bc0de;       
+      --review-ans: #9b59b6;   
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #fff; }
+
+    /* --- TOP HEADER --- */
+    .top-header { background: var(--nta-light-blue); color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; height: 60px; }
+    .exam-title { font-size: 1.2rem; font-weight: bold; }
+    .timer-box { font-size: 1.1rem; font-family: monospace; display: flex; align-items: center; gap: 10px; }
+    
+    /* --- MAIN LAYOUT --- */
+    .main-container { display: flex; flex: 1; overflow: hidden; }
+
+    /* --- LEFT AREA: QUESTIONS --- */
+    .left-area { flex: 1; display: flex; flex-direction: column; border-right: 2px solid var(--border-color); }
+    .section-tabs { background: var(--bg-color); border-bottom: 1px solid var(--border-color); display: flex; overflow-x: auto; }
+    .sec-tab { padding: 12px 25px; cursor: pointer; border-right: 1px solid var(--border-color); font-weight: bold; color: #555; background: #e5e5e5; white-space: nowrap; }
+    .sec-tab.active { background: var(--nta-light-blue); color: white; }
+
+    .q-header { padding: 10px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; font-weight: bold; color: #333; }
+    .q-marks { color: #d9534f; }
+    .q-body { flex: 1; padding: 25px 30px; overflow-y: auto; font-size: 1.1rem; line-height: 1.6; user-select: none; }
+    .q-text { margin-bottom: 30px; }
+    
+    .options { display: flex; flex-direction: column; gap: 15px; }
+    .option-row { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.1s; border: 1px solid transparent; }
+    .option-row:hover { background: #f9f9f9; border-color: #eee; }
+    .option-row input[type="radio"] { margin-top: 5px; cursor: pointer; width: 18px; height: 18px; accent-color: var(--nta-blue); }
+    .int-input { padding: 10px; font-size: 1.1rem; width: 200px; border: 1px solid #ccc; border-radius: 4px; }
+    
+    /* Bottom Action Bar */
+    .action-bar { border-top: 1px solid var(--border-color); padding: 15px 20px; background: #f9f9f9; display: flex; justify-content: space-between; align-items: center; }
+    .btn { padding: 8px 16px; font-size: 0.95rem; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: white; font-weight: bold; transition: 0.1s; }
+    .btn:hover { filter: brightness(0.95); }
+    .btn-green { background: #5cb85c; color: white; border-color: #4cae4c; }
+    .btn-blue { background: #337ab7; color: white; border-color: #2e6da4; }
+    .btn-orange { background: #f0ad4e; color: white; border-color: #eea236; }
+    .action-left { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* --- RIGHT AREA: PALETTE --- */
+    .right-area { width: 320px; display: flex; flex-direction: column; background: #eef2f5; flex-shrink: 0; }
+    .candidate-info { display: flex; align-items: center; gap: 15px; padding: 15px; background: white; border-bottom: 1px solid var(--border-color); }
+    .candidate-photo { width: 60px; height: 75px; background: #ddd; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #888; }
+    .candidate-details div { margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; }
+
+    .legend-area { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); background: white; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    
+    /* Exact NTA Shapes */
+    .nta-shape { width: 32px; height: 28px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem; border: 1px solid #ccc; }
+    .shape-not-visited { background: var(--not-visited); color: #333; border-radius: 4px; }
+    .shape-not-answered { background: var(--not-answered); border: none; border-radius: 4px 4px 10px 10px; clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 50% 100%, 0 90%, 0 10%); }
+    .shape-answered { background: var(--answered); border: none; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+    .shape-review { background: var(--review); border-radius: 50%; border: none; }
+    .shape-review-ans { background: var(--review-ans); border-radius: 50%; border: none; position: relative; }
+    .shape-review-ans::after { content: ''; position: absolute; bottom: 0; right: 0; width: 8px; height: 8px; background: #5cb85c; border-radius: 50%; border: 1px solid white; }
+
+    .palette-container { flex: 1; padding: 15px; overflow-y: auto; }
+    .palette-title { font-weight: bold; margin-bottom: 10px; font-size: 0.95rem; color: var(--nta-blue); }
+    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .pal-btn { cursor: pointer; transition: transform 0.1s; }
+    .pal-btn:hover { transform: scale(1.05); }
+
+    .submit-bar { padding: 15px; background: white; border-top: 1px solid var(--border-color); text-align: center; }
+    
+    #loading-overlay { position: fixed; inset: 0; background: white; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 15px; font-size: 1.5rem; font-weight: bold; color: var(--nta-blue); }
+    .spinner { border: 4px solid rgba(0,0,0,0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: var(--nta-blue); animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    #loading-error { font-size: 1rem; color: #eb4242; font-weight: normal; max-width: 80%; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div id="loading-text">Loading Exam Environment...</div>
+    <div id="loading-error"></div>
+  </div>
+
+  <div class="top-header">
+    <div class="exam-title" id="display-test-title">Mock Exam</div>
+    <div class="timer-box">
+      <span>Time Left:</span>
+      <span id="timer">--:--:--</span>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <div class="left-area">
+      <div class="section-tabs" id="section-tabs"></div>
+      
+      <div class="q-header">
+        <div id="q-type-label">Question Type: Multiple Choice</div>
+        <div class="q-marks" id="q-marks-label">Marks for correct answer 1 | Negative Marks 0</div>
+      </div>
+
+      <div class="q-body">
+        <div class="q-text" id="q-text"></div>
+        <div class="options" id="options-container"></div>
+      </div>
+
+      <div class="action-bar">
+        <div class="action-left">
+          <button class="btn btn-blue" onclick="saveAndReview()">Save & Mark For Review</button>
+          <button class="btn" onclick="clearResponse()">Clear Response</button>
+          <button class="btn btn-orange" onclick="markReviewNext()">Mark For Review & Next</button>
+        </div>
+        <button class="btn btn-green" onclick="saveAndNext()">Save & Next</button>
+      </div>
+    </div>
+
+    <div class="right-area">
+      <div class="candidate-info">
+        <div class="candidate-photo" id="cand-initials">👤</div>
+        <div class="candidate-details">
+          <div style="font-size:1.1rem;" id="cand-name">Student</div>
+          <div style="font-weight:normal;" id="cand-exam">Mock Session</div>
+        </div>
+      </div>
+
+      <div class="legend-area">
+        <div class="legend-item"><div class="nta-shape shape-not-visited"></div> Not Visited</div>
+        <div class="legend-item"><div class="nta-shape shape-not-answered"></div> Not Answered</div>
+        <div class="legend-item"><div class="nta-shape shape-answered"></div> Answered</div>
+        <div class="legend-item"><div class="nta-shape shape-review"></div> Marked for Review</div>
+        <div class="legend-item" style="grid-column: span 2;">
+          <div class="nta-shape shape-review-ans"></div> Answered & Marked for Review
+        </div>
+      </div>
+
+      <div class="palette-container">
+        <div class="palette-title" id="palette-title">Question Palette</div>
+        <div class="palette-grid" id="palette-grid"></div>
+      </div>
+
+      <div class="submit-bar">
+        <button class="btn btn-blue" style="width: 100%; padding: 12px; font-size: 1.05rem;" onclick="submitExam()">Submit Test</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // --- INVISIBLE ERROR CATCHER ---
+    window.onerror = function(msg, url, line) {
+      const errEl = document.getElementById('loading-error');
+      if(errEl) errEl.innerHTML += `<br><b style="color:red">Code Crash:</b> ${msg} (Line ${line})`;
+      const spinner = document.querySelector('.spinner');
+      if(spinner) spinner.style.display = 'none';
+    };
+
+    // ─── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────
+    const firebaseConfig = {
+      apiKey:            "YOUR_API_KEY",
+      authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId:         "YOUR_PROJECT_ID",
+      storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId:             "YOUR_APP_ID"
+    };
+    // ──────────────────────────────────────────────────────────────
+
+    function haltWithCriticalError(msg) {
+      document.querySelector('.spinner').style.display = 'none';
+      document.getElementById('loading-text').innerText = "Exam Paused";
+      document.getElementById('loading-error').innerHTML = `
+        <div style="margin-top: 15px;">${msg}</div>
+        <button onclick="window.location.href='index.html'" style="margin-top: 20px; padding: 10px 20px; font-size: 1rem; cursor: pointer; border-radius: 4px; border: none; background: #23527c; color: white;">Return to Home</button>
+      `;
+    }
+
+    if (firebaseConfig.apiKey === "YOUR_API_KEY") { 
+      haltWithCriticalError("Developer Error: Please paste your Firebase Config inside test.html."); 
+    }
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let testData = null;
+    let questions = [];
+    let responses = []; 
+    let currentQIdx = 0;
+    let sectionsMap = []; 
+    let timeLeft = 0;
+    let timerInterval = null;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) { window.location.href = 'index.html?auth=required'; return; }
+      
+      document.getElementById('cand-name').innerText = user.displayName || user.email.split('@')[0];
+      document.getElementById('cand-initials').innerText = (user.displayName || user.email)[0].toUpperCase();
+
+      const testId = new URLSearchParams(window.location.search).get('testId');
+      if (!testId) { 
+        return haltWithCriticalError("No Test ID found! You must launch this page by clicking a Test Card on your home page, not by double-clicking test.html."); 
+      }
+
+      try {
+        // Fetch Test Details
+        const testSnap = await db.collection('tests').doc(testId).get();
+        if (!testSnap.exists) throw new Error("Test ID not found in database.");
+        const rawData = testSnap.data();
+        testData = { id: testSnap.id, ...(rawData.test_info || {}), ...rawData };
+
+        // Fetch Questions
+        let rawQuestions = [];
+        const qSnap = await db.collection('tests').doc(testId).collection('questions').get();
+        
+        if (!qSnap.empty) {
+          rawQuestions = qSnap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+        } else if (Array.isArray(rawData.questions)) {
+          rawQuestions = rawData.questions; 
+        } else {
+           throw new Error("No questions found for this test. Ensure you uploaded the JSON properly.");
+        }
+
+        // Smart Adapter for MHT-CET JSON format
+        questions = rawQuestions.map((raw, idx) => {
+          const text = raw.question || raw.text || 'Missing text';
+          const sectionName = raw.section || 'General';
+          const qId = parseInt(raw.id) || raw.order || (idx + 1);
+          
+          let options = [];
+          if (raw.options && typeof raw.options === 'object' && !Array.isArray(raw.options)) {
+            options = [raw.options.A, raw.options.B, raw.options.C, raw.options.D].filter(Boolean);
+          } else if (Array.isArray(raw.options)) {
+            options = raw.options;
+          }
+
+          let correctAns = raw.answer !== undefined ? raw.answer : raw.correctAns;
+          if (typeof correctAns === 'string' && ['A','B','C','D'].includes(correctAns.toUpperCase())) {
+            const letterMap = { 'A':0, 'B':1, 'C':2, 'D':3 };
+            correctAns = letterMap[correctAns.toUpperCase()];
+          }
+
+          const type = raw.type || 'mcq';
+          let posMarks = 1; let negMarks = 0;
+          if (testData.sections && Array.isArray(testData.sections)) {
+            const sInfo = testData.sections.find(s => s.name === sectionName);
+            if (sInfo) {
+              posMarks = sInfo.marks_per_correct !== undefined ? sInfo.marks_per_correct : 1;
+              negMarks = sInfo.negative_marking !== undefined ? sInfo.negative_marking : 0;
+            }
+          }
+
+          return { _sortId: qId, text, options, correctAns, sectionName, type, posMarks, negMarks };
+        });
+
+        // Group into Sections
+        questions.sort((a, b) => a._sortId - b._sortId);
+        
+        let currentSec = "";
+        let startIdx = 0;
+        questions.forEach((q, idx) => {
+          if (q.sectionName !== currentSec) {
+            if (currentSec !== "") sectionsMap.push({ name: currentSec, start: startIdx, end: idx - 1 });
+            currentSec = q.sectionName;
+            startIdx = idx;
+          }
+        });
+        if (questions.length > 0) sectionsMap.push({ name: currentSec, start: startIdx, end: questions.length - 1 });
+
+        // Setup Visuals
+        document.getElementById('display-test-title').innerText = testData.name || testData.title || 'Mock Test';
+        document.getElementById('cand-exam').innerText = testData.examType ? testData.examType.replace('_', ' ').toUpperCase() : 'Mock Session';
+        
+        const durMins = testData.duration_minutes || (testData.duration ? testData.duration / 60 : 180);
+        timeLeft = durMins * 60; 
+
+        responses = questions.map(() => ({ ans: null, status: 'not-visited', flagged: false }));
+        
+        buildTabs();
+        responses[0].status = 'not-answered';
+        updateQuestionView();
+        startTimer();
+
+        // Screen is ready!
+        document.getElementById('loading-overlay').style.display = 'none';
+
+      } catch (err) {
+        console.error(err);
+        haltWithCriticalError(err.message);
+      }
+    });
+
+    // --- UI Update Functions ---
+    function buildTabs() {
+      const tabContainer = document.getElementById('section-tabs');
+      tabContainer.innerHTML = sectionsMap.map((sec, i) => 
+        `<div class="sec-tab ${i===0?'active':''}" onclick="jumpToSection(${i}, ${sec.start})">${sec.name}</div>`
+      ).join('');
+    }
+
+    function updateQuestionView() {
+      const q = questions[currentQIdx];
+      const res = responses[currentQIdx];
+
+      document.getElementById('q-type-label').innerText = `Question Type: ${q.type === 'mcq' ? 'Multiple Choice' : 'Numerical (Integer)'}`;
+      document.getElementById('q-marks-label').innerText = `Marks for correct answer ${q.posMarks} | Negative Marks ${Math.abs(q.negMarks)}`;
+      document.getElementById('q-text').innerHTML = `<strong>Question ${currentQIdx + 1}:</strong><br><br>${q.text}`;
+
+      const optContainer = document.getElementById('options-container');
+      if (q.type === 'mcq') {
+        optContainer.innerHTML = (q.options || []).map((optText, idx) => `
+          <label class="option-row">
+            <input type="radio" name="opt" value="${idx}" ${String(res.ans) === String(idx) ? 'checked' : ''}> 
+            <span>${optText}</span>
+          </label>
+        `).join('');
+      } else {
+        optContainer.innerHTML = `<input type="number" class="int-input" id="int-ans" placeholder="Enter numerical value..." value="${res.ans !== null ? res.ans : ''}">`;
+      }
+
+      const activeSecIdx = sectionsMap.findIndex(sec => currentQIdx >= sec.start && currentQIdx <= sec.end);
+      if (activeSecIdx !== -1) {
+        document.querySelectorAll('.sec-tab').forEach((el, i) => el.classList.toggle('active', i === activeSecIdx));
+        document.getElementById('palette-title').innerText = sectionsMap[activeSecIdx].name;
+      }
+      renderPalette();
+    }
+
+    function renderPalette() {
+      const grid = document.getElementById('palette-grid');
+      const activeSecIdx = sectionsMap.findIndex(sec => currentQIdx >= sec.start && currentQIdx <= sec.end);
+      if (activeSecIdx === -1) return;
+
+      const startIdx = sectionsMap[activeSecIdx].start;
+      const endIdx = sectionsMap[activeSecIdx].end;
+
+      let html = '';
+      for(let i = startIdx; i <= endIdx; i++) {
+        let statusClass = `shape-${responses[i].status}`;
+        let displayNum = i - startIdx + 1;
+        html += `<div class="nta-shape pal-btn ${statusClass}" onclick="jumpTo(${i})">${displayNum}</div>`;
+      }
+      grid.innerHTML = html;
+    }
+
+    // --- Navigation Functions ---
+    window.jumpToSection = (secIdx, startQIdx) => { jumpTo(startQIdx); }
+
+    window.jumpTo = (idx) => {
+      if (responses[currentQIdx].status === 'not-visited') responses[currentQIdx].status = 'not-answered';
+      currentQIdx = idx;
+      if (responses[currentQIdx].status === 'not-visited') responses[currentQIdx].status = 'not-answered';
+      updateQuestionView();
+    };
+
+    function getCurrentAnswer() {
+      const q = questions[currentQIdx];
+      if (q.type === 'mcq') {
+        const selected = document.querySelector('input[name="opt"]:checked');
+        return selected ? parseInt(selected.value) : null;
+      } else {
+        const val = document.getElementById('int-ans').value;
+        return val === '' ? null : val;
+      }
+    }
+
+    window.saveAndNext = () => {
+      const ans = getCurrentAnswer();
+      responses[currentQIdx].ans = ans;
+      responses[currentQIdx].flagged = false;
+      responses[currentQIdx].status = (ans !== null) ? 'answered' : 'not-answered';
+      if (currentQIdx < questions.length - 1) jumpTo(currentQIdx + 1); else updateQuestionView();
+    };
+
+    window.saveAndReview = () => {
+      const ans = getCurrentAnswer();
+      responses[currentQIdx].ans = ans;
+      responses[currentQIdx].flagged = true;
+      responses[currentQIdx].status = (ans !== null) ? 'review-ans' : 'review';
+      if (currentQIdx < questions.length - 1) jumpTo(currentQIdx + 1); else updateQuestionView();
+    };
+
+    window.markReviewNext = () => {
+      responses[currentQIdx].ans = null;
+      responses[currentQIdx].flagged = true;
+      responses[currentQIdx].status = 'review';
+      if (currentQIdx < questions.length - 1) jumpTo(currentQIdx + 1); else updateQuestionView();
+    };
+
+    window.clearResponse = () => {
+      if (questions[currentQIdx].type === 'mcq') {
+        document.querySelectorAll('input[name="opt"]').forEach(el => el.checked = false);
+      } else { document.getElementById('int-ans').value = ''; }
+      responses[currentQIdx].ans = null;
+      responses[currentQIdx].flagged = false;
+      responses[currentQIdx].status = 'not-answered';
+      renderPalette();
+    };
+
+    // --- Timer & Submit Functions ---
+    function formatTime(seconds) {
+      let h = Math.floor(seconds / 3600);
+      let m = Math.floor((seconds % 3600) / 60);
+      let s = seconds % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+      document.getElementById('timer').innerText = formatTime(timeLeft);
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) { clearInterval(timerInterval); submitExam(true); return; }
+        timeLeft--;
+        document.getElementById('timer').innerText = formatTime(timeLeft);
+      }, 1000);
+    }
+
+    window.submitExam = async (autoSubmit = false) => {
+      if (!autoSubmit) {
+        if (!confirm("Are you sure you want to submit the exam?")) return;
+      }
+      
+      clearInterval(timerInterval);
+      const loadingEl = document.getElementById('loading-overlay');
+      loadingEl.innerHTML = "<div class='spinner'></div><div style='margin-top: 15px;'>Calculating Score and Submitting...</div>";
+      loadingEl.style.display = 'flex';
+
+      const durMins = testData.duration_minutes || (testData.duration ? testData.duration / 60 : 180);
+      const timeTaken = (durMins * 60) - timeLeft;
+      
+      let score = 0, correct = 0, wrong = 0, unattempted = 0;
+      responses.forEach((r, i) => {
+        const q = questions[i];
+        if (r.ans === null || r.ans === undefined) { 
+          unattempted++; 
+        } else if (String(r.ans).trim() === String(q.correctAns).trim()) { 
+          score += q.posMarks; correct++; 
+        } else { 
+          score -= Math.abs(q.negMarks || 0); wrong++; 
+        }
+      });
+
+      try {
+        const user = auth.currentUser;
+        const finalResponses = responses.map(r => ({ ans: r.ans ?? null, flagged: r.flagged }));
+
+        sessionStorage.setItem('examResult', JSON.stringify({
+          score, correct, wrong, unattempted, responses: finalResponses,
+          totalQuestions: questions.length, timeTaken, testId: testData.id, userName: user.displayName || user.email
+        }));
+
+        await db.collection('results').add({
+          userId: user.uid, userEmail: user.email, displayName: user.displayName || '', testId: testData.id,
+          score, correct, wrong, unattempted, timeTaken, responses: finalResponses, submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        window.location.href = 'results.html';
+      } catch (err) {
+        console.error("Submission failed", err);
+        haltWithCriticalError("Failed to submit exam. Please check your internet connection.");
+      }
+    };
+  </script>
+</body>
+</html>
