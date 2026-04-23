@@ -867,39 +867,35 @@ function processFile(file) {
 window.uploadJSON = async () => {
   const testId = document.getElementById('ju-test-id').value.trim();
   if (!testId) { showToast('Please enter a Test ID.', 'error'); return; }
-  if (!parsedJSON?.questions?.length) { showToast('No questions found in JSON.', 'error'); return; }
+  if (!parsedJSON?.questions?.length && !parsedJSON?.length) { 
+    showToast('No questions found in JSON.', 'error'); return; 
+  }
 
   const btn = document.getElementById('upload-btn');
   btn.disabled = true;
   btn.textContent = "Uploading... Please wait";
-  showToast('Uploading to Firebase...', 'success');
+  showToast('Bundling questions into 1 document...', 'success');
 
   try {
-    const questions = parsedJSON.questions;
-    const chunkSize = 490; // Firebase limit is 500 writes per batch
-    
-    for (let i = 0; i < questions.length; i += chunkSize) {
-      const batch = writeBatch(db);
-      const chunk = questions.slice(i, i + chunkSize);
-      chunk.forEach(q => {
-        const ref = doc(collection(db, 'tests', testId, 'questions'));
-        batch.set(ref, q);
-      });
-      await batch.commit();
-    }
+    // Check if JSON has a "questions" wrapper or is just a flat array
+    const questionsArray = parsedJSON.questions || parsedJSON;
 
-    showToast(`✅ ${questions.length} questions uploaded successfully!`, 'success');
+    // We use updateDoc to add the massive array directly to the test document
+    await updateDoc(doc(db, 'tests', testId), {
+      questions: questionsArray
+    });
+
+    showToast(`✅ ${questionsArray.length} questions bundled and saved! (Costs 1 Read)`, 'success');
     btn.style.display = 'none';
     parsedJSON = null;
   } catch (error) {
     console.error("Firebase Upload Error:", error);
-    showToast('Upload failed: ' + error.message, 'error'); // This will reveal the exact issue
+    showToast('Upload failed: ' + error.message, 'error');
   } finally {
     btn.disabled = false;
     btn.textContent = "🚀 Upload to Firebase";
   }
 };
-
 window.downloadTemplate = () => {
   const template = {
     questions: [
