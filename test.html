@@ -156,34 +156,62 @@
   </div>
 
   <script type="module">
-    import { db, auth } from './firebase.js';
-    import { doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    // 1. Direct CDN Imports (Fixes the local 'file://' CORS issue)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // 2. YOUR FIREBASE CONFIGURATION
+    const firebaseConfig = {
+    apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+    authDomain: "sigmascore300.firebaseapp.com",
+    projectId: "sigmascore300",
+    storageBucket: "sigmascore300.firebasestorage.app",
+    messagingSenderId: "293195338803",
+    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
+    measurementId: "G-MLZYWG2EEM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     let testData = null;
     let questions = [];
     let responses = []; 
     let currentQIdx = 0;
-    let sectionsMap = []; // Array of { name, start, end }
+    let sectionsMap = []; 
     let timeLeft = 0;
     let timerInterval = null;
 
+    // --- Safety Error Handler ---
+    function haltWithCriticalError(msg) {
+      document.querySelector('.spinner').style.display = 'none';
+      document.getElementById('loading-text').innerText = "Exam Paused";
+      document.getElementById('loading-error').innerHTML = `
+        <div style="margin-top: 15px;">${msg}</div>
+        <button onclick="window.location.href='index.html'" style="margin-top: 20px; padding: 10px 20px; font-size: 1rem; cursor: pointer; border-radius: 4px; border: none; background: #23527c; color: white;">Return to Home</button>
+      `;
+    }
+
     onAuthStateChanged(auth, async (user) => {
+      // Security Check: Make sure they are logged in and config is set
+      if (firebaseConfig.apiKey === "YOUR_API_KEY") { return haltWithCriticalError("Developer Error: Please paste your Firebase Config inside test.html."); }
       if (!user) { window.location.href = 'index.html?auth=required'; return; }
       
       document.getElementById('cand-name').innerText = user.displayName || user.email.split('@')[0];
       document.getElementById('cand-initials').innerText = (user.displayName || user.email)[0].toUpperCase();
 
+      // Check if Test ID exists in the URL
       const testId = new URLSearchParams(window.location.search).get('testId');
       if (!testId) { 
-        document.getElementById('loading-error').innerText = "Error: No Test ID provided in the URL."; 
-        return; 
+        return haltWithCriticalError("No Test ID found. You must start the test by clicking a test card on the Mock Tests page."); 
       }
 
       try {
         // 1. Fetch Test Document
         const testSnap = await getDoc(doc(db, 'tests', testId));
-        if (!testSnap.exists()) throw new Error("Test not found in Database.");
+        if (!testSnap.exists()) throw new Error("Test not found in Database. Check if the Test ID is correct.");
         const rawData = testSnap.data();
         testData = { id: testSnap.id, ...(rawData.test_info || {}), ...rawData };
 
@@ -195,17 +223,15 @@
         } else if (Array.isArray(rawData.questions)) {
           rawQuestions = rawData.questions; 
         } else {
-           throw new Error("No questions found for this test.");
+           throw new Error("No questions found for this test. Make sure you uploaded the JSON to this specific Test ID.");
         }
 
         // 3. Smart Adapter: Parse your EXACT mhtcet_mock_test.json structure
         questions = rawQuestions.map((raw, idx) => {
-          // Fallbacks to handle both standard format and your custom JSON
           const text = raw.question || raw.text || 'Missing text';
           const sectionName = raw.section || 'General';
           const qId = raw.id || raw.order || (idx + 1);
           
-          // Parse {"A":"..", "B":".."} into an array
           let options = [];
           if (raw.options && typeof raw.options === 'object' && !Array.isArray(raw.options)) {
             options = [raw.options.A, raw.options.B, raw.options.C, raw.options.D].filter(Boolean);
@@ -213,14 +239,12 @@
             options = raw.options;
           }
 
-          // Parse letter answer "B" to index 1
           let correctAns = raw.answer !== undefined ? raw.answer : raw.correctAns;
           if (typeof correctAns === 'string' && ['A','B','C','D'].includes(correctAns)) {
             const letterMap = { 'A':0, 'B':1, 'C':2, 'D':3 };
             correctAns = letterMap[correctAns];
           }
 
-          // Determine marks based on section info
           let posMarks = 1; let negMarks = 0;
           if (testData.sections) {
             const sInfo = testData.sections.find(s => s.name === sectionName);
@@ -233,7 +257,7 @@
           return { _sortId: qId, text, options, correctAns, sectionName, posMarks, negMarks };
         });
 
-        // 4. Sort and build sections dynamically based on what was loaded
+        // 4. Sort and build sections dynamically
         questions.sort((a, b) => a._sortId - b._sortId);
         
         let currentSec = "";
@@ -248,8 +272,8 @@
         if (questions.length > 0) sectionsMap.push({ name: currentSec, start: startIdx, end: questions.length - 1 });
 
         // 5. Setup View
-        document.getElementById('display-test-title').innerText = testData.name || testData.title || 'MHT-CET Mock Test';
-        document.getElementById('cand-exam').innerText = 'PCM Session';
+        document.getElementById('display-test-title').innerText = testData.name || testData.title || 'Mock Test';
+        document.getElementById('cand-exam').innerText = testData.examType ? testData.examType.replace('_', ' ').toUpperCase() : 'Mock Session';
         
         const durMins = testData.duration_minutes || (testData.duration ? testData.duration / 60 : 180);
         timeLeft = durMins * 60; 
@@ -261,14 +285,16 @@
         updateQuestionView();
         startTimer();
 
+        // 6. FINALLY HIDE THE LOADING SCREEN AND SHOW BUTTONS
         document.getElementById('loading-overlay').style.display = 'none';
+
       } catch (err) {
         console.error(err);
-        document.getElementById('loading-error').innerText = err.message;
-        document.querySelector('.spinner').style.display = 'none';
+        haltWithCriticalError(err.message);
       }
     });
 
+    // --- UI Update Functions ---
     function buildTabs() {
       const tabContainer = document.getElementById('section-tabs');
       tabContainer.innerHTML = sectionsMap.map((sec, i) => 
@@ -312,13 +338,13 @@
       let html = '';
       for(let i = startIdx; i <= endIdx; i++) {
         let statusClass = `shape-${responses[i].status}`;
-        // Adjust displayed number so it matches the section exactly (e.g. Physics 1-50, Chem 1-50)
         let displayNum = i - startIdx + 1; 
         html += `<div class="nta-shape pal-btn ${statusClass}" onclick="jumpTo(${i})">${displayNum}</div>`;
       }
       grid.innerHTML = html;
     }
 
+    // --- Navigation Functions ---
     window.jumpToSection = (secIdx, startQIdx) => { jumpTo(startQIdx); }
 
     window.jumpTo = (idx) => {
@@ -364,6 +390,7 @@
       renderPalette();
     };
 
+    // --- Timer & Submit Functions ---
     function formatTime(seconds) {
       let h = Math.floor(seconds / 3600);
       let m = Math.floor((seconds % 3600) / 60);
@@ -387,7 +414,7 @@
       
       clearInterval(timerInterval);
       const loadingEl = document.getElementById('loading-overlay');
-      loadingEl.innerHTML = "<div class='spinner'></div><div>Calculating Score and Submitting...</div>";
+      loadingEl.innerHTML = "<div class='spinner'></div><div style='margin-top: 15px;'>Calculating Score and Submitting...</div>";
       loadingEl.style.display = 'flex';
 
       const durMins = testData.duration_minutes || (testData.duration ? testData.duration / 60 : 180);
@@ -422,8 +449,7 @@
         window.location.href = 'results.html';
       } catch (err) {
         console.error("Submission failed", err);
-        alert("Failed to submit exam. Please check your internet connection.");
-        loadingEl.style.display = 'none';
+        haltWithCriticalError("Failed to submit exam. Please check your internet connection.");
       }
     };
   </script>
