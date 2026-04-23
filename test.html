@@ -228,24 +228,36 @@
       if (!testId) { logMsg("ERROR: No Test ID found in URL.", true); return; }
 
       try {
-        logMsg(`Fetching Test Document [${testId}]...`);
-        const testSnap = await db.collection('tests').doc(testId).get();
-        if (!testSnap.exists) { logMsg("ERROR: Test ID not found.", true); return; }
-        const rawData = testSnap.data();
-        testData = { id: testSnap.id, ...(rawData.test_info || {}), ...rawData };
-
-        logMsg("Fetching Questions...");
-        let rawQuestions = [];
-        const qSnap = await db.collection('tests').doc(testId).collection('questions').get();
+        logMsg(`Looking for Test [${testId}]...`);
         
-        if (!qSnap.empty) {
-          rawQuestions = qSnap.docs.map(d => Object.assign({ id: d.id }, d.data()));
-        } else if (Array.isArray(rawData.questions)) {
-          rawQuestions = rawData.questions; 
-        } else {
-           logMsg("ERROR: Questions folder is empty.", true); return;
+        // --- 1. CHECK BROWSER CACHE FIRST (0 FIREBASE READS) ---
+        const cachedData = sessionStorage.getItem(`cache_test_${testId}`);
+        if (cachedData) {
+          logMsg("Loaded instantly from Browser Cache (0 Reads!)");
+          const parsedCache = JSON.parse(cachedData);
+          testData = parsedCache.testData;
+          rawQuestions = parsedCache.rawQuestions;
+        } 
+        // --- 2. FETCH FROM FIREBASE IF NOT CACHED (1 FIREBASE READ) ---
+        else {
+          logMsg("Fetching from Database (1 Read)...");
+          const testSnap = await db.collection('tests').doc(testId).get();
+          if (!testSnap.exists) { logMsg("ERROR: Test ID not found.", true); return; }
+          
+          const rawData = testSnap.data();
+          testData = { id: testSnap.id, ...(rawData.test_info || {}), ...rawData };
+          
+          if (Array.isArray(rawData.questions)) {
+            rawQuestions = rawData.questions; 
+          } else {
+             logMsg("ERROR: No questions array found. Did you re-upload?", true); return;
+          }
+          
+          // Save to cache so refreshes cost 0 reads!
+          sessionStorage.setItem(`cache_test_${testId}`, JSON.stringify({ testData, rawQuestions }));
         }
 
+        // ... (The rest of your formatting code continues exactly the same) ...
         logMsg(`Formatting ${rawQuestions.length} questions...`);
         
         questions = rawQuestions.map((raw, idx) => {
