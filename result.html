@@ -87,10 +87,12 @@
       const accuracy = attempted > 0 ? Math.round((data.correct / attempted) * 100) : 0;
       document.getElementById('stat-accuracy').innerText = `${accuracy}%`;
 
-      // Format Time Taken (Convert seconds to MM:SS)
-      const m = Math.floor(data.timeTaken / 60).toString().padStart(2, '0');
-      const s = (data.timeTaken % 60).toString().padStart(2, '0');
-      document.getElementById('stat-time').innerText = `${m}:${s}`;
+      // Format Time Taken (Convert seconds to HH:MM:SS)
+      const timeTaken = data.timeTaken || 0;
+      const h = Math.floor(timeTaken / 3600);
+      const m = Math.floor((timeTaken % 3600) / 60).toString().padStart(2, '0');
+      const s = (timeTaken % 60).toString().padStart(2, '0');
+      document.getElementById('stat-time').innerText = h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
 
       // Show Exam Type tag if available
       if(data.examType) {
