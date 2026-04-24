@@ -387,12 +387,51 @@
       document.getElementById('loader').style.display = 'flex';
       
       let score = 0, correct = 0, wrong = 0, unattempted = 0;
+      
+      // Determine exam rules
+      const isCET = testData.examType === 'mht_cet';
+      
       for (let i = 0; i < questions.length; i++) {
-        if (!responses[i].ans) unattempted++;
-        else if (responses[i].ans === questions[i].answer) { correct++; score += 4; }
-        else { wrong++; score -= 1; }
+        const q = questions[i];
+        if (!responses[i].ans) {
+          unattempted++;
+        } else if (responses[i].ans === q.answer) { 
+          correct++; 
+          // If it's CET and it's a Math question, give +2. Otherwise +1. For JEE, +4.
+          if (isCET) {
+            score += (q.subject === 'Mathematics' || q.section === 'Mathematics') ? 2 : 1;
+          } else {
+            score += 4; 
+          }
+        } else { 
+          wrong++; 
+          // If it's CET, deduct 0. If it's JEE, deduct 1.
+          score -= isCET ? 0 : 1; 
+        }
       }
 
+      try {
+        const user = auth.currentUser;
+        const timeTaken = (testData.duration_minutes * 60) - timeRemaining;
+        
+        // Save the deep analytics locally so result.html can catch them
+        sessionStorage.setItem('examResult', JSON.stringify({
+          score, correct, wrong, unattempted, timeTaken, 
+          totalQuestions: questions.length, testId: testData.id,
+          examType: testData.examType || "JEE"
+        }));
+
+        if (user) {
+          db.collection('results').add({
+            userId: user.uid, testId: testData.id, score, correct, wrong, 
+            timeTaken, submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(e => console.log(e));
+        }
+        window.location.href = 'result.html';
+      } catch (err) {
+        alert("Error saving."); document.getElementById('loader').style.display = 'none';
+      }
+    };
       try {
         const user = auth.currentUser;
         sessionStorage.setItem('examResult', JSON.stringify({
