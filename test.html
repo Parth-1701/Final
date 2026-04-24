@@ -102,31 +102,26 @@
   <div class="top-bar">
     <div class="exam-title" id="display-title">Quizable NTA Interface</div>
     <div class="timer-box" id="timer">--:--:--</div>
-    <button class="btn-submit" onclick="submitExam()">Submit Test</button>
+    <button class="btn-submit" onclick="window.submitExam()">Submit Test</button>
   </div>
 
   <div class="main-area">
-    
     <div class="left-panel">
       <div class="subject-bar" id="subject-bar"></div>
-
       <div class="q-content" id="q-scroll-area">
         <div class="q-header">
           <span id="q-subject-name" style="color: var(--accent); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Loading...</span>
           <span id="q-number">Question 1</span>
         </div>
-        
         <div class="q-text" id="q-text">Loading question text...</div>
-        
         <div class="options-grid" id="options-container"></div>
       </div>
-
       <div class="bottom-bar">
-        <button class="btn btn-outline" onclick="navigate(-1)">← Previous</button>
+        <button class="btn btn-outline" onclick="window.navigate(-1)">← Previous</button>
         <div class="nav-buttons-right">
-          <button class="btn btn-outline" onclick="clearSelection()">Clear</button>
-          <button class="btn btn-review" onclick="markForReview()">Mark for Review</button>
-          <button class="btn btn-next" onclick="saveAndNext()">Save & Next →</button>
+          <button class="btn btn-outline" onclick="window.clearSelection()">Clear</button>
+          <button class="btn btn-review" onclick="window.markForReview()">Mark for Review</button>
+          <button class="btn btn-next" onclick="window.saveAndNext()">Save & Next →</button>
         </div>
       </div>
     </div>
@@ -134,11 +129,9 @@
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         Question Palette
-        <button class="btn-outline" style="padding: 2px 8px; border: none;" onclick="toggleSidebar()">✕</button>
+        <button class="btn-outline" style="padding: 2px 8px; border: none;" onclick="window.toggleSidebar()">✕</button>
       </div>
-      
       <div class="palette-grid" id="palette-grid"></div>
-      
       <div class="legend">
         <div class="leg-item"><div class="leg-dot" style="background: rgba(62,207,142,0.5);"></div> Answered</div>
         <div class="leg-item"><div class="leg-dot" style="background: rgba(255,107,107,0.5);"></div> Skipped</div>
@@ -147,30 +140,27 @@
       </div>
     </div>
     
-    <button class="toggle-arrow" id="toggle-btn" onclick="toggleSidebar()">◀</button>
-
+    <button class="toggle-arrow" id="toggle-btn" onclick="window.toggleSidebar()">◀</button>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <script>
-    // ─── PASTE YOUR FIREBASE CONFIG HERE ───────────────────────
     const firebaseConfig = {
-    apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
-    authDomain: "sigmascore300.firebaseapp.com",
-    projectId: "sigmascore300",
-    storageBucket: "sigmascore300.firebasestorage.app",
-    messagingSenderId: "293195338803",
-    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
-    measurementId: "G-MLZYWG2EEM"
+      apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+      authDomain: "sigmascore300.firebaseapp.com",
+      projectId: "sigmascore300",
+      storageBucket: "sigmascore300.firebasestorage.app",
+      messagingSenderId: "293195338803",
+      appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
+      measurementId: "G-MLZYWG2EEM"
     };
-    // ──────────────────────────────────────────────────────────────
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     let testData = null;
     let questions = [];
@@ -178,12 +168,11 @@
     let timeRemaining = 0;
     let timerInterval = null;
 
-    // Subject Grouping Variables
     let currentGlobalIdx = 0;
     let sections = [];
     let currentSection = "";
 
-    auth.onAuthStateChanged(async (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (!user) { alert("You must be logged in!"); window.location.href = 'index.html'; return; }
 
       const params = new URLSearchParams(window.location.search);
@@ -191,14 +180,14 @@
       if (!testId) { window.location.href = 'index.html'; return; }
 
       try {
-        const testSnap = await db.collection('tests').doc(testId).get();
-        if (!testSnap.exists) throw new Error("Test not found.");
+        const testSnap = await getDoc(doc(db, 'tests', testId));
+        if (!testSnap.exists()) throw new Error("Test not found.");
         testData = testSnap.data();
         testData.id = testId;
 
         // Security Check
         if (testData.isPremium === true || testData.isPremium === "true") {
-          const userSnap = await db.collection('users').doc(user.uid).get();
+          const userSnap = await getDoc(doc(db, 'users', user.uid));
           const pkgs = (userSnap.data() || {}).purchasedPackages || [];
           if (!pkgs.includes(testData.examType)) {
             alert("🔒 Access Denied."); window.location.href = 'index.html'; return;
@@ -217,63 +206,56 @@
         }
 
         responses = questions.map(() => ({ ans: null, status: 'unvisited' }));
-        
-        // --- Detect Unique Subjects/Sections ---
         sections = [...new Set(questions.map(q => q.subject || q.section || "General"))];
         currentSection = sections[0];
 
-        buildSectionTabs();
-        buildPalette();
-        loadQuestion(0);
+        window.buildSectionTabs();
+        window.buildPalette();
+        window.loadQuestion(0);
         startTimer();
         document.getElementById('loader').style.display = 'none';
 
       } catch (err) {
         console.error(err);
-        document.getElementById('load-text').innerText = "Error loading test.";
+        document.getElementById('load-text').innerText = "Error loading test. Missing data.";
         document.getElementById('load-text').style.color = "var(--red)";
       }
     });
 
-    // --- TABS LOGIC ---
-    function buildSectionTabs() {
+    window.buildSectionTabs = () => {
       const bar = document.getElementById('subject-bar');
       bar.innerHTML = '';
       sections.forEach(sec => {
-        bar.innerHTML += `<div class="sub-tab ${sec === currentSection ? 'active' : ''}" onclick="switchSection('${sec}')">${sec}</div>`;
+        bar.innerHTML += `<div class="sub-tab ${sec === currentSection ? 'active' : ''}" onclick="window.switchSection('${sec}')">${sec}</div>`;
       });
-    }
+    };
 
     window.switchSection = (secName) => {
       currentSection = secName;
-      buildSectionTabs();
-      // Find the first question index of this new section
+      window.buildSectionTabs();
       const firstIdx = questions.findIndex(q => (q.subject || q.section || "General") === currentSection);
       if (firstIdx !== -1) {
-        buildPalette();
-        loadQuestion(firstIdx);
+        window.buildPalette();
+        window.loadQuestion(firstIdx);
       }
     };
 
-    // --- QUESTION LOGIC ---
-    function loadQuestion(globalIndex) {
+    window.loadQuestion = (globalIndex) => {
       if (globalIndex < 0 || globalIndex >= questions.length) return;
       currentGlobalIdx = globalIndex;
       const q = questions[currentGlobalIdx];
       const qSec = q.subject || q.section || "General";
 
-      // If navigation crossed into a new subject, automatically update tabs & palette
       if (currentSection !== qSec) {
         currentSection = qSec;
-        buildSectionTabs();
-        buildPalette();
+        window.buildSectionTabs();
+        window.buildPalette();
       }
 
       if (responses[currentGlobalIdx].status === 'unvisited') {
         responses[currentGlobalIdx].status = 'skipped';
       }
 
-      // Calculate the "Local" question number (e.g., Question 12 of Physics)
       let localNum = 1;
       for (let i = 0; i < currentGlobalIdx; i++) {
         if ((questions[i].subject || questions[i].section || "General") === currentSection) localNum++;
@@ -289,17 +271,15 @@
       for (const [key, val] of Object.entries(options)) {
         const isSelected = responses[currentGlobalIdx].ans === key;
         optsContainer.innerHTML += `
-          <div class="option-row ${isSelected ? 'selected' : ''}" onclick="selectOption('${key}')">
+          <div class="option-row ${isSelected ? 'selected' : ''}" onclick="window.selectOption('${key}')">
             <div class="opt-label">${key}</div>
             <div style="flex: 1;">${val}</div>
           </div>
         `;
       }
-
-      // Scroll to top of question
       document.getElementById('q-scroll-area').scrollTop = 0;
-      updatePaletteUI();
-    }
+      window.updatePaletteUI();
+    };
 
     window.selectOption = (key) => {
       if (responses[currentGlobalIdx].ans === key) {
@@ -309,47 +289,44 @@
         responses[currentGlobalIdx].ans = key;
         responses[currentGlobalIdx].status = 'answered';
       }
-      loadQuestion(currentGlobalIdx); 
+      window.loadQuestion(currentGlobalIdx); 
     };
 
     window.clearSelection = () => {
       responses[currentGlobalIdx].ans = null;
       responses[currentGlobalIdx].status = 'skipped';
-      loadQuestion(currentGlobalIdx);
+      window.loadQuestion(currentGlobalIdx);
     };
 
-    window.navigate = (dir) => loadQuestion(currentGlobalIdx + dir);
+    window.navigate = (dir) => window.loadQuestion(currentGlobalIdx + dir);
 
     window.saveAndNext = () => {
       if (responses[currentGlobalIdx].ans) responses[currentGlobalIdx].status = 'answered';
       else responses[currentGlobalIdx].status = 'skipped';
-      
-      if (currentGlobalIdx < questions.length - 1) loadQuestion(currentGlobalIdx + 1);
-      else updatePaletteUI();
+      if (currentGlobalIdx < questions.length - 1) window.loadQuestion(currentGlobalIdx + 1);
+      else window.updatePaletteUI();
     };
 
     window.markForReview = () => {
       responses[currentGlobalIdx].status = 'review';
-      if (currentGlobalIdx < questions.length - 1) loadQuestion(currentGlobalIdx + 1);
-      else updatePaletteUI();
+      if (currentGlobalIdx < questions.length - 1) window.loadQuestion(currentGlobalIdx + 1);
+      else window.updatePaletteUI();
     };
 
-    // --- PALETTE LOGIC ---
-    function buildPalette() {
+    window.buildPalette = () => {
       const grid = document.getElementById('palette-grid');
       grid.innerHTML = '';
       let localNum = 1;
-      
       questions.forEach((q, index) => {
         if ((q.subject || q.section || "General") === currentSection) {
-          grid.innerHTML += `<div class="pal-btn" id="pal-${index}" onclick="loadQuestion(${index})">${localNum}</div>`;
+          grid.innerHTML += `<div class="pal-btn" id="pal-${index}" onclick="window.loadQuestion(${index})">${localNum}</div>`;
           localNum++;
         }
       });
-      updatePaletteUI();
-    }
+      window.updatePaletteUI();
+    };
 
-    function updatePaletteUI() {
+    window.updatePaletteUI = () => {
       questions.forEach((q, index) => {
         if ((q.subject || q.section || "General") === currentSection) {
           const btn = document.getElementById(`pal-${index}`);
@@ -359,7 +336,7 @@
           }
         }
       });
-    }
+    };
 
     window.toggleSidebar = () => {
       const sidebar = document.getElementById('sidebar');
@@ -372,7 +349,7 @@
       const display = document.getElementById('timer');
       timerInterval = setInterval(() => {
         timeRemaining--;
-        if (timeRemaining <= 0) { clearInterval(timerInterval); submitExam(); return; }
+        if (timeRemaining <= 0) { clearInterval(timerInterval); window.submitExam(); return; }
         let h = Math.floor(timeRemaining / 3600);
         let m = Math.floor((timeRemaining % 3600) / 60);
         let s = timeRemaining % 60;
@@ -385,25 +362,37 @@
       if (!conf && timeRemaining > 0) return;
       clearInterval(timerInterval);
       document.getElementById('loader').style.display = 'flex';
+      document.getElementById('load-text').innerText = "Scoring Exam...";
       
       let score = 0, correct = 0, wrong = 0, unattempted = 0;
+      const isCET = testData.examType === 'mht_cet';
+      
       for (let i = 0; i < questions.length; i++) {
-        if (!responses[i].ans) unattempted++;
-        else if (responses[i].ans === questions[i].answer) { correct++; score += 4; }
-        else { wrong++; score -= 1; }
+        const q = questions[i];
+        if (!responses[i].ans) {
+          unattempted++;
+        } else if (responses[i].ans === q.answer) { 
+          correct++; 
+          if (isCET) { score += (q.subject === 'Mathematics' || q.section === 'Mathematics') ? 2 : 1; } 
+          else { score += 4; }
+        } else { 
+          wrong++; 
+          score -= isCET ? 0 : 1; 
+        }
       }
 
       try {
-        const user = auth.currentUser;
+        const timeTaken = (testData.duration_minutes * 60) - timeRemaining;
         sessionStorage.setItem('examResult', JSON.stringify({
-          score, correct, wrong, unattempted, timeTaken: (testData.duration_minutes * 60) - timeRemaining, 
-          totalQuestions: questions.length, testId: testData.id
+          score, correct, wrong, unattempted, timeTaken, totalQuestions: questions.length, 
+          testId: testData.id, examType: testData.examType || "JEE"
         }));
 
+        const user = auth.currentUser;
         if (user) {
-          db.collection('results').add({
+          await addDoc(collection(db, 'results'), {
             userId: user.uid, testId: testData.id, score, correct, wrong, 
-            timeTaken: (testData.duration_minutes * 60) - timeRemaining, submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+            timeTaken, submittedAt: serverTimestamp()
           }).catch(e => console.log(e));
         }
         window.location.href = 'result.html';
