@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable | My Results History</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26; --border: #2a2a3d; 
+      --accent: #6c63ff; --green: #3ecf8e; --red: #ff6b6b; --text: #e8e8f0; --text-dim: #9999b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    header { padding: 20px 40px; border-bottom: 1px solid var(--border); background: rgba(10, 10, 15, 0.9); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .nav-btn { color: var(--text-dim); text-decoration: none; font-weight: bold; transition: 0.2s; }
+    .nav-btn:hover { color: white; }
+
+    .container { max-width: 900px; margin: 40px auto; padding: 0 20px; width: 100%; flex: 1; }
+    h1 { font-family: 'Syne', sans-serif; font-size: 2.2rem; margin-bottom: 10px; }
+    p.subtitle { color: var(--text-dim); margin-bottom: 30px; }
+
+    .history-list { display: flex; flex-direction: column; gap: 15px; }
+    .history-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+    .history-card:hover { border-color: var(--accent); transform: translateX(5px); }
+    
+    .test-info { display: flex; flex-direction: column; gap: 5px; }
+    .test-name { font-weight: bold; font-size: 1.2rem; color: white; }
+    .test-date { font-size: 0.85rem; color: var(--text-dim); font-family: 'DM Mono'; }
+    
+    .test-stats { display: flex; gap: 30px; align-items: center; text-align: right; }
+    .stat-item { display: flex; flex-direction: column; }
+    .stat-val { font-family: 'DM Mono', monospace; font-size: 1.2rem; font-weight: bold; color: var(--accent); }
+    .stat-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .loader { text-align: center; color: var(--text-dim); padding: 40px; font-style: italic; }
+
+    @media (max-width: 600px) {
+      .history-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+      .test-stats { width: 100%; justify-content: space-between; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo">Quizable<span>.</span></a>
+    <a href="index.html" class="nav-btn">← Back to Dashboard</a>
+  </header>
+
+  <div class="container">
+    <h1>Performance History</h1>
+    <p class="subtitle">Review your past mock test scores and track your improvement.</p>
+    
+    <div class="history-list" id="history-container">
+      <div class="loader">Loading your exam records...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ─── PASTE YOUR FIREBASE CONFIG HERE ───────────────────────
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ──────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("Please log in to view your history.");
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const container = document.getElementById('history-container');
+
+      try {
+        // Fetch only the results belonging to this specific user
+        const q = query(collection(db, "results"), where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+          container.innerHTML = `<div class="loader">No tests taken yet. Head to the dashboard to start!</div>`;
+          return;
+        }
+
+        // Extract data and sort locally (Newest first)
+        let results = [];
+        querySnapshot.forEach((doc) => {
+          results.push(doc.data());
+        });
+        
+        results.sort((a, b) => {
+          const timeA = a.submittedAt ? a.submittedAt.toMillis() : 0;
+          const timeB = b.submittedAt ? b.submittedAt.toMillis() : 0;
+          return timeB - timeA;
+        });
+
+        container.innerHTML = ''; // Clear loader
+
+        results.forEach(res => {
+          // Format Date
+          const dateObj = res.submittedAt ? res.submittedAt.toDate() : new Date();
+          const dateStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          
+          // Format Accuracy
+          const attempted = (res.correct || 0) + (res.wrong || 0);
+          const accuracy = attempted > 0 ? Math.round((res.correct / attempted) * 100) : 0;
+
+          // Format Time
+          const time = res.timeTaken || 0;
+          const h = Math.floor(time / 3600);
+          const m = Math.floor((time % 3600) / 60).toString().padStart(2, '0');
+          const timeStr = h > 0 ? `${h}h ${m}m` : `${m}m`;
+
+          container.innerHTML += `
+            <div class="history-card">
+              <div class="test-info">
+                <div class="test-name">${res.testTitle || 'Mock Examination'}</div>
+                <div class="test-date">📅 ${dateStr}</div>
+              </div>
+              <div class="test-stats">
+                <div class="stat-item">
+                  <span class="stat-val">${res.score}</span>
+                  <span class="stat-label">Score</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-val" style="color: var(--green);">${accuracy}%</span>
+                  <span class="stat-label">Accuracy</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-val" style="color: var(--text-dim);">${timeStr}</span>
+                  <span class="stat-label">Time</span>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+      } catch (error) {
+        console.error("Error fetching history:", error);
+        container.innerHTML = `<div class="loader" style="color: red;">Error loading history. Check your connection.</div>`;
+      }
+    });
+  </script>
+</body>
+</html>
