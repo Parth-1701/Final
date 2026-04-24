@@ -267,15 +267,40 @@
 
       const optsContainer = document.getElementById('options-container');
       optsContainer.innerHTML = '';
-      const options = q.options || { A: "Opt 1", B: "Opt 2", C: "Opt 3", D: "Opt 4" };
-      for (const [key, val] of Object.entries(options)) {
-        const isSelected = responses[currentGlobalIdx].ans === key;
-        optsContainer.innerHTML += `
-          <div class="option-row ${isSelected ? 'selected' : ''}" onclick="window.selectOption('${key}')">
-            <div class="opt-label">${key}</div>
-            <div style="flex: 1;">${val}</div>
+      
+      // CHECK IF IT IS A NUMERICAL QUESTION
+      if (q.type === 'numerical' || !q.options) {
+        
+        const savedVal = responses[currentGlobalIdx].ans || '';
+        optsContainer.innerHTML = `
+          <div style="padding: 10px 0;">
+            <input type="number" step="any" 
+                   style="width: 100%; max-width: 400px; padding: 15px; background: var(--surface2); border: 1px solid var(--accent); color: white; border-radius: 8px; font-size: 1.5rem; font-family: 'DM Mono', monospace; outline: none;"
+                   placeholder="Enter numerical value..." 
+                   value="${savedVal}" 
+                   oninput="window.saveNumericalAnswer(this.value)">
           </div>
         `;
+
+      } else {
+        // NORMAL MCQ RENDERING
+        const options = q.options;
+        const sortedKeys = Object.keys(options).sort();
+        for (const key of sortedKeys) {
+          const val = options[key];
+          const isSelected = responses[currentGlobalIdx].ans === key;
+          optsContainer.innerHTML += `
+            <div class="option-row ${isSelected ? 'selected' : ''}" onclick="window.selectOption('${key}')">
+              <div class="opt-label">${key}</div>
+              <div style="flex: 1;">${val}</div>
+            </div>
+          `;
+        }
+      }
+      
+      document.getElementById('q-scroll-area').scrollTop = 0;
+      window.updatePaletteUI();
+        ';
       }
       document.getElementById('q-scroll-area').scrollTop = 0;
       window.updatePaletteUI();
