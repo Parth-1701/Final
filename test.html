@@ -314,6 +314,17 @@
         responses[currentGlobalIdx].ans = key;
         responses[currentGlobalIdx].status = 'answered';
       }
+
+      window.saveNumericalAnswer = (value) => {
+      if (value.trim() === '') {
+        responses[currentGlobalIdx].ans = null;
+        responses[currentGlobalIdx].status = 'skipped';
+      } else {
+        responses[currentGlobalIdx].ans = value.trim();
+        responses[currentGlobalIdx].status = 'answered';
+      }
+      window.updatePaletteUI(); // Instantly turns the palette button Green
+    };
       window.loadQuestion(currentGlobalIdx); 
     };
 
