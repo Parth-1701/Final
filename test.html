@@ -365,26 +365,27 @@
       document.getElementById('load-text').innerText = "Scoring Exam...";
       
       let score = 0, correct = 0, wrong = 0, unattempted = 0;
-      const isCET = testData.examType === 'mht_cet';
       
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
+        
+        // Read the custom marks from the database, or default to +4 / -1 if missing
+        const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
+        const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 1;
+        
         if (!responses[i].ans) {
           unattempted++;
         } else if (responses[i].ans === q.answer) { 
           correct++; 
-          if (isCET) { score += (q.subject === 'Mathematics' || q.section === 'Mathematics') ? 2 : 1; } 
-          else { score += 4; }
+          score += posMarks; // Add the specific positive marks (+3, +4, etc.)
         } else { 
           wrong++; 
-          score -= isCET ? 0 : 1; 
+          score -= negPenalty; // Deduct the specific penalty (-1, -2, 0, etc.)
         }
       }
 
       try {
-        // Safe Time Calculation
-        const totalDurationSeconds = (testData.duration_minutes || 180) * 60;
-        const timeTaken = totalDurationSeconds - timeRemaining;
+        const timeTaken = (testData.duration_minutes * 60) - timeRemaining;
         const testTitle = testData.title || testData.name || "Mock Test";
 
         sessionStorage.setItem('examResult', JSON.stringify({
