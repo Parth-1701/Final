@@ -75,7 +75,7 @@
       display:flex; gap:1rem; align-items:center;
     }
     .btn-ghost {
-      background:none; border:1px solid var(--border)--surfacestat-car-card-cardbordercolor:var(--text-dim); padding:0.45rem 1.1rem;
+      background:none; border:1px solid var(--border); color:var(--text-dim); padding:0.45rem 1.1rem;
       border-radius:8px; font-family:'DM Sans',sans-serif;
       font-size:0.875rem; cursor:pointer;
       transition: all 0.2s;
@@ -180,6 +180,8 @@
       color:var(--text);
     }
     .stat-label { font-size:0.8rem; color:var(--text-muted); margin-top:2px; }
+    .stat-card { text-align:center; }
+    .stat-card h2 { font-family:'Syne',sans-serif; font-size:2rem; font-weight:700; color:var(--text); }
 
     /* ── EXAM CARDS ── */
     .section { position:relative; z-index:1; padding:5rem 2rem; }
@@ -368,7 +370,7 @@
     .q-options { display:flex; flex-direction:column; gap:0.75rem; }
     .q-option {
       display:flex; align-items:center; gap:0.75rem;
-      background:var(--surfacestat-car-card-cardborder:1px solid var(--border);
+      background:var(--surface); border:1px solid var(--border);
       border-radius:10px; padding:0.75rem 1rem;
       cursor:pointer; transition:all 0.15s;
     }
@@ -609,7 +611,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo">
     <div class="logo-dot"></div>
@@ -627,7 +628,6 @@
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
@@ -642,15 +642,15 @@
     <button class="btn-big outline" onclick="document.getElementById('exams').scrollIntoView({behavior:'smooth'})">Browse Exams</button>
   </div>
 
-    <div class="hero-stats">
-  <div class="stat-card">
-  <h2 id="stat-students">--</h2> 
-  <div class="stat-label">Students enrolled</div>
-</div>
-<div class="stat-card">
-  <h2 id="stat-tests">--</h2>
-  <div class="stat-label">Mock Tests Available</div>
-</div> 
+  <div class="hero-stats">
+    <div class="stat-card">
+      <h2 id="stat-students">--</h2> 
+      <div class="stat-label">Students enrolled</div>
+    </div>
+    <div class="stat-card">
+      <h2 id="stat-tests">--</h2>
+      <div class="stat-label">Mock Tests Available</div>
+    </div> 
     <div class="stat">
       <div class="stat-num">4</div>
       <div class="stat-label">Major exams covered</div>
@@ -658,7 +658,6 @@
   </div>
 </section>
 
-<!-- EXAM CARDS -->
 <section class="section" id="exams">
   <div class="container">
     <div class="section-label">// Choose your battleground</div>
@@ -666,7 +665,6 @@
     <p class="section-sub">Authentic patterns, latest syllabi, and real difficulty levels.</p>
 
     <div class="exams-grid">
-
       <div class="exam-card card-jee" onclick="goToExam('jee-mains.html')">
         <div class="exam-icon">🎯</div>
         <div class="exam-name">JEE Mains</div>
@@ -718,12 +716,10 @@
         </div>
         <div class="exam-cta">Browse Tests →</div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- TEST INTERFACE PREVIEW -->
 <section class="section">
   <div class="container">
     <div class="section-label">// What it feels like</div>
@@ -801,7 +797,6 @@
   </div>
 </section>
 
-<!-- FEATURES -->
 <section class="section" id="features">
   <div class="container">
     <div class="section-label">// Under the hood</div>
@@ -843,7 +838,6 @@
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
 <section class="section" id="how">
   <div class="container">
     <div class="section-label">// The process</div>
@@ -874,7 +868,6 @@
   </div>
 </section>
 
-<!-- LEADERBOARD PREVIEW -->
 <section class="section" id="leaderboard">
   <div class="container">
     <div class="section-label">// This week's top scorers</div>
@@ -946,7 +939,6 @@
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-logo"><span>Quizable</span></div>
   <div class="footer-links">
@@ -958,7 +950,6 @@
   <div class="footer-copy">© 2026 Quizable. All rights reserved.</div>
 </footer>
 
-<!-- AUTH MODAL -->
 <div class="modal-overlay" id="authModal" onclick="closeModalOutside(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
@@ -970,7 +961,6 @@
       <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Sign up</button>
     </div>
 
-    <!-- LOGIN FORM -->
     <div id="loginForm">
       <div class="form-group">
         <label class="form-label">Email</label>
@@ -992,7 +982,6 @@
       </button>
     </div>
 
-    <!-- SIGNUP FORM -->
     <div id="signupForm" style="display:none">
       <div class="form-group">
         <label class="form-label">Full Name</label>
@@ -1029,26 +1018,24 @@
   </div>
 </div>
 
-<!-- Toast notification -->
-<div id="site-toast" style="
+<div id="toast" style="
   position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);
   background:#1a1a26;border:1px solid #2a2a3d;border-radius:10px;
   padding:0.65rem 1.25rem;font-size:0.875rem;color:#e8e8f0;
   transition:transform 0.3s ease;z-index:500;
   box-shadow:0 4px 20px rgba(0,0,0,0.4);white-space:nowrap;pointer-events:none;
-" id="toast"></div>
+"></div>
 
-<!-- Firebase SDK + Auth Logic -->
 <script type="module">
-import { initializeApp }          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
          createUserWithEmailAndPassword, GoogleAuthProvider,
          signInWithPopup, signOut, updateProfile }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ─── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────
+// ─── FIREBASE CONFIG ──────────────────────────
 const firebaseConfig = {
     apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
     authDomain: "sigmascore300.firebaseapp.com",
@@ -1058,7 +1045,6 @@ const firebaseConfig = {
     appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
     measurementId: "G-MLZYWG2EEM"
 };
-// ──────────────────────────────────────────────────────────────
 
 const app      = initializeApp(firebaseConfig);
 const auth     = getAuth(app);
@@ -1215,7 +1201,6 @@ window.goToExam = (page) => {
 
 // ── Auto-open login modal if redirected back from a protected page ──
 if (new URLSearchParams(window.location.search).get('auth') === 'required') {
-  // Wait for auth state to resolve first — only open if still not logged in
   onAuthStateChanged(auth, user => {
     if (!user) openModal('login');
   });
@@ -1273,6 +1258,25 @@ if (palette) {
   }
 }
 
+// ── Load Home Page Stats (Students & Tests) ───────────────────
+async function loadHomePageStats() {
+  try {
+    // Fetch Total Students
+    const usersSnap = await getDocs(collection(db, 'users'));
+    const studentsEl = document.getElementById('stat-students');
+    if (studentsEl) studentsEl.textContent = usersSnap.size + "+";
+
+    // Fetch Published Tests
+    const testsQuery = query(collection(db, 'tests'), where('isPublished', '==', true));
+    const testsSnap = await getDocs(testsQuery);
+    const testsEl = document.getElementById('stat-tests');
+    if (testsEl) testsEl.textContent = testsSnap.size;
+  } catch (error) {
+    console.error("Failed to load home page statistics:", error);
+  }
+}
+loadHomePageStats(); // Trigger on load
+
 // ── Scroll animations ─────────────────────────────────────────
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
@@ -1289,41 +1293,5 @@ document.querySelectorAll('.exam-card,.feat-card,.step').forEach(el => {
   obs.observe(el);
 });
 </script>
-  <script type="module">
-  // 1. Import your database from your existing firebase.js file
-  import { db } from './firebase.js'; 
-  
-  // 2. Import required Firestore functions
-  import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  async function loadHomePageStats() {
-    try {
-      // --- Fetch Total Students ---
-      // This grabs all documents inside the 'users' collection
-      const usersSnap = await getDocs(collection(db, 'users'));
-      const studentCount = usersSnap.size;
-      
-      // Update the HTML (adding a '+' for a nice visual touch)
-      const studentsEl = document.getElementById('stat-students');
-      if (studentsEl) studentsEl.textContent = studentCount + "+";
-
-      // --- Fetch Published Tests ---
-      // This queries the 'tests' collection specifically for tests marked as published
-      const testsQuery = query(collection(db, 'tests'), where('isPublished', '==', true));
-      const testsSnap = await getDocs(testsQuery);
-      const testCount = testsSnap.size;
-
-      // Update the HTML
-      const testsEl = document.getElementById('stat-tests');
-      if (testsEl) testsEl.textContent = testCount;
-
-    } catch (error) {
-      console.error("Failed to load home page statistics:", error);
-    }
-  }
-
-  // 3. Execute the function when the script loads
-  loadHomePageStats();
-  </script>
 </body>
 </html>
