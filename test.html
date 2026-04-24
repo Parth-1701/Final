@@ -23,12 +23,18 @@
     /* --- MAIN LAYOUT --- */
     .main-area { display: flex; flex: 1; overflow: hidden; position: relative; }
     
-    /* --- LEFT: QUESTION AREA --- */
-    .question-section { flex: 1; display: flex; flex-direction: column; padding: 30px; overflow-y: auto; }
-    .q-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; color: var(--text-dim); }
-    .q-text { font-size: 1.2rem; line-height: 1.6; margin-bottom: 30px; }
+    /* --- LEFT: EXAM PANEL --- */
+    .left-panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); position: relative; }
     
-    /* Image Support */
+    /* Subject Tabs */
+    .subject-bar { display: flex; background: var(--surface2); border-bottom: 1px solid var(--border); overflow-x: auto; }
+    .sub-tab { padding: 12px 25px; font-weight: bold; cursor: pointer; border-right: 1px solid var(--border); color: var(--text-dim); white-space: nowrap; transition: 0.2s; }
+    .sub-tab.active { background: var(--surface); color: var(--accent); border-top: 3px solid var(--accent); }
+    
+    /* Question Scrolling Area */
+    .q-content { flex: 1; overflow-y: auto; padding: 30px; }
+    .q-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; color: var(--text-dim); }
+    .q-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 30px; }
     .exam-img { max-width: 100%; height: auto; border-radius: 6px; margin-top: 10px; display: block; }
     
     /* Options */
@@ -39,8 +45,8 @@
     .opt-label { width: 30px; height: 30px; border-radius: 6px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid var(--border); }
     .option-row.selected .opt-label { background: var(--accent); color: white; border-color: var(--accent); }
 
-    /* Navigation Buttons */
-    .nav-buttons { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); }
+    /* GLUED BOTTOM NAV BAR */
+    .bottom-bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; padding: 15px 30px; background: var(--surface); border-top: 1px solid var(--border); }
     .nav-buttons-right { display: flex; flex-wrap: wrap; gap: 10px; }
     .btn { padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.95rem; white-space: nowrap; transition: 0.2s; }
     .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
@@ -50,18 +56,11 @@
     .btn-next { background: var(--green); color: black; }
     .btn-next:hover { filter: brightness(1.1); }
 
-    /* Make buttons stack properly on phones */
-    @media (max-width: 600px) {
-      .nav-buttons { flex-direction: column; }
-      .nav-buttons-right { width: 100%; }
-      .btn { flex: 1; text-align: center; font-size: 0.85rem; padding: 10px; }
-    }
-
     /* --- RIGHT: SIDEBAR PALETTE --- */
-    .sidebar { width: 320px; background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.3s ease; }
+    .sidebar { width: 320px; background: var(--surface); display: flex; flex-direction: column; transition: transform 0.3s ease; }
     .sidebar-header { padding: 15px; border-bottom: 1px solid var(--border); font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
     
-    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 20px; overflow-y: auto; }
+    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 20px; overflow-y: auto; align-content: flex-start; }
     .pal-btn { aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono'; font-weight: bold; cursor: pointer; border: 1px solid transparent; background: var(--surface2); color: var(--text-dim); }
     
     /* Status Colors */
@@ -70,24 +69,26 @@
     .pal-btn.review { background: rgba(246, 201, 14, 0.15); border-color: var(--gold); color: var(--gold); }
     .pal-btn.active { border-color: white; color: white; border-width: 2px; }
 
-    /* Legend */
-    .legend { padding: 20px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-dim); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .legend { padding: 20px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-dim); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
     .leg-item { display: flex; align-items: center; gap: 8px; }
     .leg-dot { width: 12px; height: 12px; border-radius: 3px; }
 
     /* Mobile Toggle Arrow */
-    .toggle-arrow { display: none; position: absolute; right: 20px; bottom: 20px; width: 50px; height: 50px; border-radius: 25px; background: var(--accent); color: white; border: none; font-size: 1.2rem; cursor: pointer; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    .toggle-arrow { display: none; position: absolute; right: 20px; bottom: 80px; width: 50px; height: 50px; border-radius: 25px; background: var(--accent); color: white; border: none; font-size: 1.2rem; cursor: pointer; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 
     /* Full Page Loader */
     #loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 15px; }
     .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Mobile Responsiveness */
     @media (max-width: 900px) {
       .sidebar { position: absolute; right: 0; top: 0; bottom: 0; transform: translateX(100%); z-index: 50; }
       .sidebar.open { transform: translateX(0); }
       .toggle-arrow { display: flex; align-items: center; justify-content: center; }
-      .q-text { font-size: 1.1rem; }
+      .bottom-bar { flex-direction: column; padding: 15px; }
+      .nav-buttons-right { width: 100%; }
+      .btn { flex: 1; text-align: center; padding: 10px; }
     }
   </style>
 </head>
@@ -106,18 +107,21 @@
 
   <div class="main-area">
     
-    <div class="question-section">
-      <div class="q-header">
-        <span id="q-subject">Loading Subject...</span>
-        <span id="q-number">Question 1</span>
-      </div>
-      
-      <div class="q-text" id="q-text">Loading question text...</div>
-      
-      <div class="options-grid" id="options-container">
-        </div>
+    <div class="left-panel">
+      <div class="subject-bar" id="subject-bar"></div>
 
-      <div class="nav-buttons">
+      <div class="q-content" id="q-scroll-area">
+        <div class="q-header">
+          <span id="q-subject-name" style="color: var(--accent); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Loading...</span>
+          <span id="q-number">Question 1</span>
+        </div>
+        
+        <div class="q-text" id="q-text">Loading question text...</div>
+        
+        <div class="options-grid" id="options-container"></div>
+      </div>
+
+      <div class="bottom-bar">
         <button class="btn btn-outline" onclick="navigate(-1)">← Previous</button>
         <div class="nav-buttons-right">
           <button class="btn btn-outline" onclick="clearSelection()">Clear</button>
@@ -132,8 +136,9 @@
         Question Palette
         <button class="btn-outline" style="padding: 2px 8px; border: none;" onclick="toggleSidebar()">✕</button>
       </div>
-      <div class="palette-grid" id="palette-grid">
-        </div>
+      
+      <div class="palette-grid" id="palette-grid"></div>
+      
       <div class="legend">
         <div class="leg-item"><div class="leg-dot" style="background: rgba(62,207,142,0.5);"></div> Answered</div>
         <div class="leg-item"><div class="leg-dot" style="background: rgba(255,107,107,0.5);"></div> Skipped</div>
@@ -151,15 +156,14 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // ─── 1. PASTE YOUR FIREBASE CONFIG HERE ───────────────────────
+    // ─── PASTE YOUR FIREBASE CONFIG HERE ───────────────────────
     const firebaseConfig = {
-    apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
-    authDomain: "sigmascore300.firebaseapp.com",
-    projectId: "sigmascore300",
-    storageBucket: "sigmascore300.firebasestorage.app",
-    messagingSenderId: "293195338803",
-    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
-    measurementId: "G-MLZYWG2EEM"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
     // ──────────────────────────────────────────────────────────────
 
@@ -167,67 +171,57 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // App State
     let testData = null;
     let questions = [];
-    let currentIdx = 0;
-    let responses = []; // Array of { ans: 'A', status: 'answered' }
+    let responses = []; 
     let timeRemaining = 0;
     let timerInterval = null;
 
-    // --- INITIALIZATION ---
+    // Subject Grouping Variables
+    let currentGlobalIdx = 0;
+    let sections = [];
+    let currentSection = "";
+
     auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        alert("You must be logged in to take a test!");
-        window.location.href = 'index.html';
-        return;
-      }
+      if (!user) { alert("You must be logged in!"); window.location.href = 'index.html'; return; }
 
       const params = new URLSearchParams(window.location.search);
       const testId = params.get('testId');
-      if (!testId) {
-        alert("No test selected!");
-        window.location.href = 'index.html';
-        return;
-      }
+      if (!testId) { window.location.href = 'index.html'; return; }
 
       try {
-        // Fetch test from Firestore
         const testSnap = await db.collection('tests').doc(testId).get();
-        if (!testSnap.exists) throw new Error("Test not found in database.");
+        if (!testSnap.exists) throw new Error("Test not found.");
         testData = testSnap.data();
         testData.id = testId;
 
-        // Security: Premium Check
+        // Security Check
         if (testData.isPremium === true || testData.isPremium === "true") {
           const userSnap = await db.collection('users').doc(user.uid).get();
-          const userData = userSnap.data() || {};
-          const pkgs = userData.purchasedPackages || [];
+          const pkgs = (userSnap.data() || {}).purchasedPackages || [];
           if (!pkgs.includes(testData.examType)) {
-            alert("🔒 Access Denied: You have not unlocked this premium package.");
-            window.location.href = 'index.html';
-            return;
+            alert("🔒 Access Denied."); window.location.href = 'index.html'; return;
           }
         }
 
-        // Setup UI
         document.getElementById('display-title').innerText = testData.title || "Mock Test";
         timeRemaining = (testData.duration_minutes || 180) * 60;
         
-        // Load Questions (Assumes questions are an array in the test document)
         questions = testData.questions || [];
         if (questions.length === 0) {
-          // Dummy data fallback so the UI doesn't crash if your array is empty
           questions = [
-            { id: 1, section: "Physics", text: "What is the unit of Force?", options: { A: "Joule", B: "Newton", C: "Watt", D: "Pascal" }, answer: "B" },
-            { id: 2, section: "Physics", text: "Find the tension. <br><br> <img src='https://via.placeholder.com/300x150?text=Diagram+Placeholder' class='exam-img'>", options: { A: "10N", B: "20N", C: "30N", D: "40N" }, answer: "A" }
+            { id: 1, section: "Physics", text: "Unit of Force?", options: { A: "Joule", B: "Newton", C: "Watt", D: "Pascal" }, answer: "B" },
+            { id: 2, section: "Chemistry", text: "Formula of Water?", options: { A: "H2O", B: "CO2", C: "O2", D: "NaCl" }, answer: "A" }
           ];
         }
 
-        // Initialize responses array
         responses = questions.map(() => ({ ans: null, status: 'unvisited' }));
-        responses[0].status = 'skipped'; // First question is visited but not answered yet
+        
+        // --- Detect Unique Subjects/Sections ---
+        sections = [...new Set(questions.map(q => q.subject || q.section || "General"))];
+        currentSection = sections[0];
 
+        buildSectionTabs();
         buildPalette();
         loadQuestion(0);
         startTimer();
@@ -235,32 +229,64 @@
 
       } catch (err) {
         console.error(err);
-        document.getElementById('load-text').innerText = "Error loading test. Please go back.";
+        document.getElementById('load-text').innerText = "Error loading test.";
         document.getElementById('load-text').style.color = "var(--red)";
       }
     });
 
-    // --- CORE LOGIC ---
-    function loadQuestion(index) {
-      if (index < 0 || index >= questions.length) return;
-      currentIdx = index;
-      const q = questions[currentIdx];
-      
-      // Update status if unvisited
-      if (responses[currentIdx].status === 'unvisited') {
-        responses[currentIdx].status = 'skipped';
+    // --- TABS LOGIC ---
+    function buildSectionTabs() {
+      const bar = document.getElementById('subject-bar');
+      bar.innerHTML = '';
+      sections.forEach(sec => {
+        bar.innerHTML += `<div class="sub-tab ${sec === currentSection ? 'active' : ''}" onclick="switchSection('${sec}')">${sec}</div>`;
+      });
+    }
+
+    window.switchSection = (secName) => {
+      currentSection = secName;
+      buildSectionTabs();
+      // Find the first question index of this new section
+      const firstIdx = questions.findIndex(q => (q.subject || q.section || "General") === currentSection);
+      if (firstIdx !== -1) {
+        buildPalette();
+        loadQuestion(firstIdx);
+      }
+    };
+
+    // --- QUESTION LOGIC ---
+    function loadQuestion(globalIndex) {
+      if (globalIndex < 0 || globalIndex >= questions.length) return;
+      currentGlobalIdx = globalIndex;
+      const q = questions[currentGlobalIdx];
+      const qSec = q.subject || q.section || "General";
+
+      // If navigation crossed into a new subject, automatically update tabs & palette
+      if (currentSection !== qSec) {
+        currentSection = qSec;
+        buildSectionTabs();
+        buildPalette();
       }
 
-      document.getElementById('q-number').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
-      document.getElementById('q-subject').innerText = q.section || "General";
+      if (responses[currentGlobalIdx].status === 'unvisited') {
+        responses[currentGlobalIdx].status = 'skipped';
+      }
+
+      // Calculate the "Local" question number (e.g., Question 12 of Physics)
+      let localNum = 1;
+      for (let i = 0; i < currentGlobalIdx; i++) {
+        if ((questions[i].subject || questions[i].section || "General") === currentSection) localNum++;
+      }
+
+      document.getElementById('q-number').innerText = `Question ${localNum}`;
+      document.getElementById('q-subject-name').innerText = currentSection;
       document.getElementById('q-text').innerHTML = q.text || q.question;
 
       const optsContainer = document.getElementById('options-container');
       optsContainer.innerHTML = '';
-      
       const options = q.options || { A: "Opt 1", B: "Opt 2", C: "Opt 3", D: "Opt 4" };
       for (const [key, val] of Object.entries(options)) {
-        const isSelected = responses[currentIdx].ans === key;
+        const isSelected = responses[currentGlobalIdx].ans === key;
         optsContainer.innerHTML += `
           <div class="option-row ${isSelected ? 'selected' : ''}" onclick="selectOption('${key}')">
             <div class="opt-label">${key}</div>
@@ -268,44 +294,42 @@
           </div>
         `;
       }
+
+      // Scroll to top of question
+      document.getElementById('q-scroll-area').scrollTop = 0;
       updatePaletteUI();
     }
 
     window.selectOption = (key) => {
-      // Toggle off if clicking the same one
-      if (responses[currentIdx].ans === key) {
-        responses[currentIdx].ans = null;
-        responses[currentIdx].status = 'skipped';
+      if (responses[currentGlobalIdx].ans === key) {
+        responses[currentGlobalIdx].ans = null;
+        responses[currentGlobalIdx].status = 'skipped';
       } else {
-        responses[currentIdx].ans = key;
-        responses[currentIdx].status = 'answered';
+        responses[currentGlobalIdx].ans = key;
+        responses[currentGlobalIdx].status = 'answered';
       }
-      loadQuestion(currentIdx); // Refresh UI
+      loadQuestion(currentGlobalIdx); 
     };
 
-    window.navigate = (direction) => {
-      loadQuestion(currentIdx + direction);
+    window.clearSelection = () => {
+      responses[currentGlobalIdx].ans = null;
+      responses[currentGlobalIdx].status = 'skipped';
+      loadQuestion(currentGlobalIdx);
     };
+
+    window.navigate = (dir) => loadQuestion(currentGlobalIdx + dir);
 
     window.saveAndNext = () => {
-      // If they selected something, ensure status is answered
-      if (responses[currentIdx].ans) responses[currentIdx].status = 'answered';
-      else responses[currentIdx].status = 'skipped';
+      if (responses[currentGlobalIdx].ans) responses[currentGlobalIdx].status = 'answered';
+      else responses[currentGlobalIdx].status = 'skipped';
       
-      if (currentIdx < questions.length - 1) loadQuestion(currentIdx + 1);
+      if (currentGlobalIdx < questions.length - 1) loadQuestion(currentGlobalIdx + 1);
       else updatePaletteUI();
     };
-    
-    window.clearSelection = () => {
-      // Wipes the answer and resets the palette status to skipped/visited
-      responses[currentIdx].ans = null;
-      responses[currentIdx].status = 'skipped';
-      loadQuestion(currentIdx); // Instantly refreshes the UI
-    };
-    
+
     window.markForReview = () => {
-      responses[currentIdx].status = 'review';
-      if (currentIdx < questions.length - 1) loadQuestion(currentIdx + 1);
+      responses[currentGlobalIdx].status = 'review';
+      if (currentGlobalIdx < questions.length - 1) loadQuestion(currentGlobalIdx + 1);
       else updatePaletteUI();
     };
 
@@ -313,17 +337,27 @@
     function buildPalette() {
       const grid = document.getElementById('palette-grid');
       grid.innerHTML = '';
-      for (let i = 0; i < questions.length; i++) {
-        grid.innerHTML += `<div class="pal-btn" id="pal-${i}" onclick="loadQuestion(${i})">${i + 1}</div>`;
-      }
+      let localNum = 1;
+      
+      questions.forEach((q, index) => {
+        if ((q.subject || q.section || "General") === currentSection) {
+          grid.innerHTML += `<div class="pal-btn" id="pal-${index}" onclick="loadQuestion(${index})">${localNum}</div>`;
+          localNum++;
+        }
+      });
+      updatePaletteUI();
     }
 
     function updatePaletteUI() {
-      for (let i = 0; i < questions.length; i++) {
-        const btn = document.getElementById(`pal-${i}`);
-        btn.className = `pal-btn ${responses[i].status}`;
-        if (i === currentIdx) btn.classList.add('active');
-      }
+      questions.forEach((q, index) => {
+        if ((q.subject || q.section || "General") === currentSection) {
+          const btn = document.getElementById(`pal-${index}`);
+          if (btn) {
+            btn.className = `pal-btn ${responses[index].status}`;
+            if (index === currentGlobalIdx) btn.classList.add('active');
+          }
+        }
+      });
     }
 
     window.toggleSidebar = () => {
@@ -333,76 +367,47 @@
       arrow.innerText = sidebar.classList.contains('open') ? '▶' : '◀';
     };
 
-    // --- TIMER LOGIC ---
     function startTimer() {
       const display = document.getElementById('timer');
       timerInterval = setInterval(() => {
         timeRemaining--;
-        if (timeRemaining <= 0) {
-          clearInterval(timerInterval);
-          submitExam();
-          return;
-        }
+        if (timeRemaining <= 0) { clearInterval(timerInterval); submitExam(); return; }
         let h = Math.floor(timeRemaining / 3600);
         let m = Math.floor((timeRemaining % 3600) / 60);
         let s = timeRemaining % 60;
         display.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        
-        if (timeRemaining < 300) display.style.color = "var(--red)"; // Last 5 mins
       }, 1000);
     }
 
-    // --- SUBMISSION LOGIC ---
     window.submitExam = async () => {
-      const conf = confirm("Are you sure you want to submit the test?");
+      const conf = confirm("Are you sure you want to submit?");
       if (!conf && timeRemaining > 0) return;
-
       clearInterval(timerInterval);
       document.getElementById('loader').style.display = 'flex';
-      document.getElementById('load-text').innerText = "Calculating Score & Saving...";
-
+      
       let score = 0, correct = 0, wrong = 0, unattempted = 0;
-
       for (let i = 0; i < questions.length; i++) {
-        const studentAns = responses[i].ans;
-        const actualAns = questions[i].answer;
-        
-        if (!studentAns) {
-          unattempted++;
-        } else if (studentAns === actualAns) {
-          correct++;
-          score += 4; // Assuming +4 for correct
-        } else {
-          wrong++;
-          score -= 1; // Assuming -1 for wrong
-        }
+        if (!responses[i].ans) unattempted++;
+        else if (responses[i].ans === questions[i].answer) { correct++; score += 4; }
+        else { wrong++; score -= 1; }
       }
 
       try {
         const user = auth.currentUser;
-        const timeTaken = (testData.duration_minutes * 60) - timeRemaining;
-
-        // 1. SAVE LOCALLY (Bulletproof redirect)
         sessionStorage.setItem('examResult', JSON.stringify({
-          score, correct, wrong, unattempted, timeTaken, 
+          score, correct, wrong, unattempted, timeTaken: (testData.duration_minutes * 60) - timeRemaining, 
           totalQuestions: questions.length, testId: testData.id
         }));
 
-        // 2. SAVE TO FIREBASE (In Background)
         if (user) {
           db.collection('results').add({
             userId: user.uid, testId: testData.id, score, correct, wrong, 
-            timeTaken, submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }).catch(e => console.log("Silent DB Error:", e));
+            timeTaken: (testData.duration_minutes * 60) - timeRemaining, submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(e => console.log(e));
         }
-
-        // 3. FORCE REDIRECT (Notice no /Final/ here!)
         window.location.href = 'result.html';
-
       } catch (err) {
-        console.error(err);
-        alert("Failed to process results. Please contact admin.");
-        document.getElementById('loader').style.display = 'none';
+        alert("Error saving."); document.getElementById('loader').style.display = 'none';
       }
     };
   </script>
