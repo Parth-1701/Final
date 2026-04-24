@@ -382,17 +382,21 @@
       }
 
       try {
-        const timeTaken = (testData.duration_minutes * 60) - timeRemaining;
+        // Safe Time Calculation
+        const totalDurationSeconds = (testData.duration_minutes || 180) * 60;
+        const timeTaken = totalDurationSeconds - timeRemaining;
+        const testTitle = testData.title || testData.name || "Mock Test";
+
         sessionStorage.setItem('examResult', JSON.stringify({
           score, correct, wrong, unattempted, timeTaken, totalQuestions: questions.length, 
-          testId: testData.id, examType: testData.examType || "JEE"
+          testId: testData.id, examType: testData.examType || "JEE", testTitle
         }));
 
         const user = auth.currentUser;
         if (user) {
           await addDoc(collection(db, 'results'), {
-            userId: user.uid, testId: testData.id, score, correct, wrong, 
-            timeTaken, submittedAt: serverTimestamp()
+            userId: user.uid, testId: testData.id, testTitle: testTitle,
+            score, correct, wrong, timeTaken, submittedAt: serverTimestamp()
           }).catch(e => console.log(e));
         }
         window.location.href = 'result.html';
