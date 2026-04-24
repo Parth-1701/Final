@@ -1258,15 +1258,14 @@ if (palette) {
   }
 }
 
-// ── Load Home Page Stats (Students & Tests) ───────────────────
+// ── Load Home Page Stats ───────────────────
 async function loadHomePageStats() {
   try {
-    // Fetch Total Students
-    const usersSnap = await getDocs(collection(db, 'users'));
+    // 1. Hardcode a marketing number for students (Secure!)
     const studentsEl = document.getElementById('stat-students');
-    if (studentsEl) studentsEl.textContent = usersSnap.size + "+";
+    if (studentsEl) studentsEl.textContent = "1,200+"; 
 
-    // Fetch Published Tests
+    // 2. Dynamically count the live mock tests (Since tests are public, this works!)
     const testsQuery = query(collection(db, 'tests'), where('isPublished', '==', true));
     const testsSnap = await getDocs(testsQuery);
     const testsEl = document.getElementById('stat-tests');
@@ -1275,8 +1274,7 @@ async function loadHomePageStats() {
     console.error("Failed to load home page statistics:", error);
   }
 }
-loadHomePageStats(); // Trigger on load
-
+loadHomePageStats();
 // ── Scroll animations ─────────────────────────────────────────
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
