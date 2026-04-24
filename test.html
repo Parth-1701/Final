@@ -8,125 +8,133 @@
   
   <script>
     window.MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
-      startup: { typeset: false } // We will trigger this manually every time a question loads
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      startup: { typeset: false } 
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
-    /* NTA Dark Theme Variables */
+    /* NTA Light Theme Variables */
     :root {
-      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26; --border: #2a2a3d; 
-      --accent: #6c63ff; --text: #e8e8f0; --text-dim: #9999b8;
+      --bg: #f0f1f4;             /* Light gray background */
+      --surface: #ffffff;        /* Pure white panels */
+      --surface2: #f8f9fa;       /* Off-white for secondary elements */
+      --border: #ced4da;         /* Standard light border */
+      
+      --accent: #1e73be;         /* NTA Signature Blue */
+      --text: #212529;           /* Dark Charcoal Text */
+      --text-dim: #6c757d;       /* Muted Text */
       
       /* NTA Standard Palette Colors */
       --nta-save: #28a745;       /* Green */
-      --nta-review: #fd7e14;     /* Orange */
-      --nta-clear: #6c757d;      /* Gray/White */
+      --nta-review: #6f42c1;     /* Purple (NTA Standard for Review) */
+      --nta-review-btn: #fd7e14; /* Orange (NTA Standard for Review Button) */
+      --nta-clear: #ffffff;      /* White */
       --nta-skipped: #dc3545;    /* Red */
-      --nta-unvisited: #f8f9fa;  /* White */
+      --nta-unvisited: #e9ecef;  /* Light Gray */
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
     body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
     /* --- TOP BAR --- */
-    .top-bar { display: flex; justify-content: space-between; align-items: center; background: #000; padding: 15px 25px; border-bottom: 2px solid var(--border); z-index: 20; }
-    .exam-title { font-weight: 700; font-size: 1.2rem; color: white; letter-spacing: 1px; }
-    .timer-box { font-family: 'DM Mono', monospace; font-size: 1.4rem; font-weight: bold; color: var(--nta-review); display: flex; align-items: center; gap: 10px; }
-    .btn-submit { background: var(--nta-skipped); color: white; border: none; padding: 10px 25px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
-    .btn-submit:hover { filter: brightness(1.2); }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--accent); padding: 12px 25px; border-bottom: 3px solid #15558d; z-index: 20; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .exam-title { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; }
+    .timer-box { font-family: 'DM Mono', monospace; font-size: 1.3rem; font-weight: bold; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 4px; }
+    .btn-submit { background: var(--surface); color: var(--accent); border: 1px solid var(--surface); padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.95rem; transition: 0.2s; }
+    .btn-submit:hover { background: #e9ecef; }
 
     /* --- MAIN LAYOUT --- */
     .main-area { display: flex; flex: 1; overflow: hidden; position: relative; }
     
     /* --- LEFT: QUESTION PANEL --- */
-    .left-panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); position: relative; }
+    .left-panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); position: relative; background: var(--surface); margin: 10px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
     
     /* Subject Tabs */
     .subject-bar { display: flex; background: var(--surface2); border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
-    .sub-tab { padding: 15px 30px; font-weight: bold; cursor: pointer; border-right: 1px solid var(--border); color: var(--text-dim); white-space: nowrap; transition: 0.2s; text-transform: uppercase; font-size: 0.9rem; }
-    .sub-tab.active { background: var(--surface); color: white; border-top: 3px solid var(--accent); }
+    .sub-tab { padding: 12px 25px; font-weight: bold; cursor: pointer; border-right: 1px solid var(--border); color: var(--text-dim); white-space: nowrap; transition: 0.2s; font-size: 0.95rem; }
+    .sub-tab.active { background: var(--accent); color: white; border-top: 3px solid #15558d; }
     
-    /* Question Scrolling Area (Dedicated Panel) */
-    .q-content { flex: 1; overflow-y: auto; padding: 30px 40px; }
-    .q-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 25px; color: var(--text-dim); font-size: 1.1rem; }
-    .q-text { font-size: 1.2rem; line-height: 1.6; margin-bottom: 30px; font-weight: 500; }
+    /* Question Scrolling Area */
+    .q-content { flex: 1; overflow-y: auto; padding: 25px 35px; }
+    .q-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; color: var(--text-dim); font-size: 1.05rem; }
+    .q-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 25px; font-weight: 500; color: #000; }
     .exam-img { max-width: 100%; height: auto; border-radius: 4px; margin-top: 15px; border: 1px solid var(--border); }
     
     /* Options & Inputs */
-    .options-grid { display: flex; flex-direction: column; gap: 15px; padding-bottom: 20px;}
-    .option-row { display: flex; align-items: center; gap: 15px; background: var(--surface2); padding: 15px 20px; border-radius: 6px; border: 2px solid var(--border); cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
-    .option-row:hover { border-color: var(--text-dim); }
-    .option-row.selected { background: rgba(40, 167, 69, 0.1); border-color: var(--nta-save); }
-    .opt-label { width: 35px; height: 35px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid var(--border); flex-shrink: 0;}
-    .option-row.selected .opt-label { background: var(--nta-save); color: white; border-color: var(--nta-save); }
+    .options-grid { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px;}
+    .option-row { display: flex; align-items: center; gap: 15px; background: var(--surface); padding: 12px 15px; border-radius: 4px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; font-size: 1.05rem; }
+    .option-row:hover { background: var(--surface2); }
+    .option-row.selected { background: #eaf4fe; border-color: var(--accent); }
+    .opt-label { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid var(--border); flex-shrink: 0; color: var(--text-dim); }
+    .option-row.selected .opt-label { background: var(--accent); color: white; border-color: var(--accent); }
 
-    .numerical-input { width: 100%; max-width: 400px; padding: 20px; background: var(--surface2); border: 2px solid var(--border); color: white; border-radius: 6px; font-size: 1.5rem; font-family: 'DM Mono', monospace; outline: none; transition: 0.2s; }
-    .numerical-input:focus { border-color: var(--nta-save); background: rgba(40, 167, 69, 0.05); }
+    .numerical-input { width: 100%; max-width: 350px; padding: 15px; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-size: 1.3rem; font-family: 'DM Mono', monospace; outline: none; transition: 0.2s; }
+    .numerical-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(30,115,190,0.1); }
 
-    /* NTA GLUED BOTTOM NAV BAR (Grouped Clustered Controls) */
-    .bottom-bar { display: flex; justify-content: space-between; padding: 20px 40px; background: var(--surface); border-top: 2px solid var(--border); gap: 15px; flex-shrink: 0; z-index: 10; }
-    .nav-group { display: flex; gap: 15px; }
-    .btn { padding: 12px 25px; border-radius: 4px; font-weight: bold; cursor: pointer; border: 1px solid transparent; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; white-space: nowrap; }
+    /* NTA GLUED BOTTOM NAV BAR */
+    .bottom-bar { display: flex; justify-content: space-between; padding: 15px 30px; background: var(--surface2); border-top: 1px solid var(--border); gap: 15px; flex-shrink: 0; z-index: 10; }
+    .nav-group { display: flex; gap: 10px; }
+    .btn { padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; border: 1px solid transparent; font-size: 0.95rem; transition: 0.2s; white-space: nowrap; }
     
-    .btn-clear { background: var(--surface2); color: white; border-color: var(--border); }
-    .btn-clear:hover { background: #2a2a3d; }
+    .btn-clear { background: var(--nta-clear); color: var(--text); border-color: var(--border); }
+    .btn-clear:hover { background: var(--surface2); }
     
-    .btn-review { background: var(--nta-review); color: white; }
-    .btn-review:hover { filter: brightness(1.1); }
+    .btn-review { background: var(--nta-review-btn); color: white; border-color: #e06c00; }
+    .btn-review:hover { filter: brightness(1.05); }
     
-    .btn-save { background: var(--nta-save); color: white; }
-    .btn-save:hover { filter: brightness(1.1); }
+    .btn-save { background: var(--nta-save); color: white; border-color: #218838; }
+    .btn-save:hover { filter: brightness(1.05); }
 
-    /* --- RIGHT: PALETTE SIDEBAR (Clean Full-Screen Modal) --- */
-    .sidebar { width: 340px; background: var(--surface2); display: flex; flex-direction: column; transition: transform 0.3s ease; flex-shrink: 0;}
-    .sidebar-header { padding: 20px; background: var(--surface); border-bottom: 1px solid var(--border); font-weight: bold; text-align: center; font-size: 1.1rem; }
+    /* --- RIGHT: PALETTE SIDEBAR --- */
+    .sidebar { width: 320px; background: var(--surface); display: flex; flex-direction: column; transition: transform 0.3s ease; flex-shrink: 0; margin: 10px 10px 10px 0; border-radius: 6px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;}
+    .sidebar-header { padding: 15px; background: var(--surface2); border-bottom: 1px solid var(--border); font-weight: bold; text-align: center; font-size: 1.05rem; }
     
     /* Stats Box */
-    .palette-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 20px; border-bottom: 1px solid var(--border); font-size: 0.85rem; font-weight: bold; }
+    .palette-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.8rem; font-weight: 500; background: var(--surface); }
     .stat-item { display: flex; align-items: center; gap: 8px; }
-    .stat-badge { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: white; font-family: 'DM Mono'; font-size: 0.75rem; flex-shrink: 0;}
+    .stat-badge { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: white; font-family: 'DM Mono'; font-size: 0.7rem; flex-shrink: 0; font-weight: bold;}
 
-    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 20px; overflow-y: auto; align-content: flex-start; }
-    .pal-btn { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono'; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.1s; }
+    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 20px; overflow-y: auto; align-content: flex-start; background: #eef2f5; flex: 1; }
+    .pal-btn { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono'; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.1s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
     
-    /* NTA Status Colors */
-    .pal-btn.unvisited { background: var(--nta-unvisited); color: black; border: 1px solid #ccc; }
-    .pal-btn.skipped { background: var(--nta-skipped); color: white; border: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
-    .pal-btn.answered { background: var(--nta-save); color: white; border: none; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+    /* True NTA Status Colors & Shapes */
+    .pal-btn.unvisited { background: var(--nta-unvisited); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+    .pal-btn.skipped { background: var(--nta-skipped); color: white; border: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+    .pal-btn.answered { background: var(--nta-save); color: white; border: none; border-top-left-radius: 10px; border-top-right-radius: 10px; }
     .pal-btn.review { background: var(--nta-review); color: white; border: none; border-radius: 50%; }
     .pal-btn.answered-review { background: var(--nta-review); color: white; border: none; border-radius: 50%; position: relative; }
     .pal-btn.answered-review::after { content: ''; position: absolute; bottom: 2px; right: 2px; width: 8px; height: 8px; background: var(--nta-save); border-radius: 50%; border: 1px solid white; }
     
-    .pal-btn.active { outline: 3px solid white; outline-offset: 2px; transform: scale(1.1); z-index: 10; }
+    .pal-btn.active { outline: 2px solid var(--accent); outline-offset: 1px; transform: scale(1.05); z-index: 10; }
 
     /* Full Page Loader */
     #loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 20px; }
-    .spinner { width: 50px; height: 50px; border: 5px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Mobile Toggle */
-    .toggle-arrow { display: none; position: absolute; right: 20px; width: 50px; height: 50px; border-radius: 25px; background: var(--accent); color: white; border: none; font-size: 1.2rem; cursor: pointer; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    .toggle-arrow { display: none; position: absolute; right: 15px; width: 45px; height: 45px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.2rem; cursor: pointer; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
     /* MOBILE RESPONSIVE FIXES */
     @media (max-width: 900px) {
       .top-bar { padding: 10px 15px; }
       .exam-title { font-size: 1rem; }
-      .timer-box { font-size: 1.1rem; }
-      .btn-submit { padding: 8px 15px; font-size: 0.9rem; }
+      .timer-box { font-size: 1rem; }
+      .btn-submit { padding: 6px 12px; font-size: 0.85rem; }
       
-      .sidebar { position: absolute; right: 0; top: 0; bottom: 0; transform: translateX(100%); z-index: 50; }
+      .left-panel { margin: 0; border-radius: 0; border-right: none; }
+      .sidebar { position: absolute; right: 0; top: 0; bottom: 0; transform: translateX(100%); z-index: 50; margin: 0; border-radius: 0; width: 300px; }
       .sidebar.open { transform: translateX(0); }
-      .toggle-arrow { display: flex; align-items: center; justify-content: center; bottom: 250px; } /* Moved up to avoid covering buttons */
+      .toggle-arrow { display: flex; align-items: center; justify-content: center; bottom: 180px; } 
       
-      .q-content { padding: 20px; }
+      .q-content { padding: 15px; }
+      .q-text { font-size: 1.1rem; }
       
-      /* Fixed Stacked Buttons for Mobile */
       .bottom-bar { flex-direction: column; padding: 15px; gap: 10px; }
       .nav-group { flex-direction: column; width: 100%; gap: 10px; }
-      .btn { width: 100%; text-align: center; white-space: normal; padding: 14px; font-size: 1rem; line-height: 1.3;}
+      .btn { width: 100%; text-align: center; white-space: normal; padding: 12px; font-size: 0.95rem; }
     }
   </style>
 </head>
@@ -134,13 +142,13 @@
 
   <div id="loader">
     <div class="spinner"></div>
-    <div style="font-family: 'DM Mono'; font-size: 1.2rem;" id="load-text">Loading Examination Environment...</div>
+    <div style="font-family: 'DM Mono'; font-size: 1rem; color: var(--text-dim);" id="load-text">Loading Examination Environment...</div>
   </div>
 
   <div class="top-bar">
     <div class="exam-title" id="display-title">Quizable NTA Engine</div>
     <div class="timer-box">⏱ <span id="timer">--:--:--</span></div>
-    <button class="btn-submit" onclick="window.submitExam()">Submit Exam</button>
+    <button class="btn-submit" onclick="window.submitExam()">Submit Test</button>
   </div>
 
   <div class="main-area">
@@ -150,8 +158,8 @@
 
       <div class="q-content" id="q-scroll-area">
         <div class="q-header">
-          <span id="q-subject-name" style="font-weight: bold; color: white;">Loading...</span>
-          <span id="q-number" style="color: var(--nta-save); font-weight: bold;">Q. 1</span>
+          <span id="q-subject-name" style="font-weight: bold; color: var(--accent);">Loading...</span>
+          <span id="q-number" style="color: var(--text); font-weight: bold;">Q. 1</span>
         </div>
         
         <div class="q-text" id="q-text">Loading question text...</div>
@@ -171,9 +179,9 @@
       <div class="sidebar-header">Question Palette</div>
       
       <div class="palette-stats">
-        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-save); border-top-left-radius: 12px; border-top-right-radius: 12px;"></div> Answered</div>
-        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-skipped); border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;"></div> Not Answered</div>
-        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-unvisited); color: black;"></div> Not Visited</div>
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-save); border-top-left-radius: 10px; border-top-right-radius: 10px;"></div> Answered</div>
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-skipped); border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;"></div> Not Answered</div>
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-unvisited); color: var(--text-dim); border: 1px solid var(--border);"></div> Not Visited</div>
         <div class="stat-item"><div class="stat-badge" style="background: var(--nta-review); border-radius: 50%;"></div> Marked Review</div>
       </div>
 
@@ -191,13 +199,12 @@
 
     // ─── 1. PASTE YOUR EXACT FIREBASE CONFIG HERE ─────────────────
     const firebaseConfig = {
-    apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
-    authDomain: "sigmascore300.firebaseapp.com",
-    projectId: "sigmascore300",
-    storageBucket: "sigmascore300.firebasestorage.app",
-    messagingSenderId: "293195338803",
-    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
-    measurementId: "G-MLZYWG2EEM"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
     // ──────────────────────────────────────────────────────────────
 
@@ -215,7 +222,6 @@
     let sections = [];
     let currentSection = "";
 
-    // STARTUP
     onAuthStateChanged(auth, async (user) => {
       if (!user) { alert("Please log in!"); window.location.href = 'index.html'; return; }
 
@@ -234,7 +240,6 @@
         
         questions = testData.questions || [];
         
-        // Map Responses mapping to NTA statuses
         responses = questions.map(() => ({ ans: null, status: 'unvisited' }));
         sections = [...new Set(questions.map(q => q.subject || q.section || "General"))];
         currentSection = sections[0];
@@ -270,7 +275,6 @@
       }
     };
 
-    // LOAD QUESTION ENGINE (Supports Numerical and Math Rendering)
     window.loadQuestion = (globalIndex) => {
       if (globalIndex < 0 || globalIndex >= questions.length) return;
       currentGlobalIdx = globalIndex;
@@ -283,7 +287,6 @@
         window.buildPalette();
       }
 
-      // If unvisited, mark as skipped (Not Answered)
       if (responses[currentGlobalIdx].status === 'unvisited') {
         responses[currentGlobalIdx].status = 'skipped';
       }
@@ -296,28 +299,28 @@
       document.getElementById('q-number').innerText = `Question ${localNum}`;
       document.getElementById('q-subject-name').innerText = currentSection;
       
-      // Formatting question text and added professional marking scheme context from reference image
-      const markingSchemeHTML = `<div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px;">Full Marks : +3 If ONLY the correct option is chosen; Zero Marks : 0; Negative Marks : -1 In all other cases.</div>`;
+      const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
+      const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 1;
+      const markingSchemeHTML = `<div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border);">Full Marks: <strong style="color:var(--nta-save)">+${posMarks}</strong> If ONLY the correct option is chosen; Negative Marks: <strong style="color:var(--nta-skipped)">-${negPenalty}</strong></div>`;
+      
       let qTextHTML = markingSchemeHTML + (q.text || q.question);
       if(q.type === 'numerical' || !q.options) {
-          qTextHTML += `<br><br><span style="color: var(--nta-review); font-size: 0.9rem; font-family: 'DM Mono';">(Numerical Value Type)</span>`;
+          qTextHTML += `<br><br><span style="color: var(--nta-review-btn); font-size: 0.9rem; font-family: 'DM Mono'; font-weight: bold;">(Numerical Value Type)</span>`;
       }
       document.getElementById('q-text').innerHTML = qTextHTML;
 
       const optsContainer = document.getElementById('options-container');
       optsContainer.innerHTML = '';
       
-      // NUMERICAL ENTRY RENDERER
       if (q.type === 'numerical' || !q.options) {
         const savedVal = responses[currentGlobalIdx].ans || '';
         optsContainer.innerHTML = `
           <input type="number" step="any" class="numerical-input"
-                 placeholder="Enter numerical value..." 
+                 placeholder="Enter value..." 
                  value="${savedVal}" 
                  oninput="window.saveNumericalAnswer(this.value)">
         `;
       } 
-      // STANDARD MCQ RENDERER
       else {
         const options = q.options;
         const sortedKeys = Object.keys(options).sort();
@@ -336,16 +339,13 @@
       document.getElementById('q-scroll-area').scrollTop = 0;
       window.updatePaletteUI();
 
-      // TRIGGER MATHJAX TO RENDER THE EQUATIONS
       if (window.MathJax) {
         MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
       }
     };
 
-    // ACTION BUTTON LOGIC
     window.selectOption = (key) => {
       responses[currentGlobalIdx].ans = key;
-      // NTA Rules: Clicking an option doesn't immediately turn it green. It turns green when they hit "Save & Next". We'll visually select it here.
       window.loadQuestion(currentGlobalIdx); 
     };
 
@@ -355,7 +355,7 @@
 
     window.clearSelection = () => {
       responses[currentGlobalIdx].ans = null;
-      responses[currentGlobalIdx].status = 'skipped'; // Returns to Not Answered red
+      responses[currentGlobalIdx].status = 'skipped'; 
       window.loadQuestion(currentGlobalIdx);
     };
 
@@ -379,7 +379,6 @@
       else window.updatePaletteUI();
     };
 
-    // PALETTE LOGIC
     window.buildPalette = () => {
       const grid = document.getElementById('palette-grid');
       grid.innerHTML = '';
@@ -412,7 +411,6 @@
       arrow.innerText = sidebar.classList.contains('open') ? '▶' : '◀';
     };
 
-    // TIMER & SUBMISSION (Smart Grading)
     function startTimer() {
       const display = document.getElementById('timer');
       timerInterval = setInterval(() => {
@@ -440,11 +438,9 @@
         const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
         const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 1;
         
-        // Note: NTA considers 'answered' and 'answered-review' for evaluation. Skip if in pure review.
         if (!responses[i].ans || responses[i].status === 'review' || responses[i].status === 'skipped' || responses[i].status === 'unvisited') {
           unattempted++;
         } else {
-          // Smart Grading Logic
           let isCorrect = false;
           if (q.type === 'numerical' || !q.options) {
              isCorrect = parseFloat(responses[i].ans) === parseFloat(q.answer);
@@ -453,11 +449,9 @@
           }
 
           if (isCorrect) { 
-            correct++; 
-            score += posMarks; 
+            correct++; score += posMarks; 
           } else { 
-            wrong++; 
-            score -= negPenalty; 
+            wrong++; score -= negPenalty; 
           }
         }
       }
