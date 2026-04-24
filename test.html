@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable | NTA Mock Test Interface</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      startup: { typeset: false } 
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* NTA Light Theme Variables */
+    :root {
+      --bg: #f0f1f4;             /* Light gray background */
+      --surface: #ffffff;        /* Pure white panels */
+      --surface2: #f8f9fa;       /* Off-white for secondary elements */
+      --border: #ced4da;         /* Standard light border */
+      
+      --accent: #1e73be;         /* NTA Signature Blue */
+      --text: #212529;           /* Dark Charcoal Text */
+      --text-dim: #6c757d;       /* Muted Text */
+      
+      /* NTA Standard Palette Colors */
+      --nta-save: #28a745;       /* Green */
+      --nta-review: #6f42c1;     /* Purple (NTA Standard for Review) */
+      --nta-review-btn: #fd7e14; /* Orange (NTA Standard for Review Button) */
+      --nta-clear: #ffffff;      /* White */
+      --nta-skipped: #dc3545;    /* Red */
+      --nta-unvisited: #e9ecef;  /* Light Gray */
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
+    body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* --- TOP BAR --- */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--accent); padding: 12px 25px; border-bottom: 3px solid #15558d; z-index: 20; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .exam-title { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; }
+    .timer-box { font-family: 'DM Mono', monospace; font-size: 1.3rem; font-weight: bold; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 4px; }
+    .btn-submit { background: var(--surface); color: var(--accent); border: 1px solid var(--surface); padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.95rem; transition: 0.2s; }
+    .btn-submit:hover { background: #e9ecef; }
+
+    /* --- MAIN LAYOUT --- */
+    .main-area { display: flex; flex: 1; overflow: hidden; position: relative; }
+    
+    /* --- LEFT: QUESTION PANEL --- */
+    .left-panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); position: relative; background: var(--surface); margin: 10px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+    
+    /* Subject Tabs */
+    .subject-bar { display: flex; background: var(--surface2); border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
+    .sub-tab { padding: 12px 25px; font-weight: bold; cursor: pointer; border-right: 1px solid var(--border); color: var(--text-dim); white-space: nowrap; transition: 0.2s; font-size: 0.95rem; }
+    .sub-tab.active { background: var(--accent); color: white; border-top: 3px solid #15558d; }
+    
+    /* Question Scrolling Area */
+    .q-content { flex: 1; overflow-y: auto; padding: 25px 35px; }
+    .q-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; color: var(--text-dim); font-size: 1.05rem; }
+    .q-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 25px; font-weight: 500; color: #000; }
+    .exam-img { max-width: 100%; height: auto; border-radius: 4px; margin-top: 15px; border: 1px solid var(--border); }
+    
+    /* Options & Inputs */
+    .options-grid { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px;}
+    .option-row { display: flex; align-items: center; gap: 15px; background: var(--surface); padding: 12px 15px; border-radius: 4px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; font-size: 1.05rem; }
+    .option-row:hover { background: var(--surface2); }
+    .option-row.selected { background: #eaf4fe; border-color: var(--accent); }
+    .opt-label { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid var(--border); flex-shrink: 0; color: var(--text-dim); }
+    .option-row.selected .opt-label { background: var(--accent); color: white; border-color: var(--accent); }
+
+    .numerical-input { width: 100%; max-width: 350px; padding: 15px; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-size: 1.3rem; font-family: 'DM Mono', monospace; outline: none; transition: 0.2s; }
+    .numerical-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(30,115,190,0.1); }
+
+    /* NTA GLUED BOTTOM NAV BAR */
+    .bottom-bar { display: flex; justify-content: space-between; padding: 15px 30px; background: var(--surface2); border-top: 1px solid var(--border); gap: 15px; flex-shrink: 0; z-index: 10; }
+    .nav-group { display: flex; gap: 10px; }
+    .btn { padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; border: 1px solid transparent; font-size: 0.95rem; transition: 0.2s; white-space: nowrap; }
+    
+    .btn-clear { background: var(--nta-clear); color: var(--text); border-color: var(--border); }
+    .btn-clear:hover { background: var(--surface2); }
+    
+    .btn-review { background: var(--nta-review-btn); color: white; border-color: #e06c00; }
+    .btn-review:hover { filter: brightness(1.05); }
+    
+    .btn-save { background: var(--nta-save); color: white; border-color: #218838; }
+    .btn-save:hover { filter: brightness(1.05); }
+
+    /* --- RIGHT: PALETTE SIDEBAR --- */
+    .sidebar { width: 320px; background: var(--surface); display: flex; flex-direction: column; transition: transform 0.3s ease; flex-shrink: 0; margin: 10px 10px 10px 0; border-radius: 6px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;}
+    .sidebar-header { padding: 15px; background: var(--surface2); border-bottom: 1px solid var(--border); font-weight: bold; text-align: center; font-size: 1.05rem; }
+    
+    /* Stats Box */
+    .palette-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.8rem; font-weight: 500; background: var(--surface); }
+    .stat-item { display: flex; align-items: center; gap: 8px; }
+    .stat-badge { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: white; font-family: 'DM Mono'; font-size: 0.7rem; flex-shrink: 0; font-weight: bold;}
+
+    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 20px; overflow-y: auto; align-content: flex-start; background: #eef2f5; flex: 1; }
+    .pal-btn { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono'; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.1s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    
+    /* True NTA Status Colors & Shapes */
+    .pal-btn.unvisited { background: var(--nta-unvisited); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+    .pal-btn.skipped { background: var(--nta-skipped); color: white; border: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+    .pal-btn.answered { background: var(--nta-save); color: white; border: none; border-top-left-radius: 10px; border-top-right-radius: 10px; }
+    .pal-btn.review { background: var(--nta-review); color: white; border: none; border-radius: 50%; }
+    .pal-btn.answered-review { background: var(--nta-review); color: white; border: none; border-radius: 50%; position: relative; }
+    .pal-btn.answered-review::after { content: ''; position: absolute; bottom: 2px; right: 2px; width: 8px; height: 8px; background: var(--nta-save); border-radius: 50%; border: 1px solid white; }
+    
+    .pal-btn.active { outline: 2px solid var(--accent); outline-offset: 1px; transform: scale(1.05); z-index: 10; }
+
+    /* Full Page Loader */
+    #loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 20px; }
+    .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Mobile Toggle */
+    .toggle-arrow { display: none; position: absolute; right: 15px; width: 45px; height: 45px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.2rem; cursor: pointer; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+    /* MOBILE RESPONSIVE FIXES */
+    @media (max-width: 900px) {
+      .top-bar { padding: 10px 15px; }
+      .exam-title { font-size: 1rem; }
+      .timer-box { font-size: 1rem; }
+      .btn-submit { padding: 6px 12px; font-size: 0.85rem; }
+      
+      .left-panel { margin: 0; border-radius: 0; border-right: none; }
+      .sidebar { position: absolute; right: 0; top: 0; bottom: 0; transform: translateX(100%); z-index: 50; margin: 0; border-radius: 0; width: 300px; }
+      .sidebar.open { transform: translateX(0); }
+      .toggle-arrow { display: flex; align-items: center; justify-content: center; bottom: 180px; } 
+      
+      .q-content { padding: 15px; }
+      .q-text { font-size: 1.1rem; }
+      
+      .bottom-bar { flex-direction: column; padding: 15px; gap: 10px; }
+      .nav-group { flex-direction: column; width: 100%; gap: 10px; }
+      .btn { width: 100%; text-align: center; white-space: normal; padding: 12px; font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loader">
+    <div class="spinner"></div>
+    <div style="font-family: 'DM Mono'; font-size: 1rem; color: var(--text-dim);" id="load-text">Loading Examination Environment...</div>
+  </div>
+
+  <div class="top-bar">
+    <div class="exam-title" id="display-title">Quizable NTA Engine</div>
+    <div class="timer-box">⏱ <span id="timer">--:--:--</span></div>
+    <button class="btn-submit" onclick="window.submitExam()">Submit Test</button>
+  </div>
+
+  <div class="main-area">
+    
+    <div class="left-panel">
+      <div class="subject-bar" id="subject-bar"></div>
+
+      <div class="q-content" id="q-scroll-area">
+        <div class="q-header">
+          <span id="q-subject-name" style="font-weight: bold; color: var(--accent);">Loading...</span>
+          <span id="q-number" style="color: var(--text); font-weight: bold;">Q. 1</span>
+        </div>
+        
+        <div class="q-text" id="q-text">Loading question text...</div>
+        <div class="options-grid" id="options-container"></div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="btn btn-clear" onclick="window.clearSelection()">Clear Response</button>
+        <div class="nav-group">
+          <button class="btn btn-review" onclick="window.markForReview()">Mark for Review & Next</button>
+          <button class="btn btn-save" onclick="window.saveAndNext()">Save & Next</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">Question Palette</div>
+      
+      <div class="palette-stats">
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-save); border-top-left-radius: 10px; border-top-right-radius: 10px;"></div> Answered</div>
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-skipped); border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;"></div> Not Answered</div>
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-unvisited); color: var(--text-dim); border: 1px solid var(--border);"></div> Not Visited</div>
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-review); border-radius: 50%;"></div> Marked Review</div>
+      </div>
+
+      <div class="palette-grid" id="palette-grid"></div>
+    </div>
+    
+    <button class="toggle-arrow" id="toggle-btn" onclick="window.toggleSidebar()">◀</button>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ─── 1. PASTE YOUR EXACT FIREBASE CONFIG HERE ─────────────────
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ──────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let testData = null;
+    let questions = [];
+    let responses = []; 
+    let timeRemaining = 0;
+    let timerInterval = null;
+
+    let currentGlobalIdx = 0;
+    let sections = [];
+    let currentSection = "";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { alert("Please log in!"); window.location.href = 'index.html'; return; }
+
+      const params = new URLSearchParams(window.location.search);
+      const testId = params.get('testId');
+      if (!testId) { window.location.href = 'index.html'; return; }
+
+      try {
+        const testSnap = await getDoc(doc(db, 'tests', testId));
+        if (!testSnap.exists()) throw new Error("Test not found.");
+        testData = testSnap.data();
+        testData.id = testId;
+
+        document.getElementById('display-title').innerText = testData.title || "NTA Mock Test";
+        timeRemaining = (testData.duration_minutes || 180) * 60;
+        
+        questions = testData.questions || [];
+        
+        responses = questions.map(() => ({ ans: null, status: 'unvisited' }));
+        sections = [...new Set(questions.map(q => q.subject || q.section || "General"))];
+        currentSection = sections[0];
+
+        window.buildSectionTabs();
+        window.buildPalette();
+        window.loadQuestion(0);
+        startTimer();
+        document.getElementById('loader').style.display = 'none';
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById('load-text').innerText = "Fatal Error Loading Database.";
+        document.getElementById('load-text').style.color = "var(--nta-skipped)";
+      }
+    });
+
+    window.buildSectionTabs = () => {
+      const bar = document.getElementById('subject-bar');
+      bar.innerHTML = '';
+      sections.forEach(sec => {
+        bar.innerHTML += `<div class="sub-tab ${sec === currentSection ? 'active' : ''}" onclick="window.switchSection('${sec}')">${sec}</div>`;
+      });
+    };
+
+    window.switchSection = (secName) => {
+      currentSection = secName;
+      window.buildSectionTabs();
+      const firstIdx = questions.findIndex(q => (q.subject || q.section || "General") === currentSection);
+      if (firstIdx !== -1) {
+        window.buildPalette();
+        window.loadQuestion(firstIdx);
+      }
+    };
+
+    window.loadQuestion = (globalIndex) => {
+      if (globalIndex < 0 || globalIndex >= questions.length) return;
+      currentGlobalIdx = globalIndex;
+      const q = questions[currentGlobalIdx];
+      const qSec = q.subject || q.section || "General";
+
+      if (currentSection !== qSec) {
+        currentSection = qSec;
+        window.buildSectionTabs();
+        window.buildPalette();
+      }
+
+      if (responses[currentGlobalIdx].status === 'unvisited') {
+        responses[currentGlobalIdx].status = 'skipped';
+      }
+
+      let localNum = 1;
+      for (let i = 0; i < currentGlobalIdx; i++) {
+        if ((questions[i].subject || questions[i].section || "General") === currentSection) localNum++;
+      }
+
+      document.getElementById('q-number').innerText = `Question ${localNum}`;
+      document.getElementById('q-subject-name').innerText = currentSection;
+      
+      const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
+      const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 1;
+      const markingSchemeHTML = `<div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border);">Full Marks: <strong style="color:var(--nta-save)">+${posMarks}</strong> If ONLY the correct option is chosen; Negative Marks: <strong style="color:var(--nta-skipped)">-${negPenalty}</strong></div>`;
+      
+      let qTextHTML = markingSchemeHTML + (q.text || q.question);
+      if(q.type === 'numerical' || !q.options) {
+          qTextHTML += `<br><br><span style="color: var(--nta-review-btn); font-size: 0.9rem; font-family: 'DM Mono'; font-weight: bold;">(Numerical Value Type)</span>`;
+      }
+      document.getElementById('q-text').innerHTML = qTextHTML;
+
+      const optsContainer = document.getElementById('options-container');
+      optsContainer.innerHTML = '';
+      
+      if (q.type === 'numerical' || !q.options) {
+        const savedVal = responses[currentGlobalIdx].ans || '';
+        optsContainer.innerHTML = `
+          <input type="number" step="any" class="numerical-input"
+                 placeholder="Enter value..." 
+                 value="${savedVal}" 
+                 oninput="window.saveNumericalAnswer(this.value)">
+        `;
+      } 
+      else {
+        const options = q.options;
+        const sortedKeys = Object.keys(options).sort();
+        for (const key of sortedKeys) {
+          const val = options[key];
+          const isSelected = responses[currentGlobalIdx].ans === key;
+          optsContainer.innerHTML += `
+            <div class="option-row ${isSelected ? 'selected' : ''}" onclick="window.selectOption('${key}')">
+              <div class="opt-label">${key}</div>
+              <div style="flex: 1;">${val}</div>
+            </div>
+          `;
+        }
+      }
+
+      document.getElementById('q-scroll-area').scrollTop = 0;
+      window.updatePaletteUI();
+
+      if (window.MathJax) {
+        MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
+      }
+    };
+
+    window.selectOption = (key) => {
+      responses[currentGlobalIdx].ans = key;
+      window.loadQuestion(currentGlobalIdx); 
+    };
+
+    window.saveNumericalAnswer = (value) => {
+      responses[currentGlobalIdx].ans = value.trim() === '' ? null : value.trim();
+    };
+
+    window.clearSelection = () => {
+      responses[currentGlobalIdx].ans = null;
+      responses[currentGlobalIdx].status = 'skipped'; 
+      window.loadQuestion(currentGlobalIdx);
+    };
+
+    window.saveAndNext = () => {
+      if (responses[currentGlobalIdx].ans) {
+        responses[currentGlobalIdx].status = 'answered';
+      } else {
+        responses[currentGlobalIdx].status = 'skipped';
+      }
+      if (currentGlobalIdx < questions.length - 1) window.loadQuestion(currentGlobalIdx + 1);
+      else window.updatePaletteUI();
+    };
+
+    window.markForReview = () => {
+      if (responses[currentGlobalIdx].ans) {
+        responses[currentGlobalIdx].status = 'answered-review';
+      } else {
+        responses[currentGlobalIdx].status = 'review';
+      }
+      if (currentGlobalIdx < questions.length - 1) window.loadQuestion(currentGlobalIdx + 1);
+      else window.updatePaletteUI();
+    };
+
+    window.buildPalette = () => {
+      const grid = document.getElementById('palette-grid');
+      grid.innerHTML = '';
+      let localNum = 1;
+      questions.forEach((q, index) => {
+        if ((q.subject || q.section || "General") === currentSection) {
+          grid.innerHTML += `<div class="pal-btn unvisited" id="pal-${index}" onclick="window.loadQuestion(${index})">${localNum}</div>`;
+          localNum++;
+        }
+      });
+      window.updatePaletteUI();
+    };
+
+    window.updatePaletteUI = () => {
+      questions.forEach((q, index) => {
+        if ((q.subject || q.section || "General") === currentSection) {
+          const btn = document.getElementById(`pal-${index}`);
+          if (btn) {
+            btn.className = `pal-btn ${responses[index].status}`;
+            if (index === currentGlobalIdx) btn.classList.add('active');
+          }
+        }
+      });
+    };
+
+    window.toggleSidebar = () => {
+      const sidebar = document.getElementById('sidebar');
+      const arrow = document.getElementById('toggle-btn');
+      sidebar.classList.toggle('open');
+      arrow.innerText = sidebar.classList.contains('open') ? '▶' : '◀';
+    };
+
+    function startTimer() {
+      const display = document.getElementById('timer');
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        if (timeRemaining <= 0) { clearInterval(timerInterval); window.submitExam(); return; }
+        let h = Math.floor(timeRemaining / 3600);
+        let m = Math.floor((timeRemaining % 3600) / 60);
+        let s = timeRemaining % 60;
+        display.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    window.submitExam = async () => {
+      const conf = confirm("Are you sure you want to final submit? You will not be able to change your answers.");
+      if (!conf && timeRemaining > 0) return;
+      clearInterval(timerInterval);
+      
+      document.getElementById('loader').style.display = 'flex';
+      document.getElementById('load-text').innerText = "Processing NTA Scores...";
+      
+      let score = 0, correct = 0, wrong = 0, unattempted = 0;
+      
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
+        const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 1;
+        
+        if (!responses[i].ans || responses[i].status === 'review' || responses[i].status === 'skipped' || responses[i].status === 'unvisited') {
+          unattempted++;
+        } else {
+          let isCorrect = false;
+          if (q.type === 'numerical' || !q.options) {
+             isCorrect = parseFloat(responses[i].ans) === parseFloat(q.answer);
+          } else {
+             isCorrect = responses[i].ans === q.answer;
+          }
+
+          if (isCorrect) { 
+            correct++; score += posMarks; 
+          } else { 
+            wrong++; score -= negPenalty; 
+          }
+        }
+      }
+
+      try {
+        const timeTaken = (testData.duration_minutes * 60) - timeRemaining;
+        sessionStorage.setItem('examResult', JSON.stringify({
+          score, correct, wrong, unattempted, timeTaken, totalQuestions: questions.length, 
+          testId: testData.id, examType: testData.examType || "JEE", testTitle: testData.title
+        }));
+
+        const user = auth.currentUser;
+        if (user) {
+          await addDoc(collection(db, 'results'), {
+            userId: user.uid, testId: testData.id, testTitle: testData.title, 
+            score, correct, wrong, timeTaken, submittedAt: serverTimestamp()
+          }).catch(e => console.log(e));
+        }
+        window.location.href = 'result.html';
+      } catch (err) {
+        alert("Network error while saving."); document.getElementById('loader').style.display = 'none';
+      }
+    };
+  </script>
+</body>
+</html>
