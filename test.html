@@ -388,18 +388,18 @@
         else { score -= Math.abs(q.negMarks || 0); wrong++; }
       });
 
-      try {
+try {
         const user = auth.currentUser;
         const finalResponses = responses.map(r => ({ ans: r.ans ?? null, flagged: r.flagged }));
 
-        // 1. SAVE LOCALLY FIRST (This guarantees the results page will have the data)
+        // 1. SAVE LOCALLY FIRST (Guarantees the results page will have data)
         sessionStorage.setItem('examResult', JSON.stringify({ 
           score, correct, wrong, unattempted, responses: finalResponses, 
           totalQuestions: questions.length, timeTaken, testId: testData.id, 
           userName: user ? (user.displayName || user.email) : "Student" 
         }));
 
-        // 2. SAVE TO DATABASE IN THE BACKGROUND (Using .catch so it doesn't block the redirect if Firebase rules are strict)
+        // 2. SAVE TO DATABASE IN BACKGROUND (Notice the .catch! It stops crashes)
         if (user) {
           db.collection('results').add({ 
             userId: user.uid, userEmail: user.email, displayName: user.displayName || '', 
@@ -408,14 +408,13 @@
           }).catch(err => console.error("Silent DB Save Error:", err));
         }
 
-        // 3. FORCE REDIRECT IMMEDIATELY
-        window.location.href = 'results.html';
+        // 3. FORCE REDIRECT IMMEDIATELY (Make sure the file name matches your actual file!)
+        window.location.href = 'result.html'; 
 
       } catch (err) { 
         console.error(err); 
-        document.getElementById('loading-overlay').innerHTML = `<div class="err-text" style="color: red; font-weight: bold;">Critical Error: Failed to redirect.</div>`; 
-      }
-    };
+        alert("Critical Error: Failed to calculate score."); 
+}
   </script>
 </body>
 </html>
