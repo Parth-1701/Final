@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ExamForge | MHT-CET Percentile Predictor</title>
+  <title>Quizable | MHT-CET Percentile Predictor</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -50,7 +50,7 @@
 <body>
 
   <header>
-    <a href="index.html" class="logo">Exam<span>Forge</span></a>
+    <a href="index.html" class="logo"><span>Quizable</span></a>
     <a href="index.html" class="nav-link">← Back to Dashboard</a>
   </header>
 
@@ -62,12 +62,22 @@
       <label>Select Exam Shift</label>
       <select id="shift-select">
         <option value="" disabled selected>-- Choose your shift --</option>
-        <option value="easy">May 2 - Shift 1 (Easy)</option>
-        <option value="moderate">May 2 - Shift 2 (Moderate)</option>
-        <option value="hard">May 3 - Shift 1 (Hard)</option>
-        <option value="moderate">May 3 - Shift 2 (Moderate)</option>
-        <option value="hard">May 4 - Shift 1 (Hard)</option>
-        <option value="easy">May 4 - Shift 2 (Easy)</option>
+        <option value="easy">April 11 - Shift 1 (Easy)</option>
+        <option value="moderate">April 11 - Shift 2 (Moderate)</option>
+        <option value="moderate">April 13 - Shift 1 (Hard)</option>
+        <option value="hard">April 13 - Shift 2 (Moderate)</option>
+        <option value="hard">April 15 - Shift 1 (Hard)</option>
+        <option value="easy">April 15 - Shift 2 (Easy)</option>
+        <option value="easy">April 16 - Shift 1 (Easy)</option>
+        <option value="moderate">April 16 - Shift 2 (Moderate)</option>
+        <option value="hard">April 17 - Shift 1 (Hard)</option>
+        <option value="moderate">April 17 - Shift 2 (Moderate)</option>
+        <option value="hard">April 18 - Shift 1 (Hard)</option>
+        <option value="easy">April 18 - Shift 2 (Easy)</option>
+        <option value="easy">April 19 - Shift 1 (Easy)</option>
+        <option value="moderate">April 19 - Shift 2 (Moderate)</option>
+        <option value="hard">April 20 - Shift 1 (Moderate)</option>
+        <option value="moderate">April 20 - Shift 2 (Moderate)</option>
       </select>
     </div>
 
@@ -76,11 +86,11 @@
       <input type="number" id="score-input" placeholder="e.g. 135" min="0" max="200">
     </div>
 
-    <button class="btn" onclick="predict()">Calculate Percentile</button>
+    <button class="btn" onclick="predict()">Calculate Shift</button>
 
     <div id="result-box">
       <div class="result-title">Expected Percentile</div>
-      <div class="result-value" id="percentile-display">--.--%</div>
+      <div class="resulresult-value"percentile-display">--.--%</div>
       <div class="disclaimer">*Prediction is based on past 3-year data and standard normalization algorithms. Actual NTA results may slightly vary.</div>
     </div>
   </div>
@@ -95,9 +105,17 @@
         [200, 100], [140, 99.5], [125, 99.0], [110, 98.0], 
         [95, 95.0], [80, 90.0], [65, 80.0], [50, 60.0], [0, 0]
       ],
+      mohard: [
+        [200, 100], [145, 99.5], [130, 99.0], [115, 98.0],
+        [100, 95.0], [85, 90.0], [70, 80.0], [55, 60], [0, 0]
+      ],
       moderate: [
         [200, 100], [150, 99.5], [135, 99.0], [120, 98.0], 
         [105, 95.0], [90, 90.0], [75, 80.0], [60, 60.0], [0, 0]
+      ],
+      mosy: [
+        [200, 100], [155, 99.5], [140, 99.0], [125, 98.0], 
+        [110, 95.0], [95, 90.0], [80, 80.0], [65, 60.0], [0, 0]
       ],
       easy: [
         [200, 100], [160, 99.5], [145, 99.0], [130, 98.0], 
