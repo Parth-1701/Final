@@ -125,7 +125,7 @@
       <div class="top-bar-wrapper">
         <div class="section-tabs" id="section-tabs"></div>
         <div class="top-actions">
-          <button class="btn-top btn-toggle" onclick="toggleSidebar()">👁 Palette</button>
+          <button class="btn-top btn-toggle" id="palette-toggle-btn" style="font-size: 1.1rem; padding: 5px 15px;" onclick="toggleSidebar()">▶</button>
           <button class="btn-top btn-submit-top" onclick="submitExam()">Submit Test</button>
         </div>
       </div>
@@ -184,12 +184,34 @@
     // --- SIDEBAR TOGGLE LOGIC ---
     window.toggleSidebar = () => {
       const rightArea = document.getElementById('right-area');
+      const toggleBtn = document.getElementById('palette-toggle-btn');
+      
       if (window.innerWidth <= 900) {
         rightArea.classList.toggle('mobile-open');
+        // On mobile: if open, point right to close. If closed, point left to pull open.
+        toggleBtn.innerText = rightArea.classList.contains('mobile-open') ? '▶' : '◀';
       } else {
         rightArea.classList.toggle('collapsed');
+        // On desktop: if collapsed, point left to pull open. If open, point right to close.
+        toggleBtn.innerText = rightArea.classList.contains('collapsed') ? '◀' : '▶';
       }
     };
+
+    // Auto-set the correct arrow direction when the page loads or resizes
+    window.addEventListener('resize', setInitialArrow);
+    window.addEventListener('DOMContentLoaded', setInitialArrow);
+    
+    function setInitialArrow() {
+      const rightArea = document.getElementById('right-area');
+      const toggleBtn = document.getElementById('palette-toggle-btn');
+      if (!toggleBtn) return;
+      
+      if (window.innerWidth <= 900) {
+        toggleBtn.innerText = rightArea.classList.contains('mobile-open') ? '▶' : '◀';
+      } else {
+        toggleBtn.innerText = rightArea.classList.contains('collapsed') ? '◀' : '▶';
+      }
+    }
 
     // DIAGNOSTIC LOGGER
     const logEl = document.getElementById('log-text');
