@@ -40,12 +40,22 @@
     .option-row.selected .opt-label { background: var(--accent); color: white; border-color: var(--accent); }
 
     /* Navigation Buttons */
-    .nav-buttons { display: flex; justify-content: space-between; margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); }
-    .btn { padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.95rem; }
+    .nav-buttons { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); }
+    .nav-buttons-right { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn { padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.95rem; white-space: nowrap; transition: 0.2s; }
     .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
     .btn-outline:hover { background: var(--surface2); }
     .btn-review { background: rgba(246, 201, 14, 0.15); color: var(--gold); border: 1px solid rgba(246,201,14,0.3); }
+    .btn-review:hover { background: rgba(246, 201, 14, 0.25); }
     .btn-next { background: var(--green); color: black; }
+    .btn-next:hover { filter: brightness(1.1); }
+
+    /* Make buttons stack properly on phones */
+    @media (max-width: 600px) {
+      .nav-buttons { flex-direction: column; }
+      .nav-buttons-right { width: 100%; }
+      .btn { flex: 1; text-align: center; font-size: 0.85rem; padding: 10px; }
+    }
 
     /* --- RIGHT: SIDEBAR PALETTE --- */
     .sidebar { width: 320px; background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.3s ease; }
@@ -109,7 +119,8 @@
 
       <div class="nav-buttons">
         <button class="btn btn-outline" onclick="navigate(-1)">← Previous</button>
-        <div style="display: flex; gap: 10px;">
+        <div class="nav-buttons-right">
+          <button class="btn btn-outline" onclick="clearSelection()">Clear</button>
           <button class="btn btn-review" onclick="markForReview()">Mark for Review</button>
           <button class="btn btn-next" onclick="saveAndNext()">Save & Next →</button>
         </div>
@@ -284,7 +295,14 @@
       if (currentIdx < questions.length - 1) loadQuestion(currentIdx + 1);
       else updatePaletteUI();
     };
-
+    
+    window.clearSelection = () => {
+      // Wipes the answer and resets the palette status to skipped/visited
+      responses[currentIdx].ans = null;
+      responses[currentIdx].status = 'skipped';
+      loadQuestion(currentIdx); // Instantly refreshes the UI
+    };
+    
     window.markForReview = () => {
       responses[currentIdx].status = 'review';
       if (currentIdx < questions.length - 1) loadQuestion(currentIdx + 1);
