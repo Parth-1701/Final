@@ -486,16 +486,21 @@
 
       try {
         const timeTaken = (testData.duration_minutes * 60) - timeRemaining;
+        
+        // ADDED: 'responses' is now saved into sessionStorage so the analysis page can read it!
         sessionStorage.setItem('examResult', JSON.stringify({
           score, correct, wrong, unattempted, timeTaken, totalQuestions: questions.length, 
-          testId: testData.id, examType: testData.examType || "JEE", testTitle: testData.title
+          testId: testData.id, examType: testData.examType || "JEE", testTitle: testData.title,
+          responses: responses 
         }));
 
         const user = auth.currentUser;
         if (user) {
+          // ADDED: 'responses' is also saved to the permanent database for future history viewing
           await addDoc(collection(db, 'results'), {
             userId: user.uid, testId: testData.id, testTitle: testData.title, 
-            score, correct, wrong, timeTaken, submittedAt: serverTimestamp()
+            score, correct, wrong, timeTaken, submittedAt: serverTimestamp(),
+            responses: responses
           }).catch(e => console.log(e));
         }
         window.location.href = 'result.html';
