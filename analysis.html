@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable | Detailed Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      startup: { typeset: false } 
+    };
+  </script>
+  <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --bg: #f0f1f4; --surface: #ffffff; --surface2: #f8f9fa; --border: #ced4da; 
+      --accent: #1e73be; --text: #212529; --text-dim: #6c757d; 
+      
+      /* Status Colors */
+      --correct-bg: #d4edda; --correct-border: #c3e6cb; --correct-text: #155724;
+      --wrong-bg: #f8d7da; --wrong-border: #f5c6cb; --wrong-text: #721c24;
+      --partial-bg: #fff3cd; --partial-border: #ffeeba; --partial-text: #856404; /* Orange for Partial */
+      --missed-bg: #e8f4f8; --missed-border: #b8daff; --missed-text: #004085; /* Blue for Missed Options */
+      --unattempted-bg: #e2e3e5; --unattempted-text: #383d41;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
+    body { background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    header { background: var(--accent); color: white; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+    h1 { font-size: 1.5rem; margin-bottom: 5px; }
+    .header-links { margin-top: 10px; }
+    .header-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem; font-weight: bold; margin: 0 10px; }
+    .header-links a:hover { color: white; }
+
+    .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+
+    .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 30px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    
+    .q-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; font-weight: bold; }
+    .q-subject { color: var(--accent); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
+    
+    .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+    .status-correct { background: var(--correct-bg); color: var(--correct-text); border: 1px solid var(--correct-border); }
+    .status-wrong { background: var(--wrong-bg); color: var(--wrong-text); border: 1px solid var(--wrong-border); }
+    .status-partial { background: var(--partial-bg); color: var(--partial-text); border: 1px solid var(--partial-border); }
+    .status-unattempted { background: var(--unattempted-bg); color: var(--unattempted-text); border: 1px solid #ccc; }
+
+    .q-text { font-size: 1.15rem; margin-bottom: 20px; color: #000; }
+    .exam-img { max-width: 100%; border: 1px solid var(--border); border-radius: 4px; margin-top: 15px; }
+
+    /* Options Analysis Styling */
+    .option-row { display: flex; align-items: center; gap: 15px; background: var(--surface); padding: 12px 15px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 10px; font-size: 1.05rem; }
+    .opt-label { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid var(--border); flex-shrink: 0; color: var(--text-dim); }
+    
+    .option-row.correct-ans { background: var(--correct-bg); border-color: var(--correct-border); }
+    .option-row.correct-ans .opt-label { background: var(--correct-text); color: white; border-color: var(--correct-text); }
+    
+    .option-row.wrong-ans { background: var(--wrong-bg); border-color: var(--wrong-border); }
+    .option-row.wrong-ans .opt-label { background: var(--wrong-text); color: white; border-color: var(--wrong-text); }
+
+    .option-row.missed-ans { background: var(--missed-bg); border-color: var(--missed-border); }
+    .option-row.missed-ans .opt-label { background: var(--missed-text); color: white; border-color: var(--missed-text); }
+
+    /* Numerical Analysis Styling */
+    .numerical-box { padding: 15px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 1.1rem; margin-bottom: 10px; }
+
+    #loader { text-align: center; padding: 50px; font-size: 1.2rem; color: var(--text-dim); font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 id="test-title">Detailed Analysis</h1>
+    <div class="header-links">
+      <a href="index.html">Dashboard</a> | 
+      <a href="result.html">Back to Score</a>
+    </div>
+  </header>
+
+  <div class="container" id="analysis-container">
+    <div id="loader">Fetching examination data...</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ─── PASTE YOUR EXACT FIREBASE CONFIG HERE ─────────────────
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ──────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadAnalysis() {
+      const container = document.getElementById('analysis-container');
+      const resultDataRaw = sessionStorage.getItem('examResult');
+      
+      if (!resultDataRaw) {
+        container.innerHTML = `<div style="text-align:center; padding: 50px;">No recent test data found. Please take a test first.</div>`;
+        return;
+      }
+
+      const resultData = JSON.parse(resultDataRaw);
+      document.getElementById('test-title').innerText = resultData.testTitle + " - Analysis";
+      const studentResponses = resultData.responses || [];
+
+      if (studentResponses.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 50px;">Detailed response data is missing. Ensure your test engine is updated to save responses.</div>`;
+        return;
+      }
+
+      try {
+        const testSnap = await getDoc(doc(db, 'tests', resultData.testId));
+        if (!testSnap.exists()) throw new Error("Original test document missing.");
+        
+        const questions = testSnap.data().questions || [];
+        container.innerHTML = ''; // Clear loader
+
+        questions.forEach((q, i) => {
+          const studentAnsStr = String(studentResponses[i].ans || "");
+          const actualAnsStr = String(q.answer || "");
+          const isMulti = q.type === 'multi' || actualAnsStr.includes(',');
+          
+          // --- 1. DETERMINE QUESTION STATUS ---
+          let statusClass = "status-unattempted";
+          let statusText = "Unattempted";
+          
+          let isFullCorrect = false;
+          let isPartial = false;
+          let isWrong = false;
+
+          if (!studentResponses[i].ans) {
+             // Remains Unattempted
+          } 
+          else if (q.type === 'numerical' || !q.options || typeof q.options !== 'object') {
+             isFullCorrect = parseFloat(studentAnsStr) === parseFloat(actualAnsStr);
+             isWrong = !isFullCorrect;
+          } 
+          else if (isMulti) {
+             // JEE Advanced Partial Evaluation Logic
+             const studentArr = studentAnsStr.split(',');
+             const actualArr = actualAnsStr.split(',');
+             
+             let hasWrong = false;
+             let correctCount = 0;
+             
+             studentArr.forEach(opt => {
+               if (actualArr.includes(opt)) correctCount++;
+               else hasWrong = true;
+             });
+             
+             if (hasWrong) {
+               isWrong = true;
+             } else if (correctCount === actualArr.length) {
+               isFullCorrect = true;
+             } else if (correctCount > 0) {
+               isPartial = true;
+             }
+          } 
+          else {
+             isFullCorrect = studentAnsStr === actualAnsStr;
+             isWrong = !isFullCorrect;
+          }
+
+          // Apply Status Badges
+          if (isFullCorrect) {
+             statusClass = "status-correct"; statusText = "Correct (+ Marks)";
+          } else if (isPartial) {
+             statusClass = "status-partial"; statusText = "Partially Correct (+ Partial Marks)";
+          } else if (isWrong) {
+             statusClass = "status-wrong"; statusText = "Incorrect (- Penalty)";
+          }
+
+          let qHTML = `
+            <div class="q-card">
+              <div class="q-header">
+                <div>
+                  <span style="font-size: 1.1rem;">Q${i+1}.</span> 
+                  <span class="q-subject">${q.subject || q.section || 'General'}</span>
+                </div>
+                <div class="status-badge ${statusClass}">${statusText}</div>
+              </div>
+              <div class="q-text">${q.text || q.question || ""}</div>
+          `;
+
+          // --- 2. RENDER OPTIONS ANALYSIS ---
+          if (q.type === 'numerical' || !q.options || typeof q.options !== 'object') {
+             qHTML += `
+               <div class="numerical-box" style="background: var(--correct-bg); border: 1px solid var(--correct-border); color: var(--correct-text);">
+                 Correct Answer: <b>${actualAnsStr}</b>
+               </div>
+             `;
+             if (studentResponses[i].ans && !isFullCorrect) {
+               qHTML += `
+                 <div class="numerical-box" style="background: var(--wrong-bg); border: 1px solid var(--wrong-border); color: var(--wrong-text);">
+                   Your Answer: <b>${studentAnsStr}</b>
+                 </div>
+               `;
+             }
+          } else {
+             const options = q.options;
+             const sortedKeys = Object.keys(options).sort();
+             
+             const actualArr = actualAnsStr ? actualAnsStr.split(',') : [];
+             const studentArr = studentAnsStr ? studentAnsStr.split(',') : [];
+             
+             sortedKeys.forEach(key => {
+               const val = options[key];
+               let rowClass = "";
+               let labelAppend = "";
+
+               if (actualArr.includes(key) && studentArr.includes(key)) {
+                 // Student clicked it, and it WAS correct
+                 rowClass = "correct-ans";
+                 labelAppend = `<span style="color:var(--correct-text); font-weight:bold; font-size:0.9rem;"> ✓ (Your Answer)</span>`;
+               } 
+               else if (!actualArr.includes(key) && studentArr.includes(key)) {
+                 // Student clicked it, but it was WRONG
+                 rowClass = "wrong-ans";
+                 labelAppend = `<span style="color:var(--wrong-text); font-weight:bold; font-size:0.9rem;"> ✗ (Incorrect Selection)</span>`;
+               }
+               else if (actualArr.includes(key) && !studentArr.includes(key)) {
+                 // Student FORGOT to click this correct option (Missed)
+                 rowClass = "missed-ans";
+                 labelAppend = `<span style="color:var(--missed-text); font-weight:bold; font-size:0.9rem;"> ⚠ (Correct Option Missed)</span>`;
+               }
+
+               qHTML += `
+                 <div class="option-row ${rowClass}">
+                   <div class="opt-label">${key}</div>
+                   <div style="flex: 1;">${val} ${labelAppend}</div>
+                 </div>
+               `;
+             });
+          }
+
+          qHTML += `</div>`;
+          container.innerHTML += qHTML;
+        });
+
+        // Trigger MathJax to render equations
+        setTimeout(() => {
+          if (window.MathJax && MathJax.typesetPromise) {
+            MathJax.typesetClear();
+            MathJax.typesetPromise([document.getElementById('analysis-container')]).catch((err) => console.log('MathJax error:', err));
+          }
+        }, 100);
+
+      } catch (error) {
+        console.error(error);
+        container.innerHTML = `<div style="text-align:center; padding: 50px; color: red;">Failed to load test analysis from database.</div>`;
+      }
+    }
+
+    loadAnalysis();
+  </script>
+</body>
+</html>
