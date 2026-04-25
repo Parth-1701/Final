@@ -365,13 +365,18 @@
         }
       }
 
-      // Scroll question to top but NOT the whole page
+// Scroll question to top but NOT the whole page
       document.getElementById('q-scroll-area').scrollTop = 0;
       window.updatePaletteUI();
 
-      if (window.MathJax) {
-        MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
-      }
+      // UPGRADED: MATHJAX TRIGGER
+      setTimeout(() => {
+        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+          MathJax.typesetClear(); // Clears the engine's memory of the previous question
+          MathJax.typesetPromise([document.getElementById('q-scroll-area')])
+            .catch((err) => console.log('MathJax error:', err));
+        }
+      }, 50); // 50ms delay gives the browser time to draw the HTML before scanning it
     };
 
     window.selectOption = (key) => {
