@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable | Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26; --border: #2a2a3d; 
+      --accent: #6c63ff; --green: #3ecf8e; --red: #ff6b6b; --gold: #f6c90e; --text: #e8e8f0; --text-dim: #9999b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+    /* SIDEBAR */
+    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); padding: 30px 20px; display: flex; flex-direction: column; z-index: 10; }
+    .logo { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; margin-bottom: 40px; }
+    .logo span { color: var(--red); }
+    .nav-btn { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 8px; cursor: pointer; text-align: left; font-weight: bold; margin-bottom: 10px; transition: 0.2s; }
+    .nav-btn.active, .nav-btn:hover { background: rgba(108,99,255,0.15); border-color: var(--accent); color: var(--accent); }
+
+    /* MAIN CONTENT */
+    .main-content { flex: 1; padding: 40px; overflow-y: auto; position: relative; }
+    h1 { font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+
+    /* FORM PANELS */
+    .panel { background: var(--surface); padding: 25px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 40px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .input-group { display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; font-family: 'DM Mono'; letter-spacing: 0.5px; }
+    input, select, textarea { background: var(--surface2); border: 1px solid var(--border); padding: 12px; color: white; border-radius: 8px; font-family: 'DM Sans'; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+    .checkbox-group { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+    .checkbox-group input { width: 20px; height: 20px; cursor: pointer; }
+
+    .btn-primary { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+    .btn-primary:hover { background: #5a52d5; transform: translateY(-2px); }
+
+    /* TEXTAREA & UPLOAD */
+    textarea { height: 200px; font-family: 'DM Mono', monospace; font-size: 0.85rem; resize: vertical; line-height: 1.5; }
+    .file-upload-box { border: 2px dashed var(--border); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02); text-align: center; cursor: pointer; transition: 0.2s; }
+    .file-upload-box:hover { border-color: var(--accent); background: rgba(108,99,255,0.05); }
+    input[type="file"] { display: none; }
+
+    /* TEST LIST */
+    .test-list { display: flex; flex-direction: column; gap: 15px; }
+    .test-card { background: var(--surface2); border: 1px solid var(--border); padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+    .test-card:hover { border-color: var(--text-dim); }
+    
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; font-family: 'DM Mono'; margin-right: 10px; }
+    .badge-premium { background: rgba(246, 201, 14, 0.1); color: var(--gold); border: 1px solid rgba(246,201,14,0.3); }
+    .badge-free { background: rgba(62,207,142,0.1); color: var(--green); border: 1px solid rgba(62,207,142,0.3); }
+    
+    .action-btn { border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: 0.2s; }
+    .btn-toggle { background: var(--surface); color: white; border: 1px solid var(--border); }
+    .btn-toggle:hover { border-color: var(--text-dim); }
+    .btn-publish { background: rgba(62,207,142,0.15); color: var(--green); border: 1px solid rgba(62,207,142,0.3); }
+    .btn-publish:hover { background: rgba(62,207,142,0.25); }
+    .btn-delete { background: var(--red); color: white; }
+    .btn-delete:hover { filter: brightness(1.1); }
+
+    .test-id-text { font-family: 'DM Mono', monospace; color: var(--accent); background: rgba(108,99,255,0.1); padding: 2px 6px; border-radius: 4px; user-select: all; cursor: pointer; }
+
+    #loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 15px; }
+  </style>
+</head>
+<body>
+
+  <div id="loader">
+    <h2 style="font-family: 'DM Mono'; color: var(--accent);">Authenticating Admin...</h2>
+  </div>
+
+  <div class="sidebar">
+    <a href="index.html" class="logo">Quizable<span>Admin</span></a>
+    <button class="nav-btn active">Dashboard</button>
+    <button class="nav-btn" onclick="window.location.href='index.html'">Exit to Site</button>
+  </div>
+
+  <div class="main-content">
+    
+    <h1>1. Create New Test Shell</h1>
+    <div class="panel">
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Test Title</label>
+          <input type="text" id="test-title" placeholder="e.g. MHT CET 2024 (Shift 1)">
+        </div>
+        <div class="input-group">
+          <label>Exam Type</label>
+          <select id="test-type">
+            <option value="jee_mains">JEE Mains</option>
+            <option value="jee_adv">JEE Advanced</option>
+            <option value="mht_cet">MHT CET</option>
+            <option value="bitsat">BITSAT</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Duration (Minutes)</label>
+          <input type="number" id="test-duration" value="180">
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="test-premium">
+          <label style="margin:0;">Premium Package</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="test-publish">
+          <label style="margin:0;">Publish to Students Immediately</label>
+        </div>
+        <button class="btn-primary" style="grid-column: 1 / -1;" onclick="createTestShell()">Create Empty Test</button>
+      </div>
+    </div>
+
+    <h1>2. Upload Questions via Test ID</h1>
+    <div class="panel">
+      <div class="input-group" style="margin-bottom: 20px;">
+        <label>Target Test ID (Copy from the list below)</label>
+        <input type="text" id="target-test-id" placeholder="Paste Test ID here..." style="font-family: 'DM Mono'; font-size: 1.1rem; border-color: var(--accent);">
+      </div>
+
+      <div class="input-group">
+        <label class="file-upload-box">
+          <span id="file-label" style="font-family: 'DM Mono'; font-weight: bold; color: var(--accent);">+ Upload .json File</span> (Or paste below)
+          <input type="file" id="json-file" accept=".json">
+        </label>
+        <textarea id="test-json" placeholder='Paste your JSON array here...'></textarea>
+      </div>
+
+      <button class="btn-primary" style="width: 100%; margin-top: 15px;" onclick="uploadQuestionsById()">Inject Questions to Database 🚀</button>
+    </div>
+
+    <h1>3. Live Tests Database</h1>
+    <div class="test-list" id="tests-container">
+      <p style="color: var(--text-dim);">Loading tests...</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ─── PASTE YOUR FIREBASE CONFIG HERE ───────────────────────
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ──────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // SECURITY CHECK
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = 'index.html'; return; }
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userData = userDoc.data();
+        if (!userData || userData.role !== 'admin') {
+          alert("SECURITY ALERT: Admin Privileges Required.");
+          window.location.href = 'index.html';
+          return;
+        }
+        document.getElementById('loader').style.display = 'none';
+        loadExistingTests();
+      } catch (err) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // --- STEP 1: CREATE TEST SHELL ---
+    window.createTestShell = async () => {
+      const title = document.getElementById('test-title').value.trim();
+      const type = document.getElementById('test-type').value;
+      const duration = parseInt(document.getElementById('test-duration').value);
+      const isPremium = document.getElementById('test-premium').checked;
+      const isPublished = document.getElementById('test-publish').checked;
+
+      if (!title) return alert("Please enter a test title.");
+
+      try {
+        await addDoc(collection(db, 'tests'), {
+          title, examType: type, duration_minutes: duration,
+          isPremium, isPublished, 
+          questions: [], 
+          createdAt: serverTimestamp()
+        });
+        
+        alert("✅ Empty Test Shell Created!");
+        document.getElementById('test-title').value = '';
+        loadExistingTests(); 
+      } catch (err) {
+        alert("Failed to create test: " + err.message);
+      }
+    };
+
+    // --- STEP 2: UPLOAD QUESTIONS VIA ID ---
+    window.uploadQuestionsById = async () => {
+      const testId = document.getElementById('target-test-id').value.trim();
+      const jsonRaw = document.getElementById('test-json').value.trim();
+
+      if (!testId) return alert("Please paste the Target Test ID.");
+      if (!jsonRaw) return alert("Please paste or upload the JSON array.");
+
+      let parsedQuestions = [];
+      try {
+        parsedQuestions = JSON.parse(jsonRaw);
+        if (!Array.isArray(parsedQuestions)) throw new Error("JSON must be an array.");
+      } catch (err) {
+        return alert("❌ Invalid JSON Format!\n\nError: " + err.message);
+      }
+
+      if(!confirm(`Are you sure you want to upload ${parsedQuestions.length} questions to Test ID: ${testId}?`)) return;
+
+      try {
+        // Check if test exists first
+        const testRef = doc(db, 'tests', testId);
+        const docSnap = await getDoc(testRef);
+        if (!docSnap.exists()) {
+          return alert("❌ Test ID not found! Make sure you copied it correctly.");
+        }
+
+        await updateDoc(testRef, { questions: parsedQuestions });
+        
+        alert(`✅ Success! ${parsedQuestions.length} questions attached to the test.`);
+        
+        // Clear form
+        document.getElementById('target-test-id').value = '';
+        document.getElementById('test-json').value = '';
+        document.getElementById('file-label').innerText = `+ Upload .json File`;
+        document.getElementById('json-file').value = '';
+        
+        loadExistingTests(); // Refresh the list
+      } catch (err) {
+        alert("Failed to save questions: " + err.message);
+      }
+    };
+
+    // JSON FILE READER
+    document.getElementById('json-file').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      document.getElementById('file-label').innerText = `📄 ${file.name} Loaded!`;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('test-json').value = e.target.result;
+      };
+      reader.readAsText(file);
+    });
+
+    // --- STEP 3: LOAD TESTS ---
+    async function loadExistingTests() {
+      const container = document.getElementById('tests-container');
+      container.innerHTML = '<p>Loading...</p>';
+      
+      try {
+        const snapshot = await getDocs(collection(db, 'tests'));
+        if (snapshot.empty) { container.innerHTML = '<p>No tests found.</p>'; return; }
+
+        container.innerHTML = '';
+        snapshot.forEach(docSnap => {
+          const test = docSnap.data();
+          const testId = docSnap.id;
+          
+          const badge = test.isPremium ? `<span class="badge badge-premium">Premium</span>` : `<span class="badge badge-free">Free</span>`;
+          const statusHTML = test.isPublished 
+            ? `<span style="color:var(--green)">● Live</span>` 
+            : `<span style="color:var(--text-dim)">○ Hidden</span>`;
+            
+          const toggleBtnHTML = test.isPublished
+            ? `<button class="action-btn btn-toggle" onclick="togglePublish('${testId}', true)">Unpublish</button>`
+            : `<button class="action-btn btn-publish" onclick="togglePublish('${testId}', false)">Publish</button>`;
+
+          const qCount = test.questions ? test.questions.length : 0;
+
+          container.innerHTML += `
+            <div class="test-card">
+              <div>
+                <div style="font-weight: bold; font-size: 1.1rem; margin-bottom: 5px;">${test.title}</div>
+                <div style="color: var(--text-dim); font-size: 0.85rem; font-family: 'DM Sans';">
+                  ID: <span class="test-id-text" title="Double click to select" onclick="copyId('${testId}')">${testId}</span> | 
+                  ${badge} ${test.examType.toUpperCase()} | 
+                  <span style="color: ${qCount > 0 ? 'var(--accent)' : 'var(--red)'}; font-weight: bold;">${qCount} Qs</span> | 
+                  ${statusHTML}
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                ${toggleBtnHTML}
+                <button class="action-btn btn-delete" onclick="deleteTest('${testId}', '${test.title.replace(/'/g, "\\'")}')">Delete</button>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        container.innerHTML = `<p style="color:red">Error loading tests.</p>`;
+      }
+    }
+
+    // Helper to auto-copy ID to clipboard (Optional but handy)
+    window.copyId = (id) => {
+      navigator.clipboard.writeText(id);
+      document.getElementById('target-test-id').value = id;
+    };
+
+    // --- TOGGLE PUBLISH LOGIC ---
+    window.togglePublish = async (testId, currentlyPublished) => {
+      try {
+        await updateDoc(doc(db, 'tests', testId), { isPublished: !currentlyPublished });
+        loadExistingTests(); 
+      } catch (err) { alert("Error updating visibility."); }
+    };
+
+    // --- DELETE LOGIC ---
+    window.deleteTest = async (testId, testTitle) => {
+      if(!confirm(`⚠️ DANGER: Are you sure you want to permanently delete "${testTitle}"?`)) return;
+      try {
+        await deleteDoc(doc(db, 'tests', testId));
+        loadExistingTests();
+      } catch(err) { alert("Error deleting test."); }
+    }
+  </script>
+</body>
+</html>
