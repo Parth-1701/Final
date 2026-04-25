@@ -1263,7 +1263,7 @@ async function loadHomePageStats() {
   try {
     // 1. Hardcode a marketing number for students (Secure!)
     const studentsEl = document.getElementById('stat-students');
-    if (studentsEl) studentsEl.textContent = "--"; 
+    if (studentsEl) studentsEl.textContent = "25"; 
 
     // 2. Dynamically count the live mock tests (Since tests are public, this works!)
     const testsQuery = query(collection(db, 'tests'), where('isPublished', '==', true));
