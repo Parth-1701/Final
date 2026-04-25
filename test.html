@@ -246,22 +246,41 @@
     let currentSection = "";
 
     onAuthStateChanged(auth, async (user) => {
-      if (!user) { alert("Please log in!"); window.location.href = 'index.html'; return; }
+    // UPGRADED AUTHENTICATION CHECK
+    onAuthStateChanged(auth, async (user) => {
+      // 1. Wait for Firebase to initialize
+      if (user) {
+        // Set Student Name safely
+        const studentEl = document.getElementById('student-name');
+        if (studentEl) studentEl.innerText = user.email ? user.email.split('@')[0].toUpperCase() : "STUDENT";
 
-      const params = new URLSearchParams(window.location.search);
-      const testId = params.get('testId');
-      if (!testId) { window.location.href = 'index.html'; return; }
+        // 2. Only proceed to fetch data AFTER user is confirmed
+        const params = new URLSearchParams(window.location.search);
+        const testId = params.get('testId');
+        
+        if (!testId) {
+          window.location.href = 'index.html';
+          return;
+        }
 
-      // Safely Set Student Name
-      document.getElementById('student-name').innerText = user.email ? user.email.split('@')[0].toUpperCase() : "STUDENT";
+        await loadTestData(testId);
+      } else {
+        // 3. Only redirect if Firebase explicitly says there is no user
+        alert("Session expired or not logged in. Please log in again.");
+        window.location.href = 'index.html';
+      }
+    });
 
+    // Move your fetching logic into this separate function
+    async function loadTestData(testId) {
       try {
         const testSnap = await getDoc(doc(db, 'tests', testId));
         if (!testSnap.exists()) throw new Error("Test not found.");
+        
         testData = testSnap.data();
         testData.id = testId;
 
-        document.getElementById('display-title').innerText = testData.title || "JEE (Advanced) Mock Test";
+        document.getElementById('display-title').innerText = testData.title || "Examination";
         timeRemaining = (Number(testData.duration_minutes) || 180) * 60;
         
         questions = Array.isArray(testData.questions) ? testData.questions : [];
@@ -277,11 +296,11 @@
 
       } catch (err) {
         console.error(err);
-        // SAFETY PATCH: Stop spinning and show exact error
         document.querySelector('.spinner').style.display = 'none'; 
         document.getElementById('load-text').innerText = "Database Error: " + err.message;
         document.getElementById('load-text').style.color = "red";
       }
+    }
     });
 
     window.buildSectionDropdown = () => {
