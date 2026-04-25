@@ -176,15 +176,18 @@
              const options = q.options;
              const sortedKeys = Object.keys(options).sort();
              
+             const actualArr = actualAns ? actualAns.split(',') : [];
+             const studentArr = studentAns ? studentAns.split(',') : [];
+             
              sortedKeys.forEach(key => {
                const val = options[key];
                let rowClass = "";
                let labelAppend = "";
 
-               if (key === actualAns) {
+               if (actualArr.includes(key)) {
                  rowClass = "correct-ans";
                  labelAppend = " ✓";
-               } else if (key === studentAns && !isCorrect) {
+               } else if (studentArr.includes(key) && !actualArr.includes(key)) {
                  rowClass = "wrong-ans";
                  labelAppend = " ✗";
                }
