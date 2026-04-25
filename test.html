@@ -536,53 +536,348 @@
         display.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
       }, 1000);
     }
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    // ─── PASTE FIREBASE CONFIG HERE ─────────────────
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ──────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let testData = null;
+    let questions = [];
+    let responses = []; 
+    let timeRemaining = 0;
+    let timerInterval = null;
+
+    let currentGlobalIdx = 0;
+    let sections = [];
+    let currentSection = "";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { alert("Please log in!"); window.location.href = 'index.html'; return; }
+      const params = new URLSearchParams(window.location.search);
+      const testId = params.get('testId');
+      if (!testId) { window.location.href = 'index.html'; return; }
+
+      document.getElementById('student-name').innerText = user.email ? user.email.split('@')[0].toUpperCase() : "STUDENT";
+
+      try {
+        const testSnap = await getDoc(doc(db, 'tests', testId));
+        if (!testSnap.exists()) throw new Error("Test not found.");
+        testData = testSnap.data();
+        testData.id = testId;
+
+        document.getElementById('display-title').innerText = testData.title || "JEE (Advanced) Mock Test";
+        timeRemaining = (testData.duration_minutes || 180) * 60;
+        
+        questions = testData.questions || [];
+        responses = questions.map(() => ({ ans: null, status: 'unvisited' }));
+        sections = [...new Set(questions.map(q => q.subject || q.section || "General"))];
+        currentSection = sections[0];
+
+        window.buildSectionDropdown();
+        window.buildPalette();
+        window.loadQuestion(0);
+        startTimer();
+        document.getElementById('loader').style.display = 'none';
+
+      } catch (err) {
+        document.getElementById('load-text').innerText = "Fatal Error Loading Database.";
+        document.getElementById('load-text').style.color = "red";
+      }
+    });
+
+    window.buildSectionDropdown = () => {
+      const dropdown = document.getElementById('section-dropdown');
+      dropdown.innerHTML = '';
+      sections.forEach(sec => {
+        dropdown.innerHTML += `<option value="${sec}" ${sec === currentSection ? 'selected' : ''}>${sec}</option>`;
+      });
+    };
+
+    window.switchSection = (secName) => {
+      currentSection = secName;
+      document.getElementById('section-dropdown').value = secName;
+      const firstIdx = questions.findIndex(q => (q.subject || q.section || "General") === currentSection);
+      if (firstIdx !== -1) {
+        window.buildPalette();
+        window.loadQuestion(firstIdx);
+      }
+    };
+
+    window.loadQuestion = (globalIndex) => {
+      if (globalIndex < 0 || globalIndex >= questions.length) return;
+      currentGlobalIdx = globalIndex;
+      const q = questions[currentGlobalIdx];
+      const qSec = q.subject || q.section || "General";
+
+      if (currentSection !== qSec) {
+        currentSection = qSec;
+        window.buildSectionDropdown();
+        window.buildPalette();
+      }
+
+      if (responses[currentGlobalIdx].status === 'unvisited') {
+        responses[currentGlobalIdx].status = 'skipped';
+      }
+
+      let localNum = 1;
+      for (let i = 0; i < currentGlobalIdx; i++) {
+        if ((questions[i].subject || questions[i].section || "General") === currentSection) localNum++;
+      }
+
+      document.getElementById('q-number').innerText = `Question ${localNum}`;
+      document.getElementById('palette-section-title').innerText = currentSection;
+      
+      const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
+      const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 2;
+      
+      // Auto-detect if multi-correct
+      const isMulti = q.type === 'multi' || (q.answer && q.answer.includes(','));
+
+      let schemeHTML = "";
+      if (q.type === 'numerical' || !q.options) {
+        schemeHTML = `<span style="font-weight:bold; color:green;">Full Marks : +${posMarks}</span> For correct answer<br><span style="font-weight:bold; color:red;">Negative Marks : -${negPenalty}</span> In all other cases.`;
+      } else if (isMulti) {
+        schemeHTML = `<span style="font-weight:bold; color:green;">Full Marks : +${posMarks}</span> If only all correct options are chosen<br><span style="font-weight:bold; color:#ff9800;">Partial Marks : +1</span> For each correct option chosen (provided NO incorrect option is chosen)<br><span style="font-weight:bold; color:red;">Negative Marks : -${negPenalty}</span> If ANY incorrect option is chosen.`;
+      } else {
+        schemeHTML = `<span style="font-weight:bold; color:green;">Full Marks : +${posMarks}</span> If ONLY the correct option is chosen<br><span style="font-weight:bold; color:red;">Negative Marks : -${negPenalty}</span> In all other cases.`;
+      }
+      
+      document.getElementById('marking-scheme').innerHTML = schemeHTML;
+      
+      let qTextHTML = (q.text || q.question);
+      if(q.type === 'numerical' || !q.options) {
+          qTextHTML += `<br><br><span style="color: var(--nta-blue); font-size: 14px; font-weight: bold;">(Numerical Value Type)</span>`;
+      }
+      document.getElementById('q-text').innerHTML = qTextHTML;
+
+      const optsContainer = document.getElementById('options-container');
+      optsContainer.innerHTML = '';
+      
+      if (q.type === 'numerical' || !q.options) {
+        const savedVal = responses[currentGlobalIdx].ans || '';
+        optsContainer.innerHTML = `
+          <input type="number" step="any" class="numerical-input"
+                 placeholder="Enter value..." 
+                 value="${savedVal}" 
+                 oninput="window.saveNumericalAnswer(this.value)">
+        `;
+      } 
+      else {
+        const options = q.options;
+        const sortedKeys = Object.keys(options).sort();
+        const currentAns = responses[currentGlobalIdx].ans || '';
+        const selectedArr = currentAns ? currentAns.split(',') : [];
+
+        sortedKeys.forEach(key => {
+          const val = options[key];
+          const isSelected = selectedArr.includes(key);
+          const shapeClass = isMulti ? 'opt-checkbox' : 'opt-radio';
+          
+          optsContainer.innerHTML += `
+            <div class="option-row ${isSelected ? 'selected' : ''}" onclick="window.selectOption('${key}')">
+              <div class="${shapeClass}"></div>
+              <div class="opt-text"><b>(${key})</b> &nbsp; ${val}</div>
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('q-scroll-area').scrollTop = 0;
+      window.updatePaletteUI();
+
+      setTimeout(() => {
+        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+          MathJax.typesetClear();
+          MathJax.typesetPromise([document.getElementById('q-scroll-area')]).catch((err) => console.log(err));
+        }
+      }, 50);
+    };
+
+    // UPGRADED SELECTION LOGIC (Handles Toggling for Multi-Correct)
+    window.selectOption = (key) => {
+      const q = questions[currentGlobalIdx];
+      const isMulti = q.type === 'multi' || (q.answer && q.answer.includes(','));
+
+      if (isMulti) {
+        let currentAns = responses[currentGlobalIdx].ans || '';
+        let selectedArr = currentAns ? currentAns.split(',') : [];
+        
+        if (selectedArr.includes(key)) {
+          selectedArr = selectedArr.filter(k => k !== key); // Toggle OFF
+        } else {
+          selectedArr.push(key); // Toggle ON
+        }
+        
+        selectedArr.sort();
+        responses[currentGlobalIdx].ans = selectedArr.length > 0 ? selectedArr.join(',') : null;
+      } else {
+        responses[currentGlobalIdx].ans = key; // Single Correct overrides
+      }
+      
+      window.loadQuestion(currentGlobalIdx); 
+    };
+
+    window.saveNumericalAnswer = (value) => {
+      responses[currentGlobalIdx].ans = value.trim() === '' ? null : value.trim();
+    };
+
+    window.clearSelection = () => {
+      responses[currentGlobalIdx].ans = null;
+      responses[currentGlobalIdx].status = 'skipped'; 
+      window.loadQuestion(currentGlobalIdx);
+    };
+
+    window.saveAndNext = () => {
+      if (responses[currentGlobalIdx].ans) {
+        responses[currentGlobalIdx].status = 'answered';
+      } else {
+        responses[currentGlobalIdx].status = 'skipped';
+      }
+      if (currentGlobalIdx < questions.length - 1) window.loadQuestion(currentGlobalIdx + 1);
+      else window.updatePaletteUI();
+    };
+
+    window.markForReview = () => {
+      if (responses[currentGlobalIdx].ans) {
+        responses[currentGlobalIdx].status = 'answered-review';
+      } else {
+        responses[currentGlobalIdx].status = 'review';
+      }
+      if (currentGlobalIdx < questions.length - 1) window.loadQuestion(currentGlobalIdx + 1);
+      else window.updatePaletteUI();
+    };
+
+    window.buildPalette = () => {
+      const grid = document.getElementById('palette-grid');
+      grid.innerHTML = '';
+      let localNum = 1;
+      questions.forEach((q, index) => {
+        if ((q.subject || q.section || "General") === currentSection) {
+          grid.innerHTML += `<div class="pal-btn unvisited" id="pal-${index}" onclick="window.loadQuestion(${index})">${localNum}</div>`;
+          localNum++;
+        }
+      });
+      window.updatePaletteUI();
+    };
+
+    window.updatePaletteUI = () => {
+      questions.forEach((q, index) => {
+        if ((q.subject || q.section || "General") === currentSection) {
+          const btn = document.getElementById(`pal-${index}`);
+          if (btn) {
+            btn.className = `pal-btn ${responses[index].status}`;
+            if (index === currentGlobalIdx) btn.classList.add('active');
+          }
+        }
+      });
+    };
+
+    window.toggleSidebar = () => {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('open');
+    };
+
+    function startTimer() {
+      const display = document.getElementById('timer');
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        if (timeRemaining <= 0) { clearInterval(timerInterval); window.submitExam(); return; }
+        let h = Math.floor(timeRemaining / 3600);
+        let m = Math.floor((timeRemaining % 3600) / 60);
+        let s = timeRemaining % 60;
+        display.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    // THE JEE ADVANCED GRADING ENGINE
     window.submitExam = async () => {
-      const conf = confirm("Are you sure you want to final submit? You will not be able to change your answers.");
+      const conf = confirm("Are you sure you want to final submit?");
       if (!conf && timeRemaining > 0) return;
       clearInterval(timerInterval);
       
       document.getElementById('loader').style.display = 'flex';
-      document.getElementById('load-text').innerText = "Processing Scores...";
+      document.getElementById('load-text').innerText = "Processing NTA Scores...";
       
       let score = 0, correct = 0, wrong = 0, unattempted = 0;
       
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
         const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
-        const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 1;
+        const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 2;
         
         if (!responses[i].ans || responses[i].status === 'review' || responses[i].status === 'skipped' || responses[i].status === 'unvisited') {
           unattempted++;
         } else {
-          let isCorrect = false;
-          if (q.type === 'numerical' || !q.options) {
-             isCorrect = parseFloat(responses[i].ans) === parseFloat(q.answer);
-          } else {
-             isCorrect = responses[i].ans === q.answer;
-          }
+          const studentAns = responses[i].ans;
+          const actualAns = q.answer;
+          const isMulti = q.type === 'multi' || (actualAns && actualAns.includes(','));
+          
+          let earnedMarks = 0;
 
-          if (isCorrect) { 
-            correct++; score += posMarks; 
-          } else { 
-            wrong++; score -= negPenalty; 
+          if (q.type === 'numerical' || !q.options) {
+             const isCorrect = parseFloat(studentAns) === parseFloat(actualAns);
+             earnedMarks = isCorrect ? posMarks : -negPenalty;
+             if (isCorrect) correct++; else wrong++;
+          } 
+          else if (isMulti) {
+             // PARTIAL MARKING ALGORITHM
+             const studentArr = studentAns.split(',');
+             const actualArr = actualAns.split(',');
+             
+             let hasWrong = false;
+             let correctCount = 0;
+             
+             studentArr.forEach(opt => {
+               if (actualArr.includes(opt)) correctCount++;
+               else hasWrong = true;
+             });
+             
+             if (hasWrong) {
+               earnedMarks = -negPenalty;
+               wrong++;
+             } else if (correctCount === actualArr.length) {
+               earnedMarks = posMarks;
+               correct++;
+             } else {
+               earnedMarks = correctCount; // +1 for each correct option selected
+               correct++; // Counted as partially correct
+             }
+          } 
+          else {
+             const isCorrect = studentAns === actualAns;
+             earnedMarks = isCorrect ? posMarks : -negPenalty;
+             if (isCorrect) correct++; else wrong++;
           }
+          
+          score += earnedMarks;
         }
       }
 
       try {
         const timeTaken = (testData.duration_minutes * 60) - timeRemaining;
-        
-        // ADDED: 'responses' is now saved into sessionStorage so the analysis page can read it!
         sessionStorage.setItem('examResult', JSON.stringify({
           score, correct, wrong, unattempted, timeTaken, totalQuestions: questions.length, 
           testId: testData.id, examType: testData.examType || "JEE", testTitle: testData.title,
-          responses: responses 
+          responses: responses
         }));
 
         const user = auth.currentUser;
         if (user) {
-          // ADDED: 'responses' is also saved to the permanent database for future history viewing
           await addDoc(collection(db, 'results'), {
             userId: user.uid, testId: testData.id, testTitle: testData.title, 
             score, correct, wrong, timeTaken, submittedAt: serverTimestamp(),
