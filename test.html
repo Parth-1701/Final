@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mock Test Interface</title>
+  <link href="https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap" rel="stylesheet">
+  
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      startup: { typeset: false } 
+    };
+  </script>
+  <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* Authentic NTA Colors */
+    :root {
+      --nta-blue: #1874b4;
+      --nta-bg: #ffffff;
+      --nta-border: #ccc;
+      --nta-text: #000000;
+      
+      --nta-save: #5cb85c;       /* Green */
+      --nta-review: #9c27b0;     /* Purple */
+      --nta-skipped: #d9534f;    /* Red */
+      --nta-unvisited: #f0f0f0;  /* Light Gray */
+      --nta-btn-blue: #23527c;   /* NTA Action Button Blue */
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { background: var(--nta-bg); color: var(--nta-text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-size: 14px; }
+
+    /* --- NTA TOP HEADER --- */
+    .top-header { background: var(--nta-blue); color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 2px solid #0f4b75; }
+    .exam-title { font-size: 18px; font-weight: bold; }
+    .timer-container { display: flex; align-items: center; gap: 15px; }
+    .timer-text { font-size: 14px; font-weight: bold; }
+    .timer-box { font-size: 18px; font-weight: bold; background: white; color: var(--nta-blue); padding: 4px 10px; border-radius: 3px; border: 1px solid #0f4b75; }
+    .btn-submit-top { background: #d9534f; color: white; border: none; padding: 6px 15px; font-weight: bold; cursor: pointer; border-radius: 3px; font-size: 14px; }
+    .btn-submit-top:hover { background: #c9302c; }
+
+    /* --- MAIN LAYOUT --- */
+    .main-area { display: flex; flex: 1; overflow: hidden; }
+    
+    /* --- LEFT: QUESTION PANEL --- */
+    .left-panel { flex: 1; display: flex; flex-direction: column; border-right: 2px solid var(--nta-border); position: relative; overflow-y: auto; padding-bottom: 50px; }
+    
+    /* Section & Marking Scheme Header */
+    .section-header { display: flex; justify-content: space-between; align-items: center; background: #e9f0f5; padding: 8px 20px; border-bottom: 1px solid var(--nta-border); }
+    .section-dropdown { padding: 6px 10px; border: 1px solid var(--nta-border); font-size: 14px; border-radius: 3px; background: white; font-weight: bold; color: var(--nta-blue); outline: none; cursor: pointer; }
+    .marking-scheme { font-size: 13px; color: #555; background: #fdfdfd; padding: 8px 20px; border-bottom: 1px dashed var(--nta-border); }
+
+    /* Question Content */
+    .q-container { padding: 20px; }
+    .q-number-bar { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: var(--nta-blue); border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    .q-text { font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
+    .exam-img { max-width: 100%; border: 1px solid #ccc; margin-top: 10px; }
+    
+    /* Options */
+    .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
+    .option-row { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 5px; }
+    
+    /* RADIOS (Single Correct) */
+    .opt-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--nta-border); display: flex; align-items: center; justify-content: center; margin-top: 2px; flex-shrink: 0; background: white; }
+    .option-row.selected .opt-radio { border-color: var(--nta-blue); }
+    .option-row.selected .opt-radio::after { content: ''; width: 10px; height: 10px; background: var(--nta-blue); border-radius: 50%; }
+    
+    /* CHECKBOXES (Multi Correct) */
+    .opt-checkbox { width: 18px; height: 18px; border-radius: 2px; border: 2px solid var(--nta-border); display: flex; align-items: center; justify-content: center; margin-top: 2px; flex-shrink: 0; background: white; }
+    .option-row.selected .opt-checkbox { border-color: var(--nta-blue); background: var(--nta-blue); }
+    .option-row.selected .opt-checkbox::after { content: '✓'; color: white; font-size: 14px; font-weight: bold; }
+
+    .opt-text { font-size: 15px; line-height: 1.4; }
+
+    /* Numerical Input */
+    .numerical-input { width: 300px; padding: 10px; border: 1px solid #999; border-radius: 3px; font-size: 16px; margin-bottom: 30px; outline: none; }
+    .numerical-input:focus { border-color: var(--nta-blue); box-shadow: 0 0 5px rgba(24, 116, 180, 0.5); }
+
+    /* Action Buttons (Below Options) */
+    .action-buttons { display: flex; justify-content: space-between; border-top: 1px solid #eee; padding-top: 20px; flex-wrap: wrap; gap: 10px; }
+    .btn-group-left { display: flex; gap: 10px; }
+    .btn-group-right { display: flex; gap: 10px; }
+    
+    .btn { padding: 8px 16px; border: 1px solid var(--nta-border); background: white; cursor: pointer; font-size: 14px; border-radius: 3px; transition: 0.1s; }
+    .btn-clear { background: #fff; }
+    .btn-clear:hover { background: #f0f0f0; }
+    .btn-review { background: #fff; }
+    .btn-review:hover { background: #f0f0f0; }
+    .btn-save { background: var(--nta-btn-blue); color: white; border-color: #122b40; font-weight: bold; }
+    .btn-save:hover { background: #1a3c5a; }
+
+    /* --- RIGHT: PALETTE SIDEBAR --- */
+    .sidebar { width: 300px; background: #eef2f5; display: flex; flex-direction: column; transition: transform 0.3s ease; flex-shrink: 0; border-left: 1px solid var(--nta-border); }
+    
+    /* Authentic Profile Box */
+    .profile-box { display: flex; gap: 15px; padding: 15px; background: white; border-bottom: 1px solid var(--nta-border); align-items: center; }
+    .profile-pic { width: 60px; height: 60px; border: 1px solid #ccc; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #999; }
+    .profile-name { font-weight: bold; font-size: 14px; color: var(--nta-blue); }
+
+    /* Stats Legend */
+    .palette-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 15px; background: white; border-bottom: 1px solid var(--nta-border); font-size: 12px; }
+    .stat-item { display: flex; align-items: center; gap: 6px; }
+    .stat-badge { width: 26px; height: 24px; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; flex-shrink: 0; font-weight: bold; border: 1px solid #aaa; }
+
+    /* Palette Grid */
+    .palette-container { padding: 10px; overflow-y: auto; flex: 1; background: #eef2f5; }
+    .section-title-palette { font-weight: bold; margin-bottom: 10px; color: var(--nta-blue); font-size: 13px; text-transform: uppercase; }
+    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    
+    /* Authentic NTA Shapes */
+    .pal-btn { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; color: black; border: 1px solid #999; font-weight: bold; user-select: none; }
+    
+    .pal-btn.unvisited { background: var(--nta-unvisited); }
+    .pal-btn.skipped { background: var(--nta-skipped); color: white; border: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+    .pal-btn.answered { background: var(--nta-save); color: white; border: none; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+    .pal-btn.review { background: var(--nta-review); color: white; border: none; border-radius: 50%; }
+    .pal-btn.answered-review { background: var(--nta-review); color: white; border: none; border-radius: 50%; position: relative; }
+    .pal-btn.answered-review::after { content: ''; position: absolute; bottom: 1px; right: 1px; width: 8px; height: 8px; background: var(--nta-save); border-radius: 50%; border: 1px solid white; }
+    
+    .pal-btn.active { box-shadow: 0 0 0 2px black inset; }
+
+    /* Full Page Loader */
+    #loader { position: fixed; inset: 0; background: white; display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 15px; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top-color: var(--nta-blue); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Mobile Toggle */
+    .toggle-arrow { display: none; position: absolute; right: 10px; top: 70px; width: 40px; height: 40px; background: var(--nta-blue); color: white; border: none; font-size: 20px; border-radius: 3px; cursor: pointer; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+
+    /* MOBILE RESPONSIVE FIXES */
+    @media (max-width: 900px) {
+      .top-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+      .timer-container { width: 100%; justify-content: space-between; }
+      .sidebar { position: absolute; right: 0; top: 0; bottom: 0; transform: translateX(100%); z-index: 50; border-left: 2px solid #ccc; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+      .sidebar.open { transform: translateX(0); }
+      .toggle-arrow { display: flex; align-items: center; justify-content: center; }
+      .action-buttons { flex-direction: column; }
+      .btn-group-left, .btn-group-right { width: 100%; display: flex; flex-direction: column; }
+      .btn { width: 100%; text-align: center; padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loader">
+    <div class="spinner"></div>
+    <div style="font-weight: bold; color: var(--nta-blue);" id="load-text">Loading NTA Environment...</div>
+  </div>
+
+  <div class="top-header">
+    <div class="exam-title" id="display-title">Quizable NTA Platform</div>
+    <div class="timer-container">
+      <span class="timer-text">Time Left:</span>
+      <div class="timer-box" id="timer">--:--:--</div>
+      <button class="btn-submit-top" onclick="window.submitExam()">Submit</button>
+    </div>
+  </div>
+
+  <div class="main-area">
+    
+    <div class="left-panel">
+      
+      <div class="section-header">
+        <span style="font-size: 14px; font-weight: bold;">Section:</span>
+        <select class="section-dropdown" id="section-dropdown" onchange="window.switchSection(this.value)"></select>
+      </div>
+
+      <div class="marking-scheme" id="marking-scheme"></div>
+
+      <div class="q-container" id="q-scroll-area">
+        <div class="q-number-bar" id="q-number">Question 1</div>
+        <div class="q-text" id="q-text">Loading question text...</div>
+        <div class="options-grid" id="options-container"></div>
+
+        <div class="action-buttons">
+          <div class="btn-group-left">
+            <button class="btn btn-review" onclick="window.markForReview()">Mark for Review & Next</button>
+            <button class="btn btn-clear" onclick="window.clearSelection()">Clear Response</button>
+          </div>
+          <div class="btn-group-right">
+            <button class="btn btn-save" onclick="window.saveAndNext()">Save & Next</button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <div class="sidebar" id="sidebar">
+      <div class="profile-box">
+        <div class="profile-pic">👤</div>
+        <div>
+          <div class="profile-name" id="student-name">Candidate Name</div>
+          <div style="font-size: 12px; color: #555;">Mock Test Enrollee</div>
+        </div>
+      </div>
+
+      <div class="palette-stats">
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-save); border-top-left-radius: 12px; border-top-right-radius: 12px;"></div> Answered</div>
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-skipped); border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;"></div> Not Answered</div>
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-unvisited); color: #333;"></div> Not Visited</div>
+        <div class="stat-item"><div class="stat-badge" style="background: var(--nta-review); border-radius: 50%;"></div> Marked for Review</div>
+        <div class="stat-item" style="grid-column: 1 / -1;"><div class="stat-badge" style="background: var(--nta-review); border-radius: 50%; position: relative;"><div style="position:absolute; bottom:1px; right:1px; width:8px; height:8px; background:var(--nta-save); border-radius:50%; border:1px solid white;"></div></div> Answered & Marked for Review (evaluated)</div>
+      </div>
+
+      <div class="palette-container">
+        <div class="section-title-palette" id="palette-section-title">SECTION</div>
+        <div class="palette-grid" id="palette-grid"></div>
+      </div>
+    </div>
+    
+    <button class="toggle-arrow" id="toggle-btn" onclick="window.toggleSidebar()">☰</button>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ─── 1. PASTE YOUR EXACT FIREBASE CONFIG HERE ─────────────────
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ──────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let testData = null;
+    let questions = [];
+    let responses = []; 
+    let timeRemaining = 0;
+    let timerInterval = null;
+
+    let currentGlobalIdx = 0;
+    let sections = [];
+    let currentSection = "";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { alert("Please log in!"); window.location.href = 'index.html'; return; }
+
+      const params = new URLSearchParams(window.location.search);
+      const testId = params.get('testId');
+      if (!testId) { window.location.href = 'index.html'; return; }
+
+      // Safely Set Student Name
+      document.getElementById('student-name').innerText = user.email ? user.email.split('@')[0].toUpperCase() : "STUDENT";
+
+      try {
+        const testSnap = await getDoc(doc(db, 'tests', testId));
+        if (!testSnap.exists()) throw new Error("Test not found.");
+        testData = testSnap.data();
+        testData.id = testId;
+
+        document.getElementById('display-title').innerText = testData.title || "JEE (Advanced) Mock Test";
+        timeRemaining = (Number(testData.duration_minutes) || 180) * 60;
+        
+        questions = Array.isArray(testData.questions) ? testData.questions : [];
+        responses = questions.map(() => ({ ans: null, status: 'unvisited' }));
+        sections = [...new Set(questions.map(q => q.subject || q.section || "General"))];
+        currentSection = sections[0] || "General";
+
+        window.buildSectionDropdown();
+        window.buildPalette();
+        window.loadQuestion(0);
+        startTimer();
+        document.getElementById('loader').style.display = 'none';
+
+      } catch (err) {
+        console.error(err);
+        // SAFETY PATCH: Stop spinning and show exact error
+        document.querySelector('.spinner').style.display = 'none'; 
+        document.getElementById('load-text').innerText = "Database Error: " + err.message;
+        document.getElementById('load-text').style.color = "red";
+      }
+    });
+
+    window.buildSectionDropdown = () => {
+      const dropdown = document.getElementById('section-dropdown');
+      if(!dropdown) return;
+      dropdown.innerHTML = '';
+      sections.forEach(sec => {
+        dropdown.innerHTML += `<option value="${sec}" ${sec === currentSection ? 'selected' : ''}>${sec}</option>`;
+      });
+    };
+
+    window.switchSection = (secName) => {
+      currentSection = secName;
+      const dropdown = document.getElementById('section-dropdown');
+      if(dropdown) dropdown.value = secName;
+      
+      const firstIdx = questions.findIndex(q => (q.subject || q.section || "General") === currentSection);
+      if (firstIdx !== -1) {
+        window.buildPalette();
+        window.loadQuestion(firstIdx);
+      }
+    };
+
+    window.loadQuestion = (globalIndex) => {
+      if (globalIndex < 0 || globalIndex >= questions.length) return;
+      currentGlobalIdx = globalIndex;
+      const q = questions[currentGlobalIdx] || {};
+      const qSec = q.subject || q.section || "General";
+
+      if (currentSection !== qSec) {
+        currentSection = qSec;
+        window.buildSectionDropdown();
+        window.buildPalette();
+      }
+
+      if (responses[currentGlobalIdx].status === 'unvisited') {
+        responses[currentGlobalIdx].status = 'skipped';
+      }
+
+      let localNum = 1;
+      for (let i = 0; i < currentGlobalIdx; i++) {
+        if ((questions[i].subject || questions[i].section || "General") === currentSection) localNum++;
+      }
+
+      document.getElementById('q-number').innerText = `Question ${localNum}`;
+      document.getElementById('palette-section-title').innerText = currentSection;
+      
+      const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
+      const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 2;
+      
+      // SAFETY PATCH: Force answers to act as Strings to prevent JSON Number crashes
+      const actualAnsStr = String(q.answer || "");
+      const isMulti = q.type === 'multi' || actualAnsStr.includes(',');
+
+      let schemeHTML = "";
+      if (q.type === 'numerical' || !q.options || typeof q.options !== 'object') {
+        schemeHTML = `<span style="font-weight:bold; color:green;">Full Marks : +${posMarks}</span> For correct answer<br><span style="font-weight:bold; color:red;">Negative Marks : -${negPenalty}</span> In all other cases.`;
+      } else if (isMulti) {
+        schemeHTML = `<span style="font-weight:bold; color:green;">Full Marks : +${posMarks}</span> If only all correct options are chosen<br><span style="font-weight:bold; color:#ff9800;">Partial Marks : +1</span> For each correct option chosen (provided NO incorrect option is chosen)<br><span style="font-weight:bold; color:red;">Negative Marks : -${negPenalty}</span> If ANY incorrect option is chosen.`;
+      } else {
+        schemeHTML = `<span style="font-weight:bold; color:green;">Full Marks : +${posMarks}</span> If ONLY the correct option is chosen<br><span style="font-weight:bold; color:red;">Negative Marks : -${negPenalty}</span> In all other cases.`;
+      }
+      
+      document.getElementById('marking-scheme').innerHTML = schemeHTML;
+      
+      let qTextHTML = (q.text || q.question || "");
+      if(q.type === 'numerical' || !q.options || typeof q.options !== 'object') {
+          qTextHTML += `<br><br><span style="color: var(--nta-blue); font-size: 14px; font-weight: bold;">(Numerical Value Type)</span>`;
+      }
+      document.getElementById('q-text').innerHTML = qTextHTML;
+
+      const optsContainer = document.getElementById('options-container');
+      optsContainer.innerHTML = '';
+      
+      if (q.type === 'numerical' || !q.options || typeof q.options !== 'object') {
+        const savedVal = responses[currentGlobalIdx].ans || '';
+        optsContainer.innerHTML = `
+          <input type="number" step="any" class="numerical-input"
+                 placeholder="Enter value..." 
+                 value="${savedVal}" 
+                 oninput="window.saveNumericalAnswer(this.value)">
+        `;
+      } 
+      else {
+        const options = q.options;
+        const sortedKeys = Object.keys(options).sort();
+        const currentAnsStr = String(responses[currentGlobalIdx].ans || "");
+        const selectedArr = currentAnsStr ? currentAnsStr.split(',') : [];
+
+        sortedKeys.forEach(key => {
+          const val = options[key];
+          const isSelected = selectedArr.includes(key);
+          const shapeClass = isMulti ? 'opt-checkbox' : 'opt-radio';
+          
+          optsContainer.innerHTML += `
+            <div class="option-row ${isSelected ? 'selected' : ''}" onclick="window.selectOption('${key}')">
+              <div class="${shapeClass}"></div>
+              <div class="opt-text"><b>(${key})</b> &nbsp; ${val}</div>
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('q-scroll-area').scrollTop = 0;
+      window.updatePaletteUI();
+
+      setTimeout(() => {
+        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+          MathJax.typesetClear();
+          MathJax.typesetPromise([document.getElementById('q-scroll-area')]).catch((err) => console.log(err));
+        }
+      }, 50);
+    };
+
+    window.selectOption = (key) => {
+      const q = questions[currentGlobalIdx] || {};
+      const actualAnsStr = String(q.answer || "");
+      const isMulti = q.type === 'multi' || actualAnsStr.includes(',');
+
+      if (isMulti) {
+        const currentAnsStr = String(responses[currentGlobalIdx].ans || "");
+        let selectedArr = currentAnsStr ? currentAnsStr.split(',') : [];
+        
+        if (selectedArr.includes(key)) {
+          selectedArr = selectedArr.filter(k => k !== key);
+        } else {
+          selectedArr.push(key);
+        }
+        
+        selectedArr.sort();
+        responses[currentGlobalIdx].ans = selectedArr.length > 0 ? selectedArr.join(',') : null;
+      } else {
+        responses[currentGlobalIdx].ans = key;
+      }
+      
+      window.loadQuestion(currentGlobalIdx); 
+    };
+
+    window.saveNumericalAnswer = (value) => {
+      responses[currentGlobalIdx].ans = value.trim() === '' ? null : value.trim();
+    };
+
+    window.clearSelection = () => {
+      responses[currentGlobalIdx].ans = null;
+      responses[currentGlobalIdx].status = 'skipped'; 
+      window.loadQuestion(currentGlobalIdx);
+    };
+
+    window.saveAndNext = () => {
+      if (responses[currentGlobalIdx].ans) {
+        responses[currentGlobalIdx].status = 'answered';
+      } else {
+        responses[currentGlobalIdx].status = 'skipped';
+      }
+      if (currentGlobalIdx < questions.length - 1) window.loadQuestion(currentGlobalIdx + 1);
+      else window.updatePaletteUI();
+    };
+
+    window.markForReview = () => {
+      if (responses[currentGlobalIdx].ans) {
+        responses[currentGlobalIdx].status = 'answered-review';
+      } else {
+        responses[currentGlobalIdx].status = 'review';
+      }
+      if (currentGlobalIdx < questions.length - 1) window.loadQuestion(currentGlobalIdx + 1);
+      else window.updatePaletteUI();
+    };
+
+    window.buildPalette = () => {
+      const grid = document.getElementById('palette-grid');
+      if(!grid) return;
+      grid.innerHTML = '';
+      let localNum = 1;
+      questions.forEach((q, index) => {
+        const qSec = q.subject || q.section || "General";
+        if (qSec === currentSection) {
+          grid.innerHTML += `<div class="pal-btn unvisited" id="pal-${index}" onclick="window.loadQuestion(${index})">${localNum}</div>`;
+          localNum++;
+        }
+      });
+      window.updatePaletteUI();
+    };
+
+    window.updatePaletteUI = () => {
+      questions.forEach((q, index) => {
+        const qSec = q.subject || q.section || "General";
+        if (qSec === currentSection) {
+          const btn = document.getElementById(`pal-${index}`);
+          if (btn) {
+            btn.className = `pal-btn ${responses[index].status}`;
+            if (index === currentGlobalIdx) btn.classList.add('active');
+          }
+        }
+      });
+    };
+
+    window.toggleSidebar = () => {
+      const sidebar = document.getElementById('sidebar');
+      if(sidebar) sidebar.classList.toggle('open');
+    };
+
+    function startTimer() {
+      const display = document.getElementById('timer');
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        if (timeRemaining <= 0) { clearInterval(timerInterval); window.submitExam(); return; }
+        let h = Math.floor(timeRemaining / 3600);
+        let m = Math.floor((timeRemaining % 3600) / 60);
+        let s = timeRemaining % 60;
+        if(display) display.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    // THE JEE ADVANCED GRADING ENGINE
+    window.submitExam = async () => {
+      const conf = confirm("Are you sure you want to final submit?");
+      if (!conf && timeRemaining > 0) return;
+      clearInterval(timerInterval);
+      
+      document.getElementById('loader').style.display = 'flex';
+      document.querySelector('.spinner').style.display = 'block'; 
+      document.getElementById('load-text').innerText = "Processing NTA Scores...";
+      document.getElementById('load-text').style.color = "var(--nta-blue)";
+      
+      let score = 0, correct = 0, wrong = 0, unattempted = 0;
+      
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i] || {};
+        const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
+        const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 2;
+        
+        if (!responses[i].ans || responses[i].status === 'review' || responses[i].status === 'skipped' || responses[i].status === 'unvisited') {
+          unattempted++;
+        } else {
+          const studentAnsStr = String(responses[i].ans || "");
+          const actualAnsStr = String(q.answer || "");
+          const isMulti = q.type === 'multi' || actualAnsStr.includes(',');
+          
+          let earnedMarks = 0;
+
+          if (q.type === 'numerical' || !q.options || typeof q.options !== 'object') {
+             const isCorrect = parseFloat(studentAnsStr) === parseFloat(actualAnsStr);
+             earnedMarks = isCorrect ? posMarks : -negPenalty;
+             if (isCorrect) correct++; else wrong++;
+          } 
+          else if (isMulti) {
+             const studentArr = studentAnsStr.split(',');
+             const actualArr = actualAnsStr.split(',');
+             
+             let hasWrong = false;
+             let correctCount = 0;
+             
+             studentArr.forEach(opt => {
+               if (actualArr.includes(opt)) correctCount++;
+               else hasWrong = true;
+             });
+             
+             if (hasWrong) {
+               earnedMarks = -negPenalty;
+               wrong++;
+             } else if (correctCount === actualArr.length) {
+               earnedMarks = posMarks;
+               correct++;
+             } else {
+               earnedMarks = correctCount; 
+               correct++; 
+             }
+          } 
+          else {
+             const isCorrect = studentAnsStr === actualAnsStr;
+             earnedMarks = isCorrect ? posMarks : -negPenalty;
+             if (isCorrect) correct++; else wrong++;
+          }
+          
+          score += earnedMarks;
+        }
+      }
+
+      try {
+        const timeTaken = (Number(testData.duration_minutes) * 60) - timeRemaining;
+        sessionStorage.setItem('examResult', JSON.stringify({
+          score, correct, wrong, unattempted, timeTaken, totalQuestions: questions.length, 
+          testId: testData.id, examType: testData.examType || "JEE", testTitle: testData.title,
+          responses: responses
+        }));
+
+        const user = auth.currentUser;
+        if (user) {
+          await addDoc(collection(db, 'results'), {
+            userId: user.uid, testId: testData.id, testTitle: testData.title, 
+            score, correct, wrong, timeTaken, submittedAt: serverTimestamp(),
+            responses: responses
+          }).catch(e => console.log(e));
+        }
+        window.location.href = 'result.html';
+      } catch (err) {
+        document.querySelector('.spinner').style.display = 'none'; 
+        document.getElementById('load-text').innerText = "Network Error saving results: " + err.message;
+        document.getElementById('load-text').style.color = "red";
+      }
+    };
+  </script>
+</body>
+</html>
