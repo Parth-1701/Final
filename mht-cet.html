@@ -442,13 +442,13 @@ function renderTests() {
       <div class="tc-sub">${escHtml(t.description || t.year || '')}</div>
       <div class="tc-meta">
         <div class="tc-pill">⏱ ${duration} min</div>
-        <div class="tc-pill">❓ ${t.totalQuestions || 90} Qs</div>
-        <div class="tc-pill">📊 ${t.totalMarks || 300} marks</div>
+        <div class="tc-pill">❓ ${t.totalQuestions || 150} Qs</div>
+        <div class="tc-pill">📊 ${t.totalMarks || 200} marks</div>
         ${t.sections ? `<div class="tc-pill">📚 ${t.sections.length} sections</div>` : ''}
       </div>
       <div class="tc-footer">
         ${result
-          ? `<div class="tc-completed">✓ ${result.score}/${t.totalMarks||300} · Best score</div>`
+          ? `<div class="tc-completed">✓ ${result.score}/${t.totalMarks||200} · Best score</div>`
           : `<div class="tc-attempts"><strong>${attempts.toLocaleString()}</strong> attempts</div>`
         }
         <button class="tc-start" onclick="event.stopPropagation();startTest('${t.id}','${escHtml(t.title)}')">
