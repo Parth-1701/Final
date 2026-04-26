@@ -448,7 +448,7 @@ function renderTests() {
       </div>
       <div class="tc-footer">
         ${result
-          ? `<div class="tc-completed">✓ ${result.score}/${t.totalMarks||300} · Best score</div>`
+          ? `<div class="tc-completed">✓ ${result.score}/${t.totalMarks||180} · Best score</div>`
           : `<div class="tc-attempts"><strong>${attempts.toLocaleString()}</strong> attempts</div>`
         }
         <button class="tc-start" onclick="event.stopPropagation();startTest('${t.id}','${escHtml(t.title)}')">
