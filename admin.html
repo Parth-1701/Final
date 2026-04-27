@@ -193,6 +193,7 @@
         await addDoc(collection(db, 'tests'), {
           title, examType: type, duration_minutes: duration,
           isPremium, isPublished, 
+          solutionPdf: document.getElementById('test-pdf').value.trim(), // <--- NEW LINE
           questions: [], 
           createdAt: serverTimestamp()
         });
