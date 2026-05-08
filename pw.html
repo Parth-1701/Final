@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable — Video Courses</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
+      --border: #2a2a3d; --accent: #6c63ff; --accent2: #ff6b6b;
+      --text: #e8e8f0; --text-muted: #6b6b8a; --text-dim: #9999b8;
+      --glow: rgba(108,99,255,0.3);
+    }
+    
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    body::before { content:''; position:fixed; inset:0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; }
+
+    /* ── MINIMAL NAV ── */
+    nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:flex-start; gap: 1rem; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; letter-spacing:-0.02em; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px var(--accent); }
+    
+    /* ── PAGE CONTENT ── */
+    .page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .page-header { text-align: center; margin-bottom: 4rem; animation: fadeUp 0.6s ease both; }
+    .section-label { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.75rem; }
+    .page-title { font-family:'Syne',sans-serif; font-size:clamp(2rem, 5vw, 3.5rem); font-weight:800; letter-spacing:-0.02em; margin-bottom: 1rem; }
+    .page-sub { color:var(--text-muted); font-size:1.1rem; max-width:540px; margin: 0 auto; line-height:1.7; }
+
+    /* ── COURSES GRID ── */
+    .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
+    
+    .course-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px; 
+      overflow: hidden; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: var(--text);
+      display: flex; flex-direction: column; position: relative; animation: fadeUp 0.6s 0.2s ease both;
+    }
+    .course-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    
+    .course-thumb { width: 100%; height: 180px; background: linear-gradient(135deg, rgba(108,99,255,0.2), rgba(10,10,15,1)); display: flex; align-items: center; justify-content: center; font-size: 3rem; border-bottom: 1px solid var(--border); }
+    .course-content { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+    .course-title { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3; }
+    .course-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; margin-bottom: 1.5rem; flex: 1; }
+    .course-meta { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .meta-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.75rem; font-family: 'DM Mono', monospace; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+    .course-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1rem; }
+    .course-price { font-weight: 700; font-family: 'DM Mono', monospace; color: var(--accent3, #43e97b); }
+    .course-cta { font-size: 0.875rem; font-weight: 500; color: var(--accent); transition: gap 0.2s; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index" class="nav-logo">
+    <div class="logo-dot"></div>
+    Quizable<span></span>
+  </a>
+  <div style="height: 20px; width: 1px; background: var(--border); margin: 0 10px;"></div>
+  <a href="index" style="color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s;">
+    ← Back to Dashboard
+  </a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="container">
+    <div class="page-header">
+      <div class="section-label">// Learn from the best</div>
+      <h1 class="page-title">Masterclasses</h1>
+      <p class="page-sub">Deep-dive video lectures, concept breakdowns, and problem-solving strategies for JEE and MHT CET.</p>
+    </div>
+
+    <div class="courses-grid">
+      <a href="course-view" class="course-card">
+        <div class="course-thumb" style="background: linear-gradient(135deg, rgba(108,99,255,0.2), var(--surface));">⚛️</div>
+        <div class="course-content">
+          <h3 class="course-title">Arjuna 2026</h3>
+          <p class="course-desc">Free Lectures.</p>
+          <div class="course-meta">
+            <span class="meta-pill">▶️ Full Playlist</span>
+          </div>
+          <div class="course-footer">
+            <span class="course-price">Premium</span>
+            <span class="course-cta">View Course →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
