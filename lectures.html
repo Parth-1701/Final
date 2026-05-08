@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable — Course Player</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
+      --border: #2a2a3d; --accent: #6c63ff; 
+      --text: #e8e8f0; --text-muted: #6b6b8a; --text-dim: #9999b8;
+    }
+    
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── MINIMAL NAV ── */
+    nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:flex-start; gap: 1rem; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .nav-back { color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s; }
+    .nav-back:hover { color: var(--accent); }
+
+    /* ── PLAYER LAYOUT ── */
+    .player-container { margin-top: 64px; flex: 1; display: grid; grid-template-columns: 1fr 380px; height: calc(100vh - 64px); }
+    
+    /* LEFT: Video Area */
+    .video-section { padding: 2rem; overflow-y: auto; }
+    .video-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 2rem; border: 1px solid var(--border); }
+    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+    
+    .course-header h1 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .course-header p { color: var(--text-dim); line-height: 1.6; font-size: 1rem; max-width: 800px; }
+
+    /* RIGHT: Playlist Sidebar */
+    .playlist-section { background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; }
+    .playlist-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+    .playlist-header h3 { font-family: 'Syne', sans-serif; font-size: 1.2rem; margin-bottom: 0.3rem; }
+    .playlist-header p { font-size: 0.8rem; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+
+    .playlist-items { overflow-y: auto; flex: 1; }
+    .lecture-item { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; display: flex; gap: 1rem; align-items: flex-start; }
+    .lecture-item:hover { background: var(--surface2); }
+    .lecture-item.active { background: rgba(108,99,255,0.1); border-left: 4px solid var(--accent); padding-left: calc(1.5rem - 4px); }
+    
+    .lecture-num { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+    .lecture-item.active .lecture-num { color: var(--accent); }
+    .lecture-details h4 { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.3rem; color: var(--text); }
+    .lecture-item.active .lecture-details h4 { color: var(--accent); font-weight: 700; }
+    .lecture-details p { font-size: 0.8rem; color: var(--text-dim); display: flex; gap: 10px; align-items: center; }
+
+    @media(max-width: 900px) {
+      .player-container { grid-template-columns: 1fr; display: flex; flex-direction: column; height: auto; }
+      .playlist-section { border-left: none; border-top: 1px solid var(--border); height: 500px; }
+      .video-section { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index" class="nav-logo">
+    <div class="logo-dot"></div> Quizable<span></span>
+  </a>
+  <div style="height: 20px; width: 1px; background: var(--border); margin: 0 10px;"></div>
+  <a href="courses" class="nav-back">← Back to Courses</a>
+</nav>
+
+<div class="player-container">
+  
+  <div class="video-section">
+    <div class="video-wrapper">
+      <iframe id="main-player" src="" allowfullscreen></iframe>
+    </div>
+    
+    <div class="course-header">
+      <h1>JEE Advanced Physics: Mechanics</h1>
+      <p>Master rotational dynamics, rigid body motion, and complex multi-concept mechanics problems designed specifically for the advanced paper.</p>
+    </div>
+  </div>
+
+  <div class="playlist-section">
+    <div class="playlist-header">
+      <h3>Course Modules</h3>
+      <p>Loading...</p>
+    </div>
+    
+    <div class="playlist-items"></div>
+  </div>
+
+</div>
+
+<script>
+  // Replace these with your actual details!
+  const YOUTUBE_API_KEY = 'AIzaSy_YOUR_REAL_API_KEY_HERE'; 
+  const PLAYLIST_ID = 'PLBCF2DAC6FFB574DE'; 
+
+  // Function: Update player + styling on click (Includes Ad/Related-Video suppressors)
+  window.playVideo = function(element, youtubeId) {
+    document.getElementById('main-player').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`;
+    
+    const items = document.querySelectorAll('.lecture-item');
+    items.forEach(item => item.classList.remove('active'));
+    element.classList.add('active');
+  };
+
+  // Function: Fetch Playlist & Build Sidebar
+  async function loadPlaylist() {
+    const playlistContainer = document.querySelector('.playlist-items');
+    playlistContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-dim);">Loading lectures...</div>';
+
+    try {
+      const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${PLAYLIST_ID}&key=${YOUTUBE_API_KEY}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      playlistContainer.innerHTML = ''; // Clear loader text
+
+      data.items.forEach((item, index) => {
+        const title = item.snippet.title;
+        const videoId = item.snippet.resourceId.videoId;
+        
+        // Skip hidden/deleted videos
+        if (title === "Private video" || title === "Deleted video") return; 
+
+        const lectureNum = String(index + 1).padStart(2, '0');
+        const isActive = index === 0 ? 'active' : '';
+
+        // Inject Sidebar Button
+        playlistContainer.innerHTML += `
+          <div class="lecture-item ${isActive}" onclick="playVideo(this, '${videoId}')">
+            <div class="lecture-num">${lectureNum}</div>
+            <div class="lecture-details">
+              <h4>${title}</h4>
+              <p><span>▶️ Video Lecture</span></p>
+            </div>
+          </div>
+        `;
+
+        // Pre-load the first video automatically
+        if (index === 0) {
+          document.getElementById('main-player').src = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
+        }
+      });
+
+      // Update total lecture count in the header
+      document.querySelector('.playlist-header p').textContent = `${data.items.length} Lectures`;
+
+    } catch (error) {
+      playlistContainer.innerHTML = '<div style="padding: 20px; color: #ff6b6b;">Error loading playlist. Did you set up the API Key?</div>';
+      console.error("YouTube API Error:", error);
+    }
+  }
+
+  // Initialize
+  loadPlaylist();
+</script>
+
+</body>
+</html>
