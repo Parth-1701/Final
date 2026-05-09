@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable — Pricing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
+      --border: #2a2a3d; --accent: #6c63ff; 
+      --text: #e8e8f0; --text-muted: #6b6b8a; --text-dim: #9999b8;
+      --success: #43e97b; --gold: #ffd700;
+    }
+    
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:0;
+    }
+
+    /* ── NAV ── */
+    nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; gap: 1rem; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .nav-back { color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s; }
+    .nav-back:hover { color: var(--accent); }
+
+    /* ── PRICING LAYOUT ── */
+    .page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; }
+    .container { max-width: 1000px; margin: 0 auto; text-align: center; }
+    .hero-glow { position:absolute; width:600px; height:600px; background: radial-gradient(circle, rgba(108,99,255,0.1) 0%, transparent 60%); top: 0; left:50%; transform:translate(-50%,-20%); pointer-events:none; z-index: -1; }
+
+    .page-title { font-family:'Syne',sans-serif; font-size:clamp(2rem, 5vw, 3.5rem); font-weight:800; letter-spacing:-0.02em; margin-bottom: 1rem; animation: fadeUp 0.6s ease both; }
+    .page-sub { color:var(--text-dim); font-size:1.1rem; max-width:600px; margin: 0 auto 2.5rem; line-height:1.7; animation: fadeUp 0.6s 0.1s ease both; }
+
+    /* ── BILLING TOGGLE ── */
+    .toggle-container { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 4rem; animation: fadeUp 0.6s 0.15s ease both; }
+    .toggle-label { font-size: 1rem; font-weight: 600; color: var(--text-dim); transition: color 0.3s; cursor: pointer; }
+    .toggle-label.active { color: var(--text); }
+    .toggle-switch { width: 60px; height: 32px; background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; position: relative; cursor: pointer; transition: background 0.3s; }
+    .toggle-slider { width: 24px; height: 24px; background: var(--accent); border-radius: 50%; position: absolute; top: 3px; left: 4px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 0 10px rgba(108,99,255,0.4); }
+    .toggle-container.annual-active .toggle-switch { background: rgba(108,99,255,0.1); border-color: var(--accent); }
+    .toggle-container.annual-active .toggle-slider { transform: translateX(26px); }
+
+    .save-badge { background: rgba(67, 233, 123, 0.15); color: var(--success); font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid rgba(67, 233, 123, 0.3); margin-left: 0.5rem; text-transform: uppercase; }
+
+    /* ── PRICING CARDS ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; align-items: stretch; animation: fadeUp 0.6s 0.2s ease both; }
+    .pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 3rem 2rem; display: flex; flex-direction: column; text-align: left; position: relative; transition: all 0.3s ease; }
+    .pricing-card:hover { transform: translateY(-5px); }
+    
+    .card-gold { border-top: 4px solid var(--gold); }
+    .card-gold:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.1); border-color: rgba(255, 215, 0, 0.4); }
+    
+    .card-platinum { border-top: 4px solid var(--accent); background: linear-gradient(180deg, var(--surface2) 0%, var(--surface) 100%); }
+    .card-platinum:hover { box-shadow: 0 15px 40px rgba(108, 99, 255, 0.15); border-color: var(--accent); }
+    
+    .popular-badge { position: absolute; top: -12px; right: 2rem; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.3rem 0.8rem; border-radius: 99px; }
+    
+    .discount-label { font-size: 0.8rem; color: var(--success); font-weight: 700; opacity: 0; transition: opacity 0.3s; height: 0; margin-bottom: 0; }
+    .annual-active .discount-label { opacity: 1; height: auto; margin-bottom: 0.5rem; }
+
+    .plan-name { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .plan-price { font-family: 'DM Mono', monospace; font-size: 3rem; font-weight: 500; color: var(--text); margin-bottom: 0.5rem; display: flex; align-items: baseline; gap: 0.5rem; transition: all 0.3s; }
+    .plan-price span { font-size: 1rem; color: var(--text-muted); }
+    .plan-desc { color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; }
+
+    .features-list { list-style: none; margin-bottom: 2.5rem; flex: 1; }
+    .features-list li { display: flex; gap: 0.8rem; align-items: flex-start; margin-bottom: 1rem; color: var(--text); font-size: 0.95rem; line-height: 1.5; }
+    .check { color: var(--success); font-weight: bold; }
+
+    .btn-buy { width: 100%; border: none; padding: 1.2rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-gold { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-gold:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-platinum { background: var(--accent); color: #fff; }
+    .btn-platinum:hover { background: #5a52d5; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(108,99,255,0.3); }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo"><div class="logo-dot"></div> Quizable<span>.</span></a>
+  <div style="height: 20px; width: 1px; background: var(--border); margin: 0 10px;"></div>
+  <a href="/" class="nav-back">← Dashboard</a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="hero-glow"></div>
+  <div class="container">
+    
+    <h1 class="page-title">Accelerate your preparation.</h1>
+    <p class="page-sub">Choose the plan that fits your study style. Unlock full mock tests, detailed analytics, and elite video masterclasses.</p>
+
+    <div class="toggle-container" id="toggle-container">
+      <span class="toggle-label active" id="label-monthly" onclick="setBilling('monthly')">Monthly</span>
+      <div class="toggle-switch" onclick="toggleBilling()">
+        <div class="toggle-slider"></div>
+      </div>
+      <span class="toggle-label" id="label-annual" onclick="setBilling('annual')">Annually <span class="save-badge">Save up to 37%</span></span>
+    </div>
+
+    <div class="pricing-grid">
+      
+      <div class="pricing-card card-gold">
+        <h3 class="plan-name">Gold</h3>
+        <div class="discount-label">Save ₹389 a year</div>
+        <div class="plan-price" id="price-gold">₹99 <span>/ month</span></div>
+        <p class="plan-desc">The ultimate testing suite to perfect your exam strategy and time management.</p>
+        
+        <ul class="features-list">
+          <li><span class="check">✓</span> All Premium Mock Tests for JEE, MHT CET, and BITSAT.</li>
+          <li><span class="check">✓</span> Chapter-wise quizzes and assignments.</li>
+          <li><span class="check">✓</span> Deep-dive Post-Test Analytics & Leaderboard.</li>
+          <li><span class="check">✓</span> Percentile Predictor access.</li>
+        </ul>
+        
+        <button class="btn-buy btn-gold" onclick="triggerPayment('gold')">Unlock Gold</button>
+      </div>
+
+      <div class="pricing-card card-platinum">
+        <div class="popular-badge">Most Popular</div>
+        <h3 class="plan-name">Platinum</h3>
+        <div class="discount-label">Save ₹889 a year</div>
+        <div class="plan-price" id="price-platinum">₹199 <span>/ month</span></div>
+        <p class="plan-desc">Complete access to tests plus high-yield video lectures to master the toughest concepts.</p>
+        
+        <ul class="features-list">
+          <li><span class="check">✓</span> <strong>Everything in Gold Plan</strong></li>
+          <li><span class="check">✓</span> Unlimited access to all Video Masterclasses.</li>
+          <li><span class="check">✓</span> Exclusive Ad-Free video hosting.</li>
+          <li><span class="check">✓</span> Video solutions for complex mock test problems.</li>
+          <li><span class="check">✓</span> Priority email support.</li>
+        </ul>
+        
+        <button class="btn-buy btn-platinum" onclick="triggerPayment('platinum')">Unlock Platinum</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+      apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+      authDomain: "sigmascore300.firebaseapp.com",
+      projectId: "sigmascore300"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // ── PRICING STATE & LOGIC ──
+  let billingCycle = 'monthly'; // Defaults to monthly
+
+  const pricingData = {
+    gold: {
+      monthly: { price: '₹99', suffix: '/ month', amountPaise: 9900 },
+      annual: { price: '₹799', suffix: '/ year', amountPaise: 79900 } // ₹99 * 12 = 1188. Saving ₹389!
+    },
+    platinum: {
+      monthly: { price: '₹199', suffix: '/ month', amountPaise: 19900 },
+      annual: { price: '₹1499', suffix: '/ year', amountPaise: 149900 } // ₹199 * 12 = 2388. Saving ₹889!
+    }
+  };
+
+  // Toggle Function attached to the switch
+  window.toggleBilling = function() {
+    setBilling(billingCycle === 'monthly' ? 'annual' : 'monthly');
+  };
+
+  // Specific setter function
+  window.setBilling = function(cycle) {
+    billingCycle = cycle;
+    const container = document.getElementById('toggle-container');
+    
+    if (cycle === 'annual') {
+      container.classList.add('annual-active');
+      document.getElementById('label-annual').classList.add('active');
+      document.getElementById('label-monthly').classList.remove('active');
+    } else {
+      container.classList.remove('annual-active');
+      document.getElementById('label-monthly').classList.add('active');
+      document.getElementById('label-annual').classList.remove('active');
+    }
+
+    // Update UI Prices
+    document.getElementById('price-gold').innerHTML = `${pricingData.gold[cycle].price} <span>${pricingData.gold[cycle].suffix}</span>`;
+    document.getElementById('price-platinum').innerHTML = `${pricingData.platinum[cycle].price} <span>${pricingData.platinum[cycle].suffix}</span>`;
+  };
+
+  // ── PAYMENT GATEWAY LOGIC ──
+  window.triggerPayment = function(tier) {
+    const currentUser = auth.currentUser;
+    
+    if (!currentUser) {
+      alert("Please log in to your account first!");
+      window.location.href = "/";
+      return;
+    }
+
+    // Determine exact amount and the specific plan string based on the current toggle state
+    const currentPrice = pricingData[tier][billingCycle].amountPaise;
+    const backendPlanType = `${tier}_${billingCycle}`; // e.g., "gold_monthly" or "platinum_annual"
+
+    var options = {
+      "key": "rzp_live_YOUR_KEY_HERE",
+      "amount": currentPrice, 
+      "currency": "INR",
+      "name": "Quizable",
+      "description": `Quizable ${tier.charAt(0).toUpperCase() + tier.slice(1)} - ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}`,
+      "theme": {
+        "color": tier === 'gold' ? "#ffd700" : "#6c63ff"
+      },
+      "notes": {
+        "firebase_uid": currentUser.uid,
+        "plan_type": backendPlanType // SUPER IMPORTANT: This tells Make.com EXACTLY what they bought
+      },
+      "handler": function (response) {
+        alert(`Payment Successful! Welcome to Quizable ${tier.toUpperCase()}.`);
+        setTimeout(() => { window.location.href = "/profile"; }, 2500);
+      }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+  };
+</script>
+
+</body>
+</html>
