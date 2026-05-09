@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable — Coming Soon</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: #2a2a3d;
+      --accent: #6c63ff;
+      --text: #e8e8f0;
+      --text-muted: #6b6b8a;
+      --text-dim: #9999b8;
+      --glow: rgba(108,99,255,0.3);
+    }
+    
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:0;
+    }
+
+    /* ── MINIMAL NAV ── */
+    nav {
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      display:flex; align-items:center; justify-content:flex-start; gap: 1rem;
+      padding: 0 2.5rem; height: 64px;
+      background: rgba(10,10,15,0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800;
+      letter-spacing:-0.02em; display:flex; align-items:center; gap:0.5rem;
+      text-decoration: none; color: var(--text);
+    }
+    .nav-logo span { color:var(--accent); }
+    .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+    /* ── PAGE CONTENT ── */
+    .page-wrapper {
+      position: relative; z-index: 1; flex: 1; 
+      display: flex; align-items: center; justify-content: center;
+      padding: 100px 2rem 4rem;
+    }
+    
+    .hero-glow {
+      position:absolute; width:700px; height:700px;
+      background: radial-gradient(circle, rgba(108,99,255,0.08) 0%, transparent 60%);
+      top: 50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index: -1;
+    }
+
+    .coming-soon-container {
+      max-width: 600px; text-align: center;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .badge {
+      display:inline-flex; align-items:center; gap:0.5rem;
+      background:rgba(108,99,255,0.1); border:1px solid rgba(108,99,255,0.3);
+      border-radius:99px; padding:0.35rem 1.2rem;
+      font-size:0.75rem; font-family:'DM Mono',monospace;
+      color:var(--accent); margin-bottom:1.5rem; text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    .title {
+      font-family:'Syne',sans-serif; font-size:clamp(2.5rem, 6vw, 4rem);
+      font-weight:800; letter-spacing:-0.03em; margin-bottom: 1rem; line-height: 1.1;
+    }
+    .title em { font-style:normal; background: linear-gradient(135deg, var(--accent), #a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .subtitle { color:var(--text-dim); font-size:1.1rem; line-height:1.7; margin-bottom: 2.5rem; }
+
+    /* ── COUNTDOWN TIMER ── */
+    .countdown {
+      display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem;
+    }
+    .time-box {
+      background: rgba(108,99,255,0.05); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.2rem 1.5rem; min-width: 90px;
+      text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .time-box span {
+      font-family: 'DM Mono', monospace; font-size: 2.2rem; font-weight: 500;
+      color: var(--accent); display: block; line-height: 1; margin-bottom: 0.5rem;
+    }
+    .time-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+    /* ── EMAIL FORM ── */
+    .notify-form {
+      display: flex; gap: 0.5rem; max-width: 420px; margin: 0 auto;
+      background: var(--surface2); padding: 0.5rem; border-radius: 12px;
+      border: 1px solid var(--border); transition: border-color 0.3s;
+    }
+    .notify-form:focus-within { border-color: var(--accent); box-shadow: 0 0 15px var(--glow); }
+    .notify-input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); padding: 0.5rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; }
+    .notify-input::placeholder { color: var(--text-muted); }
+    .notify-btn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+    .notify-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px var(--glow); }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    @media(max-width: 600px) {
+      .countdown { gap: 0.5rem; }
+      .time-box { padding: 1rem; min-width: 70px; }
+      .time-box span { font-size: 1.6rem; }
+      .notify-form { flex-direction: column; background: transparent; border: none; padding: 0; }
+      .notify-form:focus-within { box-shadow: none; }
+      .notify-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 0.5rem; }
+      .notify-btn { width: 100%; padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo"><div class="logo-dot"></div> Quizable<span></span></a>
+  <div style="height: 20px; width: 1px; background: var(--border); margin: 0 10px;"></div>
+  <a href="/" style="color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s;">← Back to Dashboard</a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="hero-glow"></div>
+  
+  <div class="coming-soon-container">
+    <div class="badge">In Development</div>
+    <h1 class="title">Something <em>massive</em> is brewing.</h1>
+    <p class="subtitle">We are currently building out this section of the platform to bring you the highest quality preparation tools. Dropping in:</p>
+
+    <div class="countdown" id="countdown-ui">
+      <div class="time-box"><span id="cd-days">00</span><div class="time-label">Days</div></div>
+      <div class="time-box"><span id="cd-hours">00</span><div class="time-label">Hours</div></div>
+      <div class="time-box"><span id="cd-minutes">00</span><div class="time-label">Mins</div></div>
+      <div class="time-box"><span id="cd-seconds">00</span><div class="time-label">Secs</div></div>
+    </div>
+
+    <form class="notify-form" onsubmit="handleNotifySubmit(event)">
+      <input type="email" id="notify-email" class="notify-input" placeholder="Enter your email address" required />
+      <button type="submit" class="notify-btn" id="notify-submit-btn">Notify Me</button>
+    </form>
+    
+    <div id="notify-message" style="margin-top: 1rem; font-size: 0.85rem; color: #43e97b; display: none;">
+      You're on the list! We'll be in touch soon.
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── COUNTDOWN LOGIC ──
+  // Set your exact launch date and time here!
+  const launchDate = new Date("July 15, 2026 10:00:00").getTime();
+
+  const timer = setInterval(function() {
+    const now = new Date().getTime();
+    const distance = launchDate - now;
+
+    // Time calculations
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Output the result
+    document.getElementById("cd-days").innerText = String(days).padStart(2, '0');
+    document.getElementById("cd-hours").innerText = String(hours).padStart(2, '0');
+    document.getElementById("cd-minutes").innerText = String(minutes).padStart(2, '0');
+    document.getElementById("cd-seconds").innerText = String(seconds).padStart(2, '0');
+
+    // If the count down is finished
+    if (distance < 0) {
+      clearInterval(timer);
+      document.getElementById("countdown-ui").innerHTML = "<div style='font-family: Syne, sans-serif; font-size: 1.5rem; color: var(--accent); margin-bottom: 1rem; font-weight: bold;'>We are Live!</div>";
+    }
+  }, 1000);
+
+  // ── WAITLIST LOGIC ──
+  window.handleNotifySubmit = async function(event) {
+    event.preventDefault();
+    const emailInput = document.getElementById('notify-email');
+    const btn = document.getElementById('notify-submit-btn');
+    const msg = document.getElementById('notify-message');
+
+    if (!emailInput.value.trim()) return;
+
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+    try {
+      // Simulate network delay for UI (Replace with Firebase addDoc later if needed)
+      await new Promise(r => setTimeout(r, 800));
+
+      emailInput.style.display = 'none';
+      btn.style.display = 'none';
+      msg.style.display = 'block';
+    } catch (error) {
+      btn.disabled = false;
+      btn.textContent = "Try Again";
+    }
+  };
+</script>
+
+</body>
+</html>
