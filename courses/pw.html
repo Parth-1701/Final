@@ -8,88 +8,51 @@
  <style>
     :root {
       --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
-      --border: #2a2a3d; --accent: #6c63ff; 
+      --border: #2a2a3d; --accent: #6c63ff; --accent2: #ff6b6b;
       --text: #e8e8f0; --text-muted: #6b6b8a; --text-dim: #9999b8;
+      --glow: rgba(108,99,255,0.3);
     }
     
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 100px 1.5rem 4rem; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    body::before { content:''; position:fixed; inset:0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; }
 
-    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; height: 64px; background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
-    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; text-decoration: none; color: white; font-size: 1.2rem; }
-    .nav-logo span { color: var(--accent); }
-    .back-link { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; }
+    /* ── MINIMAL NAV ── */
+    nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:flex-start; gap: 1rem; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; letter-spacing:-0.02em; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px var(--accent); }
+    
+    /* ── PAGE CONTENT ── */
+    .page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .page-header { text-align: center; margin-bottom: 4rem; animation: fadeUp 0.6s ease both; }
+    .section-label { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.75rem; }
+    .page-title { font-family:'Syne',sans-serif; font-size:clamp(2rem, 5vw, 3.5rem); font-weight:800; letter-spacing:-0.02em; margin-bottom: 1rem; }
+    .page-sub { color:var(--text-muted); font-size:1.1rem; max-width:540px; margin: 0 auto; line-height:1.7; }
 
-    .container { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 2rem; }
-
-    /* ── MINIMALIST PARTNER CARD ── */
+    /* ── COURSES GRID ── */
+    .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
+    
     .course-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      text-decoration: none;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px; 
+      overflow: hidden; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: var(--text);
+      display: flex; flex-direction: column; position: relative; animation: fadeUp 0.6s 0.2s ease both;
     }
-
-    .course-card:hover {
-      transform: translateY(-8px);
-      border-color: var(--accent);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    }
-
-    .banner-wrapper {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: var(--surface2);
-      overflow: hidden;
-    }
-
-    .banner-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s ease;
-    }
-    .course-card:hover .banner-img { transform: scale(1.05); }
-
+    .course-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    
+    .course-thumb { width: 100%; height: 180px; background: linear-gradient(135deg, rgba(108,99,255,0.2), rgba(10,10,15,1)); display: flex; align-items: center; justify-content: center; font-size: 3rem; border-bottom: 1px solid var(--border); }
     .course-content { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+    .course-title { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3; }
+    .course-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; margin-bottom: 1.5rem; flex: 1; }
+    .course-meta { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .meta-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.75rem; font-family: 'DM Mono', monospace; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+    .course-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1rem; }
+    .course-price { font-weight: 700; font-family: 'DM Mono', monospace; color: var(--accent3, #43e97b); }
+    .course-cta { font-size: 0.875rem; font-weight: 500; color: var(--accent); transition: gap 0.2s; }
 
-    .institute-tag { 
-      font-family: 'DM Sans', sans-serif; 
-      font-weight: 700; color: var(--accent); 
-      font-size: 0.75rem; text-transform: uppercase; 
-      letter-spacing: 0.05em; margin-bottom: 0.5rem; 
-    }
-
-    .course-title { 
-      font-family: 'Syne', sans-serif; font-size: 1.4rem; 
-      font-weight: 800; color: #fff; margin-bottom: 1rem; 
-      line-height: 1.3;
-    }
-
-    .description { 
-      color: var(--text-dim); font-size: 0.9rem; 
-      line-height: 1.5; margin-bottom: 1.5rem; 
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-    }
-
-    .card-footer {
-      margin-top: auto; padding-top: 1rem;
-      border-top: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      color: var(--text-muted); font-size: 0.85rem;
-    }
-
-    .redirect-label { color: var(--accent); font-weight: 600; display: flex; align-items: center; gap: 6px; }
-
-    #loading { grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-muted); }
-
-    @media(max-width: 600px) { .container { grid-template-columns: 1fr; } }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
   </style>
-
 </head>
 <body>
 
