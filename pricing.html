@@ -111,21 +111,21 @@
       
       <div class="pricing-card card-gold">
         <h3 class="plan-name">Gold</h3>
-        <div class="discount-label">Save ₹389 a year</div>
-        <div class="plan-price" id="price-gold">₹99 <span>/ month</span></div>
+        <div class="discount-label">Save ₹60 a year</div>
+        <div class="plan-price" id="price-gold">₹15 <span>/ month</span></div>
         <p class="plan-desc">The ultimate testing suite to perfect your exam strategy and time management.</p>
         
         <ul class="features-list">
           <li><span class="check">✓</span> All Premium Mock Tests for JEE, MHT CET, and BITSAT.</li>
           <li><span class="check">✓</span> Chapter-wise quizzes and assignments.</li>
           <li><span class="check">✓</span> Deep-dive Post-Test Analytics & Leaderboard.</li>
-          <li><span class="check">✓</span> Percentile Predictor access.</li>
+          <li><span class="check">✓</span> College Predictor access.</li>
         </ul>
         
         <button class="btn-buy btn-gold" onclick="triggerPayment('gold')">Unlock Gold</button>
       </div>
 
-      <div class="pricing-card card-platinum">
+  <!--    <div class="pricing-card card-platinum">
         <div class="popular-badge">Most Popular</div>
         <h3 class="plan-name">Platinum</h3>
         <div class="discount-label">Save ₹889 a year</div>
@@ -141,7 +141,7 @@
         </ul>
         
         <button class="btn-buy btn-platinum" onclick="triggerPayment('platinum')">Unlock Platinum</button>
-      </div>
+      </div>. -->
 
     </div>
   </div>
@@ -165,8 +165,8 @@
 
   const pricingData = {
     gold: {
-      monthly: { price: '₹99', suffix: '/ month', amountPaise: 9900 },
-      annual: { price: '₹799', suffix: '/ year', amountPaise: 79900 } // ₹99 * 12 = 1188. Saving ₹389!
+      monthly: { price: '₹15', suffix: '/ month', amountPaise: 1500 },
+      annual: { price: '₹120', suffix: '/ year', amountPaise: 12000 } // ₹99 * 12 = 1188. Saving ₹389!
     },
     platinum: {
       monthly: { price: '₹199', suffix: '/ month', amountPaise: 19900 },
