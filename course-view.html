@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable — Course Player</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@400;500&family=DM+Mono:wght@500&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26; --border: #2a2a3d; --accent: #6c63ff; --text: #e8e8f0; --text-muted: #6b6b8a; --text-dim: #9999b8; }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; gap: 1rem; padding: 0 2.5rem; height: 64px; background: rgba(10, 10, 15, 0.95); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none; }
+    .nav-logo span { color: var(--accent); }
+    .nav-back { color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s; }
+    .nav-back:hover { color: var(--accent); }
+
+    .layout { display: flex; flex: 1; margin-top: 64px; height: calc(100vh - 64px); overflow: hidden; }
+    
+    /* Main Video Area */
+    .video-area { flex: 1; display: flex; flex-direction: column; padding: 2rem; overflow-y: auto; }
+    .player-container { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-bottom: 2rem; }
+    iframe { width: 100%; height: 100%; border: none; }
+    
+    .course-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .course-desc { color: var(--text-dim); font-size: 1rem; line-height: 1.6; max-width: 800px; }
+
+    /* Sidebar (Video List) */
+    .sidebar { width: 350px; background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+    .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; }
+    .video-list { flex: 1; overflow-y: auto; }
+    .video-item { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+    .video-item:hover { background: var(--surface2); }
+    .video-item.active { border-left: 4px solid var(--accent); background: rgba(108,99,255,0.05); }
+    .vid-index { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    .vid-title { font-size: 0.9rem; font-weight: 500; color: var(--text); }
+
+    #loading-screen { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; color: var(--text-muted); }
+
+    @media(max-width: 900px) { .layout { flex-direction: column; overflow: auto; height: auto; } .sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border); } .video-area { padding: 1rem; } }
+  </style>
+</head>
+<body>
+
+<div id="loading-screen">Authenticating Access...</div>
+
+<nav>
+  <a href="/" class="nav-logo">Quizable<span>.</span></a>
+  <div style="height: 20px; width: 1px; background: var(--border); margin: 0 10px;"></div>
+  <a href="javascript:history.back()" class="nav-back">← Back</a>
+</nav>
+
+<div class="layout">
+  <div class="video-area">
+    <div class="player-container" id="player-wrapper">
+      </div>
+    <h1 class="course-title" id="c-title">Course Title</h1>
+    <p class="course-desc" id="c-desc">Course Description</p>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-header">Course Content</div>
+    <div class="video-list" id="vid-list">
+      </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = { apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk", authDomain: "sigmascore300.firebaseapp.com", projectId: "sigmascore300" };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentVideos = [];
+
+  // SECURITY GATEKEEPER
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      alert("Please log in to view courses.");
+      window.location.href = "/";
+      return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = urlParams.get('id');
+
+    if (!courseId) {
+      window.location.href = "/courses"; // Kick out if no ID provided
+      return;
+    }
+
+    try {
+      // 1. Fetch Course Data
+      const courseSnap = await getDoc(doc(db, "courses", courseId));
+      if (!courseSnap.exists()) throw new Error("Course not found");
+      const courseData = courseSnap.data();
+
+      // 2. Fetch User Data
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+      const userPlan = userSnap.exists() ? (userSnap.data().plan || "free") : "free";
+
+      // 3. ENFORCE PREMIUM (Only Platinum users get Masterclasses)
+      if (courseData.isPremium && userPlan !== "platinum") {
+        alert("This Masterclass is exclusive to Platinum members. Upgrade your account to unlock this content.");
+        window.location.href = "/pricing";
+        return;
+      }
+
+      // If they passed the checks, reveal the UI!
+      document.getElementById('loading-screen').style.display = 'none';
+      loadCourseUI(courseData);
+
+    } catch (e) {
+      console.error(e);
+      alert("Error loading course.");
+      window.location.href = "/courses";
+    }
+  });
+
+  function loadCourseUI(data) {
+    document.getElementById('c-title').textContent = data.title;
+    document.getElementById('c-desc').textContent = data.description;
+
+    const listContainer = document.getElementById('vid-list');
+    const playerWrapper = document.getElementById('player-wrapper');
+
+    // Scenario A: It's a YouTube Playlist
+    if (data.playlistId) {
+      playerWrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/videoseries?list=${data.playlistId}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+      listContainer.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--text-dim); font-size: 0.9rem;">This is a continuous playlist. Use the player controls to skip between videos.</div>`;
+    } 
+    // Scenario B: Manual Video Links
+    else if (data.videos && data.videos.length > 0) {
+      currentVideos = data.videos;
+      
+      // Build Sidebar List
+      currentVideos.forEach((vid, index) => {
+        listContainer.innerHTML += `
+          <div class="video-item" id="vid-item-${index}" onclick="playVideo(${index})">
+            <div class="vid-index">Module ${index + 1}</div>
+            <div class="vid-title">${vid.title}</div>
+          </div>
+        `;
+      });
+
+      // Automatically play the first video
+      window.playVideo(0);
+    } else {
+      playerWrapper.innerHTML = `<div style="display:flex; height:100%; align-items:center; justify-content:center; color: #fff;">No videos uploaded yet.</div>`;
+    }
+  }
+
+  // Function to switch videos in the iframe
+  window.playVideo = function(index) {
+    // Remove active class from all
+    document.querySelectorAll('.video-item').forEach(el => el.classList.remove('active'));
+    // Add active class to clicked
+    document.getElementById(`vid-item-${index}`).classList.add('active');
+
+    const vidUrl = currentVideos[index].url;
+    // Extract standard YouTube ID if they pasted a normal link instead of embed link
+    let embedUrl = vidUrl;
+    if (vidUrl.includes("watch?v=")) {
+      const vidId = vidUrl.split("watch?v=")[1].split("&")[0];
+      embedUrl = `https://www.youtube.com/embed/${vidId}`;
+    }
+
+    document.getElementById('player-wrapper').innerHTML = `<iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  };
+</script>
+
+</body>
+</html>
