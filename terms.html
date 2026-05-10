@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable — Terms of Service</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: #2a2a3d;
+      --accent: #6c63ff;
+      --text: #e8e8f0;
+      --text-muted: #6b6b8a;
+      --text-dim: #9999b8;
+      --warning: #ffbc2e;
+    }
+    
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh; overflow-x: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:0;
+    }
+
+    /* ── MINIMAL NAV ── */
+    nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:flex-start; gap: 1rem; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+    /* ── PAGE CONTENT ── */
+    .page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    
+    .hero-glow { position:absolute; width:600px; height:600px; background: radial-gradient(circle, rgba(108,99,255,0.08) 0%, transparent 70%); top: 0; left:50%; transform:translate(-50%,-30%); pointer-events:none; z-index: -1; }
+
+    .page-header { text-align: center; margin-bottom: 3rem; animation: fadeUp 0.6s ease both; }
+    .section-label { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.75rem; }
+    .page-title { font-family:'Syne',sans-serif; font-size:clamp(2rem, 4vw, 3rem); font-weight:800; letter-spacing:-0.02em; margin-bottom: 1rem; }
+    
+    /* ── LEGAL DOCUMENT STYLING ── */
+    .legal-doc { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 3rem 4rem; box-shadow: 0 12px 40px rgba(0,0,0,0.2); animation: fadeUp 0.6s 0.2s ease both; }
+    .legal-doc p { color: var(--text-dim); line-height: 1.8; margin-bottom: 1.5rem; font-size: 0.95rem; }
+    .legal-doc h2 { font-family: 'Syne', sans-serif; color: var(--text); font-size: 1.4rem; margin: 2.5rem 0 1rem 0; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    .legal-doc ul { color: var(--text-dim); margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8; font-size: 0.95rem; }
+    .legal-doc li { margin-bottom: 0.5rem; }
+    .legal-doc strong { color: var(--text); }
+    .last-updated { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--text-muted); text-align: right; margin-bottom: 2rem; }
+    
+    /* Strict Warning Box */
+    .highlight-box { background: rgba(255, 188, 46, 0.05); border-left: 4px solid var(--warning); padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0; }
+    .highlight-box h3 { color: var(--warning); font-family: 'Syne', sans-serif; margin-bottom: 0.5rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .highlight-box p { margin-bottom: 0; color: var(--text); font-size: 0.95rem; }
+
+    /* ── NEW STACKED FOOTER ── */
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 4rem 2rem 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; margin-top: auto; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; }
+    .footer-logo span { color: var(--accent); }
+    .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1rem; }
+    .footer-links a { color: var(--text-muted); font-size: 0.875rem; text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { color: var(--text-muted); font-size: 0.8rem; font-family: 'DM Mono', monospace; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    @media(max-width:768px) { .legal-doc { padding: 2rem; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo"><div class="logo-dot"></div> Quizable<span>.</span></a>
+  <div style="height: 20px; width: 1px; background: var(--border); margin: 0 10px;"></div>
+  <a href="/" style="color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s;">← Back to Dashboard</a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="hero-glow"></div>
+  <div class="container">
+    
+    <div class="page-header">
+      <div class="section-label">// Legal</div>
+      <h1 class="page-title">Terms of Service</h1>
+    </div>
+
+    <div class="legal-doc">
+      <div class="last-updated">Last Updated: May 2026</div>
+
+      <p>Welcome to Quizable ("we," "our," or "us"). By accessing or using the Quizable website (quizable.online) and our educational services, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please do not use our platform.</p>
+
+      <h2>1. User Accounts and Security</h2>
+      <p>To access our mock tests and video masterclasses, you must register for an account. You agree to provide accurate, current, and complete information during the registration process. You are entirely responsible for maintaining the confidentiality of your account password and for all activities that occur under your account.</p>
+
+      <div class="highlight-box">
+        <h3>⚠️ Account Sharing is Strictly Prohibited</h3>
+        <p>Your Quizable account, including Gold and Platinum subscriptions, is licensed for <strong>individual use only</strong>. Sharing your login credentials with friends, classmates, or across multiple users is a direct violation of these terms. Our security systems actively monitor for concurrent logins, unusual IP address hopping, and multi-device streaming.<br><br><strong>Penalty:</strong> If our system detects account sharing, your account will be permanently suspended immediately. <strong>No refunds will be issued</strong> for accounts terminated due to credential sharing.</p>
+      </div>
+
+      <h2>2. Intellectual Property Rights</h2>
+      <p>All content available on Quizable, including but not limited to video masterclasses, mock test questions, solutions, analytics software, graphics, and logos, is the exclusive property of Quizable. </p>
+      <ul>
+        <li>You may not download, record, screen-capture, or scrape any video content or test questions.</li>
+        <li>You may not redistribute, sell, or broadcast our content on YouTube, Telegram, or any other platform.</li>
+        <li>Violation of our copyright will result in immediate account termination and potential legal action.</li>
+      </ul>
+
+      <h2>3. Payments and Subscriptions</h2>
+      <p>Quizable offers premium access tiers (Gold and Platinum) billed either monthly or annually. By selecting a premium tier, you agree to pay the stated fees via our designated payment gateways.</p>
+      <p>All sales are final. Due to the digital nature of our educational content, we operate under a strict "No Refund" policy, except in specific cases of technical failure as outlined in our <a href="/refunds" style="color: var(--accent);">Refund Policy</a>.</p>
+
+      <h2>4. User Conduct & Leaderboard Integrity</h2>
+      <p>We strive to maintain a fair and highly competitive environment for all aspirants. While using Quizable, you agree NOT to:</p>
+      <ul>
+        <li>Use automated scripts, bots, or browser extensions to answer mock test questions.</li>
+        <li>Exploit bugs to artificially inflate your percentile or leaderboard rankings.</li>
+        <li>Harass or abuse other students, instructors, or support staff.</li>
+      </ul>
+      <p>Accounts found manipulating test scores will be permanently removed from all leaderboards without warning.</p>
+
+      <h2>5. Disclaimers and Limitation of Liability</h2>
+      <p>Quizable is an educational tool designed to assist in your preparation for engineering entrance exams (JEE, MHT CET, BITSAT). However, we <strong>do not guarantee</strong> admission into any college, specific percentiles, or exam rankings.</p>
+      <p>Our platform is provided on an "as-is" and "as available" basis. We are not liable for any direct, indirect, or consequential damages resulting from your use of the platform, including temporary server downtimes during your preparation.</p>
+
+      <h2>6. Account Termination</h2>
+      <p>We reserve the right to suspend or terminate your account at any time, without prior notice or liability, for any reason, including without limitation if you breach these Terms of Service. Upon termination, your right to use the service will immediately cease.</p>
+
+      <h2>7. Contact Information</h2>
+      <p>If you have any questions about these Terms, please contact our legal team at:<br>
+      <strong>Email:</strong> support@quizable.online</p>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Quizable<span>.</span></div>
+  <div class="footer-links">
+    <a href="/privacy">Privacy</a>
+    <a href="/terms" style="color: var(--text);">Terms</a>
+    <a href="/refunds">Refunds</a>
+    <a href="/contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Quizable. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
