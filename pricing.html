@@ -76,9 +76,20 @@
     .check { color: var(--success); font-weight: bold; }
 
     .btn-buy { width: 100%; border: none; padding: 1.2rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .btn-gold { background: transparent; color: var(--text); border: 1px solid var(--border); }
-    .btn-gold:hover { border-color: var(--gold); color: var(--gold); }
-    .btn-platinum { background: var(--accent); color: #fff; }
+.btn-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #DAA520 100%);
+  color: #1a1a26; /* Dark text for contrast */
+  border: none;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(218, 165, 32, 0.2);
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(218, 165, 32, 0.4);
+  background: linear-gradient(135deg, #FFE44D 0%, #FFD700 100%);
+}    .btn-platinum { background: var(--accent); color: #fff; }
     .btn-platinum:hover { background: #5a52d5; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(108,99,255,0.3); }
 
     @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
