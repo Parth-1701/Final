@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable — My Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
+      --border: #2a2a3d; --accent: #6c63ff; --accent-hover: #5a52d5;
+      --text: #e8e8f0; --text-muted: #6b6b8a; --text-dim: #9999b8;
+    }
+    
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:0;
+    }
+
+    /* ── MINIMAL NAV ── */
+    nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .nav-back { color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s; }
+    .nav-back:hover { color: var(--accent); }
+    .btn-logout { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; transition: all 0.2s; }
+    .btn-logout:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+    /* ── PROFILE LAYOUT ── */
+    .page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; display: flex; justify-content: center; }
+    .profile-container { width: 100%; max-width: 600px; animation: fadeUp 0.6s ease both; }
+    
+    .profile-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2.5rem; }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #a78bfa); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: #fff; box-shadow: 0 8px 20px rgba(108,99,255,0.3); }
+    .header-info h1 { font-family: 'Syne', sans-serif; font-size: 2rem; margin-bottom: 0.2rem; }
+    .header-info p { color: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 0.9rem; }
+    
+    /* ── STATUS BADGES ── */
+    .status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 99px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.5rem; }
+    .status-free { background: rgba(107, 107, 138, 0.1); color: var(--text-muted); border: 1px solid rgba(107, 107, 138, 0.3); }
+    .status-gold { background: rgba(255, 215, 0, 0.1); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.4); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); }
+    .status-platinum { background: rgba(229, 228, 226, 0.1); color: #e5e4e2; border: 1px solid rgba(229, 228, 226, 0.4); box-shadow: 0 0 15px rgba(229, 228, 226, 0.2); }
+
+    /* ── EDIT FORM ── */
+    .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-control { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 0.8rem 1rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; transition: border-color 0.2s; }
+    .form-control:focus { outline: none; border-color: var(--accent); }
+    .form-control:disabled { opacity: 0.6; cursor: not-allowed; }
+    
+    .btn-save { width: 100%; background: var(--accent); color: #fff; border: none; padding: 1rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 1rem; }
+    .btn-save:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(108,99,255,0.25); }
+    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    #update-msg { margin-top: 1rem; text-align: center; font-size: 0.9rem; font-weight: 500; display: none; }
+    .msg-success { color: #43e97b; }
+    .msg-error { color: #ff6b6b; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo"><div class="logo-dot"></div> Quizable<span>.</span></a>
+    <div style="height: 20px; width: 1px; background: var(--border); margin: 0 10px;"></div>
+    <a href="/" class="nav-back">← Dashboard</a>
+  </div>
+  <button class="btn-logout" onclick="logoutUser()">Log Out</button>
+</nav>
+
+<div class="page-wrapper">
+  <div class="profile-container">
+    
+    <div class="profile-header">
+      <div class="avatar" id="user-avatar">?</div>
+      <div class="header-info">
+        <h1 id="display-name">Loading...</h1>
+        <p id="display-email">fetching email...</p>
+        <div id="premium-status" class="status-badge status-free">Free Tier</div>
+      </div>
+    </div>
+
+    <div class="profile-card">
+      <form id="profile-form" onsubmit="handleProfileUpdate(event)">
+        
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="input-name" class="form-control" placeholder="Enter your full name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number (For UPI Verification)</label>
+          <input type="tel" id="input-phone" class="form-control" placeholder="e.g., +91 9876543210">
+        </div>
+
+        <div class="form-group">
+          <label>Target Exam</label>
+          <select id="input-exam" class="form-control">
+            <option value="none">Select an exam</option>
+            <option value="jee-main">JEE Main</option>
+            <option value="jee-adv">JEE Advanced</option>
+            <option value="mht-cet">MHT CET</option>
+            <option value="bitsat">BITSAT</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="input-email" class="form-control" disabled>
+        </div>
+
+        <button type="submit" class="btn-save" id="btn-save">Save Changes</button>
+        <div id="update-msg"></div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+      apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+      authDomain: "sigmascore300.firebaseapp.com",
+      projectId: "sigmascore300"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUid = null;
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "/"; 
+      return;
+    }
+    currentUid = user.uid;
+
+    const name = user.displayName || "Aspirant";
+    document.getElementById('display-name').textContent = name;
+    document.getElementById('display-email').textContent = user.email;
+    document.getElementById('input-name').value = user.displayName || "";
+    document.getElementById('input-email').value = user.email;
+    document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        
+        if (data.phone) document.getElementById('input-phone').value = data.phone;
+        if (data.targetExam) document.getElementById('input-exam').value = data.targetExam;
+
+        // NEW TIER LOGIC
+        const userPlan = data.plan || "free"; 
+        const statusBadge = document.getElementById('premium-status');
+        
+        if (userPlan === "platinum") {
+          statusBadge.textContent = "Platinum Member";
+          statusBadge.className = "status-badge status-platinum";
+        } else if (userPlan === "gold") {
+          statusBadge.textContent = "Gold Member";
+          statusBadge.className = "status-badge status-gold";
+        } else {
+          statusBadge.textContent = "Free Tier";
+          statusBadge.className = "status-badge status-free";
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching user data:", e);
+    }
+  });
+
+  window.handleProfileUpdate = async function(event) {
+    event.preventDefault();
+    const btn = document.getElementById('btn-save');
+    const msg = document.getElementById('update-msg');
+    
+    const newName = document.getElementById('input-name').value.trim();
+    const newPhone = document.getElementById('input-phone').value.trim();
+    const newExam = document.getElementById('input-exam').value;
+
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+    msg.style.display = "none";
+
+    try {
+      await updateProfile(auth.currentUser, { displayName: newName });
+      await setDoc(doc(db, "users", currentUid), {
+        name: newName,
+        phone: newPhone,
+        targetExam: newExam
+      }, { merge: true });
+
+      document.getElementById('display-name').textContent = newName;
+      document.getElementById('user-avatar').textContent = newName.charAt(0).toUpperCase();
+
+      msg.textContent = "Profile updated successfully!";
+      msg.className = "msg-success";
+      msg.style.display = "block";
+    } catch (error) {
+      msg.textContent = "Failed to update profile. Please try again.";
+      msg.className = "msg-error";
+      msg.style.display = "block";
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Save Changes";
+  };
+
+  window.logoutUser = function() {
+    signOut(auth).then(() => { window.location.href = "/"; });
+  };
+</script>
+
+</body>
+</html>
