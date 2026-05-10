@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizable — Course Directory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
+      --border: #2a2a3d; --accent: #6c63ff; 
+      --text: #e8e8f0; --text-muted: #6b6b8a; --text-dim: #9999b8;
+    }
+    
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:0;
+    }
+
+    /* ── DROPDOWN NAV ── */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; height: 64px; background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-left, .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-logo { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text); }
+    .nav-logo span { color: var(--accent); }
+    .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+    .upgrade-link { color: #ffd700; font-size: 0.9rem; font-weight: 600; text-decoration: none; display: none; transition: 0.2s; }
+    .upgrade-link:hover { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+
+    .dropdown { position: relative; }
+    .dropdown-btn { background: transparent; color: var(--text); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+    .dropdown-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .arrow { font-size: 0.7rem; transition: transform 0.3s ease; }
+    .dropdown.active .arrow { transform: rotate(180deg); }
+
+    .dropdown-content { position: absolute; top: calc(100% + 10px); right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 220px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .dropdown.active .dropdown-content { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown-content a, .dropdown-logout { display: block; width: 100%; text-align: left; padding: 12px 16px; color: var(--text); text-decoration: none; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; background: transparent; border: none; cursor: pointer; transition: background 0.2s; }
+    .dropdown-content a:hover, .dropdown-logout:hover { background: var(--surface2); color: var(--accent); }
+    .dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .dropdown-logout { color: #ff6b6b; font-weight: 500; }
+
+    /* ── PAGE CONTENT ── */
+    .page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; }
+    .container { max-width: 1000px; margin: 0 auto; text-align: center; }
+    .hero-glow { position:absolute; width:600px; height:600px; background: radial-gradient(circle, rgba(108,99,255,0.08) 0%, transparent 60%); top: 0; left:50%; transform:translate(-50%,-10%); pointer-events:none; z-index: -1; }
+
+    .page-header { margin-bottom: 4rem; animation: fadeUp 0.6s ease both; }
+    .section-label { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:1rem; }
+    .page-title { font-family:'Syne',sans-serif; font-size:clamp(2.5rem, 5vw, 3.5rem); font-weight:800; letter-spacing:-0.02em; margin-bottom: 1rem; }
+    .page-sub { color:var(--text-dim); font-size:1.1rem; max-width:600px; margin: 0 auto; line-height:1.7; }
+
+    /* ── DIRECTORY GRID ── */
+    .directory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; animation: fadeUp 0.6s 0.2s ease both; text-align: left; }
+    
+    .exam-directory-card { 
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px; 
+      padding: 2.5rem 2rem; display: flex; flex-direction: column; text-decoration: none; 
+      position: relative; overflow: hidden; transition: all 0.3s ease; 
+    }
+    
+    .exam-directory-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--card-accent, var(--accent)); opacity: 0; transition: opacity 0.3s;
+    }
+    
+    .exam-directory-card:hover { 
+      transform: translateY(-5px); 
+      border-color: var(--card-accent, var(--accent)); 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+    }
+    .exam-directory-card:hover::before { opacity: 1; }
+
+    /* Specific Exam Accents */
+    .dir-jee { --card-accent: #6c63ff; }
+    .dir-jee .dir-icon { background: rgba(108,99,255,0.1); color: #6c63ff; border: 1px solid rgba(108,99,255,0.2); }
+    
+    .dir-adv { --card-accent: #ff6b6b; }
+    .dir-adv .dir-icon { background: rgba(255,107,107,0.1); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.2); }
+    
+    .dir-mhtcet { --card-accent: #43e97b; }
+    .dir-mhtcet .dir-icon { background: rgba(67,233,123,0.1); color: #43e97b; border: 1px solid rgba(67,233,123,0.2); }
+    
+    .dir-bitsat { --card-accent: #f7971e; }
+    .dir-bitsat .dir-icon { background: rgba(247,151,30,0.1); color: #f7971e; border: 1px solid rgba(247,151,30,0.2); }
+
+    .dir-foundation { --card-accent: #a78bfa; }
+    .dir-foundation .dir-icon { background: rgba(167,139,250,0.1); color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
+
+    .dir-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .dir-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: 0.3s; }
+    .exam-directory-card:hover .dir-icon { transform: scale(1.1); }
+    
+    .dir-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
+    .dir-count { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
+    
+    .dir-desc { color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem; flex: 1; }
+    
+    .dir-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 1.2rem; margin-top: auto; }
+    .course-types { display: flex; gap: 0.5rem; }
+    .type-pill { background: var(--surface2); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem; color: var(--text-muted); }
+    .explore-btn { color: var(--text); font-weight: 600; font-size: 0.9rem; transition: 0.2s; display: flex; align-items: center; gap: 0.4rem; }
+    .exam-directory-card:hover .explore-btn { color: var(--card-accent); gap: 0.6rem; }
+
+    /* ── FOOTER ── */
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 4rem 2rem 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; margin-top: auto; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; }
+    .footer-logo span { color: var(--accent); }
+    .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1rem; }
+    .footer-links a { color: var(--text-muted); font-size: 0.875rem; text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { color: var(--text-muted); font-size: 0.8rem; font-family: 'DM Mono', monospace; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    
+    .mobile-only { display: none; }
+    @media(max-width:768px) {
+      nav { padding: 0 1.2rem; }
+      .nav-right { gap: 0.5rem; }
+      .dropdown-content { right: 0; width: 220px; }
+      .nav-cta { display: none !important; }
+      .mobile-only { display: block; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo"><div class="logo-dot"></div> Quizable<span>.</span></a>
+  </div>
+  
+  <div class="nav-right">
+    <a href="/pricing" class="upgrade-link" id="nav-upgrade">Upgrade</a>
+    
+    <div class="dropdown">
+      <button class="dropdown-btn" id="menu-btn" onclick="toggleMenu()">
+        Menu <span class="arrow">▼</span>
+      </button>
+      <div class="dropdown-content" id="dropdown-menu">
+        <a href="/">🏠 Dashboard</a>
+        <a href="/profile">👤 My Profile</a>
+        <a href="/tests">📝 Mock Tests</a>
+        <a href="/pricing">💎 Pricing & Plans</a>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-logout" onclick="logoutUser()">Log Out</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <div class="hero-glow"></div>
+  <div class="container">
+    
+    <div class="page-header">
+      <div class="section-label">// Video Library</div>
+      <h1 class="page-title">Master Your Target Exam.</h1>
+      <p class="page-sub">Select an exam below to browse available full-year courses, crash courses, and rapid revision series taught by top educators.</p>
+    </div>
+
+    <div class="directory-grid">
+      
+      <a href="/course-list.html?exam=JEE+Main" class="exam-directory-card dir-jee">
+        <div class="dir-header">
+          <div class="dir-icon">🎯</div>
+          <div>
+            <h3 class="dir-title">JEE Main</h3>
+            <div class="dir-count">View Catalog</div>
+          </div>
+        </div>
+        <p class="dir-desc">Master the core concepts of Physics, Chemistry, and Mathematics required to ace the NTA JEE Main examination.</p>
+        <div class="dir-footer">
+          <div class="course-types">
+            <span class="type-pill">Crash</span>
+            <span class="type-pill">Full Year</span>
+          </div>
+          <div class="explore-btn">Explore →</div>
+        </div>
+      </a>
+
+      <a href="/course-list.html?exam=JEE+Advanced" class="exam-directory-card dir-adv">
+        <div class="dir-header">
+          <div class="dir-icon">🔥</div>
+          <div>
+            <h3 class="dir-title">JEE Advanced</h3>
+            <div class="dir-count">View Catalog</div>
+          </div>
+        </div>
+        <p class="dir-desc">Deep dive into multi-concept problems and advanced applications required to secure a seat in the IITs.</p>
+        <div class="dir-footer">
+          <div class="course-types">
+            <span class="type-pill">Advanced Problems</span>
+          </div>
+          <div class="explore-btn">Explore →</div>
+        </div>
+      </a>
+
+      <a href="/course-list.html?exam=MHT+CET" class="exam-directory-card dir-mhtcet">
+        <div class="dir-header">
+          <div class="dir-icon">🌿</div>
+          <div>
+            <h3 class="dir-title">MHT CET</h3>
+            <div class="dir-count">View Catalog</div>
+          </div>
+        </div>
+        <p class="dir-desc">Focused preparation based strictly on the Maharashtra State Board HSC syllabus to maximize your state rank.</p>
+        <div class="dir-footer">
+          <div class="course-types">
+            <span class="type-pill">PCM</span>
+            <span class="type-pill">PCB</span>
+          </div>
+          <div class="explore-btn">Explore →</div>
+        </div>
+      </a>
+
+      <a href="/course-list.html?exam=BITSAT" class="exam-directory-card dir-bitsat">
+        <div class="dir-header">
+          <div class="dir-icon">⚡</div>
+          <div>
+            <h3 class="dir-title">BITSAT</h3>
+            <div class="dir-count">View Catalog</div>
+          </div>
+        </div>
+        <p class="dir-desc">Specialized modules covering speed-building strategies, English proficiency, and Logical Reasoning.</p>
+        <div class="dir-footer">
+          <div class="course-types">
+            <span class="type-pill">Speed & Logic</span>
+          </div>
+          <div class="explore-btn">Explore →</div>
+        </div>
+      </a>
+
+      <a href="/course-list.html?exam=All" class="exam-directory-card dir-foundation">
+        <div class="dir-header">
+          <div class="dir-icon">📚</div>
+          <div>
+            <h3 class="dir-title">General / Foundation</h3>
+            <div class="dir-count">View Catalog</div>
+          </div>
+        </div>
+        <p class="dir-desc">Build an unbreakable foundation. Master the basics of calculus, mechanics, and physical chemistry from scratch.</p>
+        <div class="dir-footer">
+          <div class="course-types">
+            <span class="type-pill">Chapter-wise</span>
+          </div>
+          <div class="explore-btn">Explore →</div>
+        </div>
+      </a>
+
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Quizable<span>.</span></div>
+  <div class="footer-links">
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Quizable. All rights reserved.</div>
+</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+      apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+      authDomain: "sigmascore300.firebaseapp.com",
+      projectId: "sigmascore300"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "/"; // Send unauthorized users to home/login
+      return;
+    }
+
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const plan = userDoc.data().plan || "free";
+        if (plan === "free") {
+          document.getElementById('nav-upgrade').style.display = "block";
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch plan:", e);
+    }
+  });
+
+  window.logoutUser = function() {
+    signOut(auth).then(() => { window.location.href = "/"; });
+  };
+</script>
+
+<script>
+  function toggleMenu() { document.querySelector('.dropdown').classList.toggle('active'); }
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropdown-btn') && !event.target.closest('.dropdown-btn')) {
+      const dropdowns = document.getElementsByClassName("dropdown");
+      for (let i = 0; i < dropdowns.length; i++) {
+        if (dropdowns[i].classList.contains('active')) dropdowns[i].classList.remove('active');
+      }
+    }
+  }
+</script>
+
+</body>
+</html>
