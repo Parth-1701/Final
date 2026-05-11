@@ -27,57 +27,33 @@
     .page-wrapper { padding: 120px 2rem 4rem; max-width: 1100px; margin: 0 auto; width: 100%; }
     .page-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 3rem; text-align: center; }
 
-/* Container for the exam cards */
+/* 1. Make the cards bigger */
 .exam-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
+  /* Changed from 200px to 280px for larger, more premium cards */
+  /* Changed auto-fill to auto-fit so they stretch nicely */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
   margin-top: 2rem;
 }
 
-/* The card itself */
-.exam-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 1rem;
-  text-align: center;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+/* (Keep your existing .exam-card CSS exactly as it is) */
 
-.exam-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--accent);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-}
-
-/* The 1:1 Image Banner */
+/* 2. Fix the image fit */
 .exam-banner {
   width: 100%;
   aspect-ratio: 1 / 1;
-  object-fit: cover; /* Prevents the image from stretching */
+  
+  /* The Magic Fix: 'contain' ensures the whole image is visible without cropping. 
+     If you prefer edge-to-edge bleeding without empty space, use 'cover' instead. */
+  object-fit: contain; 
+  
   border-radius: 14px;
-  background: var(--surface2); /* Placeholder color while image loads */
-  margin-bottom: 1rem;
-  border: 1px solid var(--border);
-}
-
-/* Exam Title */
-.exam-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 0.2rem;
-}
-
-.exam-subtitle {
-  font-size: 0.8rem;
-  color: var(--text-dim);
+  background: var(--surface2); /* Acts as a nice backdrop if the image has transparency */
+  margin-bottom: 1.2rem;
+  
+  /* Optional: removes the border if your image already has a background */
+  border: none; 
 }
     @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
   </style>
