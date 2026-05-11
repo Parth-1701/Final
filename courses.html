@@ -27,33 +27,65 @@
     .page-wrapper { padding: 120px 2rem 4rem; max-width: 1100px; margin: 0 auto; width: 100%; }
     .page-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 3rem; text-align: center; }
 
-/* 1. Make the cards bigger */
+/* The Grid Container */
 .exam-grid {
   display: grid;
-  /* Changed from 200px to 280px for larger, more premium cards */
-  /* Changed auto-fill to auto-fit so they stretch nicely */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
   margin-top: 2rem;
 }
 
-/* (Keep your existing .exam-card CSS exactly as it is) */
+/* The Course Card Layout */
+.exam-card {
+  background: var(--surface); /* Your dark card background */
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.2rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  
+  /* Flexbox makes the image and text sit side-by-side */
+  display: flex;
+  align-items: center; 
+  gap: 1.2rem;
+}
 
-/* 2. Fix the image fit */
-.exam-banner {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  
-  /* The Magic Fix: 'contain' ensures the whole image is visible without cropping. 
-     If you prefer edge-to-edge bleeding without empty space, use 'cover' instead. */
+.exam-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent); /* Your purple or gold accent color */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+/* The SMALL 1:1 Image */
+.exam-thumb {
+  width: 70px; /* Kept small! */
+  height: 70px; /* Forces the 1:1 square */
   object-fit: contain; 
-  
-  border-radius: 14px;
-  background: var(--surface2); /* Acts as a nice backdrop if the image has transparency */
-  margin-bottom: 1.2rem;
-  
-  /* Optional: removes the border if your image already has a background */
-  border: none; 
+  border-radius: 10px;
+  background: var(--surface2); /* Nice backdrop for transparent logos */
+  padding: 0.3rem; /* Gives the image a little breathing room inside the square */
+  flex-shrink: 0; /* Prevents the image from squishing if the text gets long */
+}
+
+/* Text Container */
+.exam-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.exam-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.3rem 0;
+}
+
+.exam-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin: 0;
 }
     @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
   </style>
@@ -67,31 +99,30 @@
 
 <div class="exam-grid">
   
-  <a href="/courses/CET" class="exam-card">
-    <img src="https://via.placeholder.com/400x400/1a1a26/6c63ff?text=JEE" alt="JEE Main" class="exam-banner">
-    <h3 class="exam-title">Physics Wallah</h3>
-    <span class="exam-subtitle">Engineering and Medical</span>
+  <a href="/pw" class="exam-card">
+    <img src="https://iili.io/BDLklfe.png" alt="JEE Main" class="exam-thumb">
+    <div class="exam-info">
+      <h3 class="exam-title">Physics Wallah</h3>
+      <span class="exam-subtitle"> JEE and NEET</span>
+    </div>
   </a>
 
-  <a href="/courses/pwmaha" class="exam-card">
-    <img src="https://iili.io/BDiS9iF.jpg" alt="MHT CET" class="exam-banner">
-    <h3 class="exam-title">PW Maharashtra</h3>
-    <span class="exam-subtitle">Engineering</span>
+  <a href="/pwmaha" class="exam-card">
+    <img src="https://iili.io/BDiS9iF.jpg" alt="MHT CET" class="exam-thumb">
+    <div class="exam-info">
+      <h3 class="exam-title">PW Maharashtra</h3>
+      <span class="exam-subtitle"> MHT-CET</span>
+    </div>
   </a>
 
 <!--  <a href="/partner.html?exam=BITSAT" class="exam-card">
-    <img src="https://via.placeholder.com/400x400/1a1a26/6c63ff?text=BITSAT" alt="BITSAT" class="exam-banner">
-    <h3 class="exam-title">BITSAT</h3>
-    <span class="exam-subtitle">Engineering</span>
-  </a>
-
-  <a href="/partner.html?exam=JEE+Advanced" class="exam-card">
-    <img src="https://via.placeholder.com/400x400/1a1a26/6c63ff?text=ADVANCED" alt="JEE Advanced" class="exam-banner">
-    <h3 class="exam-title">JEE Advanced</h3>
-    <span class="exam-subtitle">IIT Admission</span>
+    <img src="your-bitsat-logo.png" alt="BITSAT" class="exam-thumb">
+    <div class="exam-info">
+      <h3 class="exam-title">BITSAT</h3>
+      <span class="exam-subtitle">BITS Pilani Admission</span>
+    </div>
   </a> -->
 
 </div>
-
 </body>
 </html>
