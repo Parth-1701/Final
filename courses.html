@@ -94,5 +94,26 @@
   </div>
 </div>
 
+  <script type="module">
+  // Import Firebase Auth
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { app } from "./firebase-config.js"; // Adjust this path if your config file is named differently
+
+  const auth = getAuth(app);
+
+  // Listen for the user's login status
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User IS logged in. 
+      // Reveal the webpage so they can see the courses!
+      document.body.style.display = "block"; 
+      console.log("Access granted to:", user.email);
+    } else {
+      // User is NOT logged in.
+      // Redirect them to the homepage or login page immediately.
+      window.location.href = "/index.html"; // Change this if your login page has a different name
+    }
+  });
+  </script>
 </body>
 </html>
