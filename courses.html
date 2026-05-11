@@ -39,6 +39,20 @@
     .exam-name { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; }
     .exam-desc { color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; }
     .cta-text { font-weight: 600; color: var(--accent); margin-top: auto; display: flex; align-items: center; gap: 0.5rem; }
+   
+    .banner-wrapper {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--surface2);
+      overflow: hidden;
+    }
+
+    .banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: 0.5s ease;
+    }
 
     @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
   </style>
@@ -66,8 +80,10 @@
 
   <div class="directory-grid">
     <a href="/courses/pw" class="exam-card">
-      <div class="exam-icon"><img src="https://iili.io/BDAoUTQ.jpg"</div>
-      <h3 class="exam-name">Physics Wallah</h3>
+          <div class="banner-wrapper">
+      <img src="https://iili.io/BDAoUTQ.jpg" class="banner-img" alt="PW">
+          </div>
+            <h3 class="exam-name">Physics Wallah</h3>
       <p class="exam-desc">Access batches from PW. Redirects to partner websites for video content.</p>
       <div class="cta-text">View Batches →</div>
     </a>
