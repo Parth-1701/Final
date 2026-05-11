@@ -27,66 +27,19 @@
     .page-wrapper { padding: 120px 2rem 4rem; max-width: 1100px; margin: 0 auto; width: 100%; }
     .page-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 3rem; text-align: center; }
 
-/* The Grid Container */
-.exam-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
-}
+    /* ── GRID ── */
+    .directory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+    .exam-card { 
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px; 
+      padding: 2.5rem 2rem; text-decoration: none; color: inherit; transition: 0.3s;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .exam-card:hover { transform: translateY(-5px); border-color: var(--accent); background: #161622; }
+    .exam-icon { font-size: 2rem; }
+    .exam-name { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; }
+    .exam-desc { color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; }
+    .cta-text { font-weight: 600; color: var(--accent); margin-top: auto; display: flex; align-items: center; gap: 0.5rem; }
 
-/* The Course Card Layout */
-.exam-card {
-  background: var(--surface); /* Your dark card background */
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.2rem;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  
-  /* Flexbox makes the image and text sit side-by-side */
-  display: flex;
-  align-items: center; 
-  gap: 1.2rem;
-}
-
-.exam-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent); /* Your purple or gold accent color */
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-}
-
-/* The SMALL 1:1 Image */
-.exam-thumb {
-  width: 70px; /* Kept small! */
-  height: 70px; /* Forces the 1:1 square */
-  object-fit: contain; 
-  border-radius: 10px;
-  background: var(--surface2); /* Nice backdrop for transparent logos */
-  padding: 0.3rem; /* Gives the image a little breathing room inside the square */
-  flex-shrink: 0; /* Prevents the image from squishing if the text gets long */
-}
-
-/* Text Container */
-.exam-info {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.exam-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0 0 0.3rem 0;
-}
-
-.exam-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  margin: 0;
-}
     @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
   </style>
 </head>
@@ -97,32 +50,43 @@
   <a href="/" style="color:var(--text-dim); text-decoration:none; font-size:0.9rem;">← Dashboard</a>
 </nav>
 
-<div class="exam-grid">
+<div class="page-wrapper">
   
-  <a href="/pw" class="exam-card">
-    <img src="https://iili.io/BDLklfe.png" alt="JEE Main" class="exam-thumb">
-    <div class="exam-info">
-      <h3 class="exam-title">Physics Wallah</h3>
-      <span class="exam-subtitle"> JEE and NEET</span>
+  <div class="partner-banner">
+    <div class="partner-info">
+      <h4>Official Testing Partner</h4>
+      <p>Providing precision assessment for elite coaching institutes.</p>
     </div>
-  </a>
-
-  <a href="/pwmaha" class="exam-card">
-    <img src="https://iili.io/BDiS9iF.jpg" alt="MHT CET" class="exam-thumb">
-    <div class="exam-info">
-      <h3 class="exam-title">PW Maharashtra</h3>
-      <span class="exam-subtitle"> MHT-CET</span>
+    <div class="partner-logos">
+      <div style="font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;">QUIZABLE × PARTNER</div>
     </div>
-  </a>
+  </div>
 
-<!--  <a href="/partner.html?exam=BITSAT" class="exam-card">
-    <img src="your-bitsat-logo.png" alt="BITSAT" class="exam-thumb">
-    <div class="exam-info">
-      <h3 class="exam-title">BITSAT</h3>
-      <span class="exam-subtitle">BITS Pilani Admission</span>
-    </div>
-  </a> -->
+  <h1 class="page-title">Explore Courses</h1>
 
+  <div class="directory-grid">
+    <a href="/course-list.html?exam=JEE+Main" class="exam-card">
+      <div class="exam-icon">🎯</div>
+      <h3 class="exam-name">JEE Main</h3>
+      <p class="exam-desc">Access batches from top institutes. Redirects to partner websites for video content.</p>
+      <div class="cta-text">View Batches →</div>
+    </a>
+
+    <a href="/course-list.html?exam=JEE+Advanced" class="exam-card">
+      <div class="exam-icon">🔥</div>
+      <h3 class="exam-name">JEE Advanced</h3>
+      <p class="exam-desc">Elite problem-solving batches curated by partner faculty.</p>
+      <div class="cta-text">View Batches →</div>
+    </a>
+
+    <a href="/course-list.html?exam=MHT+CET" class="exam-card">
+      <div class="exam-icon">🌿</div>
+      <h3 class="exam-name">MHT CET</h3>
+      <p class="exam-desc">State-board focused prep modules from our institute partners.</p>
+      <div class="cta-text">View Batches →</div>
+    </a>
+  </div>
 </div>
+
 </body>
 </html>
