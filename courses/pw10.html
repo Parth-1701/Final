@@ -217,7 +217,7 @@
         document.body.style.display = "block"; 
       } else {
         // Not logged in! Redirect.
-        window.location.href = "/index.html"; 
+        window.location.href = "/index.html?auth=required"; 
       }
     });
   } catch (error) {
