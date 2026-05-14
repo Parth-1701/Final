@@ -184,5 +184,39 @@
   </a>. -->
   </div>
 
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // PASTE YOUR ACTUAL CONFIG HERE
+  const firebaseConfig = {
+    apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+    authDomain: "sigmascore300.firebaseapp.com",
+    projectId: "sigmascore300",
+    storageBucket: "sigmascore300.firebasestorage.app",
+    messagingSenderId: "293195338803",
+    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
+    measurementId: "G-MLZYWG2EEM"
+  };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Logged in! Show the page.
+        document.body.style.display = "block"; 
+      } else {
+        // Not logged in! Redirect.
+        window.location.href = "/index.html?auth=required"; 
+      }
+    });
+  } catch (error) {
+    console.error("Firebase Initialization Error:", error);
+    // Failsafe: if Firebase crashes, at least show the page so you aren't stuck on white
+    document.body.style.display = "block"; 
+  }
+  </script>
 </body>
 </html>
