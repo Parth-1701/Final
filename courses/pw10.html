@@ -14,8 +14,7 @@
     
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 100px 1.5rem 4rem; }
- 
-    }
+
         /* ── MINIMAL NAV ── */
     nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:flex-start; gap: 1rem; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
     .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
@@ -185,7 +184,7 @@
   </a> -->
   </div>
 
-<script type="module">
+  <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -218,6 +217,6 @@
     // Failsafe: if Firebase crashes, at least show the page so you aren't stuck on white
     document.body.style.display = "block"; 
   }
-</script>
+  </script>
 </body>
 </html>
