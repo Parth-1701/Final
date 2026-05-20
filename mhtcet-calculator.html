@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHT CET 2026 Score Calculator | Quizable</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    // Tell PDF.js where to find its background worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  </script>
+
+
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
+      --border: #2a2a3d; --accent: #6c63ff; 
+      --text: #e8e8f0; --text-muted: #6b6b8a; --success: #00e676;
+    }
+    
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 100px 1.5rem 4rem; display: flex; flex-direction: column; align-items: center; }
+
+
+    /* Minimal Nav */
+    nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:flex-start; gap: 1rem; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+
+    /* Main Container */
+    .calculator-container {
+      max-width: 600px;
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+
+    h1 { font-family: 'Syne', sans-serif; font-size: 2rem; margin-bottom: 1rem; }
+    p.instructions { color: var(--text-muted); font-size: 1rem; margin-bottom: 2rem; line-height: 1.6; }
+
+
+    /* Upload Button UI */
+    .upload-area { margin: 2rem 0; }
+    .cta-button {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 20px rgba(108, 99, 255, 0.3);
+    }
+    .cta-button:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(108, 99, 255, 0.5); }
+    
+    #uploadStatus { margin-top: 15px; font-size: 0.9rem; font-weight: 500; height: 20px; color: var(--text-muted); }
+
+
+    /* Results Dashboard */
+    #resultsDashboard {
+      display: none;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      animation: fadeIn 0.5s ease;
+    }
+    .score-massive { font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800; color: var(--success); line-height: 1; margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(0, 230, 118, 0.3); }
+    .breakdown { display: flex; justify-content: space-around; background: var(--surface2); padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem; }
+    .breakdown div h4 { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .breakdown div span { font-size: 1.5rem; font-weight: 700; }
+
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+
+  <nav>
+    <a href="/index.html" class="nav-logo"><div class="logo-dot"></div> Quizable<span>.</span></a>
+    <div style="height: 20px; width: 1px; background: var(--border); margin: 0 10px;"></div>
+    <a href="/index.html" style="color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s;">← Home</a>
+  </nav>
+
+
+  <div class="calculator-container">
+    <h1>MHT CET Score Calculator</h1>
+    <p class="instructions">Download your official Response Sheet PDF from the CET cell and upload it here to instantly calculate your estimated score. <br><br><em>100% secure. Files are processed locally and never sent to our servers.</em></p>
+    
+    <div class="upload-area">
+      <input type="file" id="pdfUpload" accept="application/pdf" style="display: none;" />
+      <label for="pdfUpload" class="cta-button">📄 Upload Response Sheet (PDF)</label>
+      <p id="uploadStatus"></p>
+    </div>
+
+
+    <div id="resultsDashboard">
+      <h2 style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 10px;">Your Estimated Score</h2>
+      <div class="score-massive" id="totalScore">0</div>
+      
+      <div class="breakdown">
+        <div>
+          <h4>Physics & Chem</h4>
+          <span id="pcScore">0</span><span style="color: var(--text-muted); font-size: 1rem;"> / 100</span>
+        </div>
+        <div>
+          <h4>Mathematics</h4>
+          <span id="mathScore">0</span><span style="color: var(--text-muted); font-size: 1rem;"> / 100</span>
+        </div>
+      </div>
+
+
+      <a href="/index.html" style="color: var(--accent); text-decoration: underline; font-weight: bold; font-size: 0.9rem;">Create a free Quizable account to save this score and view detailed analytics →</a>
+    </div>
+  </div>
+
+
+  <script>
+    document.getElementById('pdfUpload').addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+
+      const statusText = document.getElementById('uploadStatus');
+      statusText.style.color = "var(--accent)";
+      statusText.innerText = "Analyzing PDF... please wait.";
+      
+      // Hide results if they upload a second file
+      document.getElementById('resultsDashboard').style.display = "none";
+
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        
+        let fullText = "";
+
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          const pageStrings = textContent.items.map(item => item.str);
+          fullText += pageStrings.join(" ") + " ";
+        }
+
+
+        calculateScoreFromText(fullText);
+
+
+      } catch (error) {
+        console.error("Error reading PDF:", error);
+        statusText.style.color = "#ff4444";
+        statusText.innerText = "Error reading file. Please ensure it's the official PDF.";
+      }
+    });
+
+
+    function calculateScoreFromText(text) {
+      let physicsChemScore = 0;
+      let mathScore = 0;
+
+
+      // --- REGEX EXTRACTION LOGIC ---
+      // NOTE: You will need to fine-tune the words "Question ID", "Chosen Option", and "Correct Option" 
+      // based on the exact spelling/formatting of the real PDF.
+
+
+      // Split the text into chunks, assuming each question starts near a "Question ID"
+      const questions = text.split(/Question\s*ID/i); 
+      questions.shift(); // Remove the header chunk before the first question
+
+
+      questions.forEach(qText => {
+        // Look for the numbers next to Chosen Option and Correct Option
+        const chosenMatch = qText.match(/Chosen\s*Option\s*[:\-]?\s*(\d)/i);
+        const correctMatch = qText.match(/Correct\s*Option\s*[:\-]?\s*(\d)/i);
+
+
+        if (chosenMatch && correctMatch) {
+          const chosen = chosenMatch[1];
+          const correct = correctMatch[1];
+
+
+          // If they match, award marks
+          if (chosen === correct) {
+            
+            // Check if this question chunk belongs to Mathematics
+            if (qText.toLowerCase().includes('mathematics') || qText.toLowerCase().includes('maths')) {
+               mathScore += 2; // Math is +2 marks per question
+            } else {
+               physicsChemScore += 1; // Physics/Chem is +1 mark per question
+            }
+          }
+        }
+      });
+
+
+      // Update UI
+      document.getElementById('uploadStatus').style.color = "var(--success)";
+      document.getElementById('uploadStatus').innerText = "Analysis Complete!";
+      
+      document.getElementById('totalScore').innerText = physicsChemScore + mathScore;
+      document.getElementById('pcScore').innerText = physicsChemScore;
+      document.getElementById('mathScore').innerText = mathScore;
+      
+      document.getElementById('resultsDashboard').style.display = "block";
+    }
+  </script>
+</body>
+</html>
