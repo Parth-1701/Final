@@ -52,7 +52,7 @@
 
     /* JSON Format Guide */
     .format-guide { background: rgba(108,99,255,0.05); border: 1px solid rgba(108,99,255,0.2); padding: 1rem; border-radius: 8px; margin-top: 0.5rem; display: none; }
-    .format-guide pre { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #a78bfa; overflow-x: auto; margin-top: 0.5rem; }
+    .format-guide pre { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #a78bfa; overflow-x: auto; margin-top: 0.5rem; background: var(--surface2); padding: 10px; border-radius: 6px; }
 
     @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
@@ -87,6 +87,7 @@
         <select id="test-exam" class="form-control">
           <option value="JEE Main">JEE Main</option>
           <option value="JEE Advanced">JEE Advanced</option>
+          <option value="NEET">NEET</option>
           <option value="MHT CET">MHT CET</option>
           <option value="BITSAT">BITSAT</option>
         </select>
@@ -125,7 +126,9 @@
       <button type="button" class="btn-secondary" style="margin-top: 10px; font-size: 0.8rem;" onclick="toggleGuide()">View JSON Format Guide</button>
       
       <div class="format-guide" id="json-guide">
-        <p style="font-size: 0.85rem; color: var(--text);">Your JSON file must contain an array of question objects. Ensure the <code>answer</code> field is populated with the correct key (e.g., A, B, C, D or the integer value).</p>
+        <p style="font-size: 0.85rem; color: var(--text);">Your JSON file must contain an array of question objects.</p>
+        
+        <h4 style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">Engineering Exams (Text-Based)</h4>
         <pre>[
   {
     "id": 1,
@@ -135,8 +138,21 @@
     "options": { "A": "v = 0", "B": "v = max", "C": "a = 0", "D": "None" },
     "answer": "B",
     "positiveMarks": 4,
-    "negativeMarks": -1,
-    "solution": "Velocity is maximum at the mean position."
+    "negativePenalty": 1
+  }
+]</pre>
+
+        <h4 style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">NEET Exams (Image-Based)</h4>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">Must use exact section names ("Physics Section A", "Physics Section B") for the 10-question limit tracker to work. Use "questionImage" instead of "question" text.</p>
+        <pre>[
+  {
+    "section": "Physics Section B",
+    "questionImage": "https://quizable.online/images/neet1/q1.webp",
+    "type": "single",
+    "options": { "1": "Option A", "2": "Option B", "3": "Option C", "4": "Option D" },
+    "answer": "3",
+    "positiveMarks": 4,
+    "negativePenalty": 1
   }
 ]</pre>
       </div>
@@ -284,9 +300,9 @@
         examTag: exam,
         isPremium: isPremium,
         durationMins: duration,
-        totalQuestions: questionsArray.length, // Automatically counts how many questions are in the JSON
+        totalQuestions: questionsArray.length, 
         isPublished: isPublished,
-        questions: questionsArray, // Injects the entire JSON array directly into the document!
+        questions: questionsArray, // Injects the entire JSON array directly!
         createdAt: serverTimestamp()
       });
       
