@@ -69,16 +69,22 @@
 <div class="page-wrapper" id="admin-content">
   
   <div class="tab-container">
-    <button class="tab-btn active" onclick="switchTab('tests')">Upload Mock Test</button>
+    <button class="tab-btn active" onclick="switchTab('tests')">Manage Mock Tests</button>
     <button class="tab-btn" onclick="switchTab('courses')">Upload Masterclass</button>
   </div>
 
   <div class="admin-card active" id="tab-tests">
-    <h2 style="font-family: 'Syne', sans-serif; margin-bottom: 1.5rem;">Add New Mock Test</h2>
+    <h2 style="font-family: 'Syne', sans-serif; margin-bottom: 1.5rem;">Create or Update Mock Test</h2>
     
-    <div class="form-group">
-      <label>Test Title</label>
-      <input type="text" id="test-title" class="form-control" placeholder="e.g., JEE Mains Full Syllabus Mock 01">
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label>Test Title</label>
+        <input type="text" id="test-title" class="form-control" placeholder="e.g., JEE Mains Full Syllabus Mock 01">
+      </div>
+      <div class="form-group">
+        <label>Test ID <span style="color: var(--accent);">(Optional)</span></label>
+        <input type="text" id="custom-test-id" class="form-control" placeholder="Leave blank for new test">
+      </div>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -101,6 +107,36 @@
       </div>
     </div>
 
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label>Class Level</label>
+        <select id="test-class" class="form-control">
+          <option value="11">Class 11</option>
+          <option value="12">Class 12</option>
+          <option value="12+">Dropper (12+)</option>
+          <option value="All">All / Combined</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Test Type</label>
+        <select id="test-type" class="form-control">
+          <option value="Full Syllabus">Full Syllabus</option>
+          <option value="Part Syllabus">Part Syllabus</option>
+          <option value="Chapter-wise">Chapter-wise</option>
+          <option value="PYQ">Previous Year Paper</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Target Batch</label>
+        <select id="test-batch" class="form-control">
+          <option value="All">All Batches (Public)</option>
+          <option value="DL695-INSW01-2025-117921">Batch DL695-INSW01</option>
+          <option value="Dropper-Alpha">Dropper Alpha</option>
+          <option value="Crash-2026">Crash Course '26</option>
+        </select>
+      </div>
+    </div>
+
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
       <div class="form-group">
         <label>Duration (Minutes)</label>
@@ -117,17 +153,15 @@
 
     <hr style="border-color: var(--border); margin: 2rem 0;">
 
-    <h3 style="font-family: 'Syne', sans-serif; margin-bottom: 1rem; font-size: 1.2rem;">Bulk Upload Questions</h3>
+    <h3 style="font-family: 'Syne', sans-serif; margin-bottom: 1rem; font-size: 1.2rem;">Test Content (JSON)</h3>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">If updating an existing Test ID, leaving this blank will update the metadata without touching the questions.</p>
     
     <div class="form-group">
-      <label>Select .json file</label>
       <input type="file" id="test-questions-file" class="form-control" accept=".json">
       
       <button type="button" class="btn-secondary" style="margin-top: 10px; font-size: 0.8rem;" onclick="toggleGuide()">View JSON Format Guide</button>
       
       <div class="format-guide" id="json-guide">
-        <p style="font-size: 0.85rem; color: var(--text);">Your JSON file must contain an array of question objects.</p>
-        
         <h4 style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">Engineering Exams (Text-Based)</h4>
         <pre>[
   {
@@ -143,7 +177,6 @@
 ]</pre>
 
         <h4 style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">NEET Exams (Image-Based)</h4>
-        <p style="font-size: 0.8rem; color: var(--text-muted);">Must use exact section names ("Physics Section A", "Physics Section B") for the 10-question limit tracker to work. Use "questionImage" instead of "question" text.</p>
         <pre>[
   {
     "section": "Physics Section B",
@@ -158,7 +191,7 @@
       </div>
     </div>
 
-    <button class="btn-primary" onclick="saveTest()" id="btn-save-test">Upload & Publish Mock Test</button>
+    <button class="btn-primary" onclick="saveTest()" id="btn-save-test">Push to Database</button>
   </div>
 
   <div class="admin-card" id="tab-courses">
@@ -201,7 +234,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
       apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
@@ -258,66 +291,100 @@
   };
 
   // ── FIREBASE UPLOAD LOGIC ──
-  
-  // Save Mock Test with JSON Parser
   window.saveTest = async function() {
-    const title = document.getElementById('test-title').value;
+    const title = document.getElementById('test-title').value.trim();
+    const customTestId = document.getElementById('custom-test-id').value.trim();
     const exam = document.getElementById('test-exam').value;
     const isPremium = document.getElementById('test-access').value === 'true';
     const duration = parseInt(document.getElementById('test-duration').value) || 180;
     const isPublished = document.getElementById('test-publish').value === 'true';
+    
+    // Filters
+    const classLevel = document.getElementById('test-class').value;
+    const testType = document.getElementById('test-type').value;
+    const targetBatch = document.getElementById('test-batch').value;
+
     const fileInput = document.getElementById('test-questions-file');
     const btn = document.getElementById('btn-save-test');
 
     if (!title) { alert("Test Title is required!"); return; }
-    if (fileInput.files.length === 0) { alert("Please upload a .json file containing the questions."); return; }
 
     btn.disabled = true;
-    btn.textContent = "Processing File...";
+    btn.textContent = "Processing...";
 
-    // 1. Read and parse the JSON file
-    let questionsArray = [];
-    try {
-      const file = fileInput.files[0];
-      const text = await file.text();
-      questionsArray = JSON.parse(text);
-      
-      if (!Array.isArray(questionsArray)) {
-        throw new Error("JSON root must be an array.");
+    let questionsArray = null;
+
+    // Check if a JSON file was uploaded
+    if (fileInput.files.length > 0) {
+      try {
+        const file = fileInput.files[0];
+        const text = await file.text();
+        questionsArray = JSON.parse(text);
+        
+        if (!Array.isArray(questionsArray)) {
+          throw new Error("JSON root must be an array.");
+        }
+      } catch (e) {
+        alert("Error: The uploaded file is not a valid JSON array format.");
+        btn.disabled = false;
+        btn.textContent = "Push to Database";
+        return;
       }
-    } catch (e) {
-      alert("Error: The uploaded file is not a valid JSON array format. Check the format guide.");
+    } else if (!customTestId) {
+      // Cannot create a brand new test without questions
+      alert("Please upload a .json file to create a new test, or provide an existing Test ID to update metadata.");
       btn.disabled = false;
-      btn.textContent = "Upload & Publish Mock Test";
+      btn.textContent = "Push to Database";
       return;
     }
 
-    // 2. Upload to Firestore
-    btn.textContent = "Uploading to Database...";
+    // Build the payload
+    const testPayload = {
+      title: title,
+      examTag: exam,
+      isPremium: isPremium,
+      durationMins: duration,
+      classLevel: classLevel,
+      testType: testType,
+      targetBatch: targetBatch,
+      isPublished: isPublished,
+      updatedAt: serverTimestamp()
+    };
+
+    // If a new file was uploaded, attach it to the payload
+    if (questionsArray) {
+      testPayload.questions = questionsArray;
+      testPayload.totalQuestions = questionsArray.length;
+    }
+
+    // Upload to Firestore
+    btn.textContent = "Updating Database...";
     try {
-      await addDoc(collection(db, "tests"), {
-        title: title,
-        examTag: exam,
-        isPremium: isPremium,
-        durationMins: duration,
-        totalQuestions: questionsArray.length, 
-        isPublished: isPublished,
-        questions: questionsArray, // Injects the entire JSON array directly!
-        createdAt: serverTimestamp()
-      });
+      if (customTestId) {
+        // OVERWRITE / UPDATE existing test
+        await setDoc(doc(db, "tests", customTestId), testPayload, { merge: true });
+        alert(`Success! Test '${customTestId}' has been updated.`);
+      } else {
+        // CREATE new test
+        testPayload.createdAt = serverTimestamp();
+        await addDoc(collection(db, "tests"), testPayload);
+        alert(`Success! New Mock Test published.`);
+      }
       
-      alert(`Success! Mock Test published with ${questionsArray.length} questions.`);
+      // Reset UI
       document.getElementById('test-title').value = '';
+      document.getElementById('custom-test-id').value = '';
       fileInput.value = '';
     } catch (e) {
-      console.error("Error adding test: ", e);
-      alert("Database Error: Could not publish test.");
+      console.error("Error saving test: ", e);
+      alert("Database Error: Could not save test.");
     }
 
     btn.disabled = false;
-    btn.textContent = "Upload & Publish Mock Test";
+    btn.textContent = "Push to Database";
   };
 
+  // Masterclass Logic
   window.saveCourse = async function() {
     const title = document.getElementById('course-title').value;
     const desc = document.getElementById('course-desc').value;
