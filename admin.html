@@ -82,15 +82,15 @@
         <input type="text" id="test-title" class="form-control" placeholder="e.g., JEE Mains Full Syllabus Mock 01">
       </div>
       <div class="form-group">
-        <label>Test ID <span style="color: var(--accent);">(Optional)</span></label>
-        <input type="text" id="custom-test-id" class="form-control" placeholder="Leave blank for new test">
+        <label>Test ID <span style="color: var(--accent);">(Optional Update Target)</span></label>
+        <input type="text" id="custom-test-id" class="form-control" placeholder="Blank = New Document">
       </div>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
       <div class="form-group">
         <label>Target Exam</label>
-        <select id="test-exam" class="form-control">
+        <select id="test-exam" class="form-control" onchange="window.filterBatchesByExam(this.value)">
           <option value="JEE Main">JEE Main</option>
           <option value="JEE Advanced">JEE Advanced</option>
           <option value="NEET">NEET</option>
@@ -107,6 +107,7 @@
       </div>
     </div>
 
+    <!-- 3-Column Filter Grid -->
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
       <div class="form-group">
         <label>Class Level</label>
@@ -129,10 +130,7 @@
       <div class="form-group">
         <label>Target Batch</label>
         <select id="test-batch" class="form-control">
-          <option value="All">All Batches (Public)</option>
-          <option value="DL695-INSW01-2025-117921">Batch DL695-INSW01</option>
-          <option value="Dropper-Alpha">Dropper Alpha</option>
-          <option value="Crash-2026">Crash Course '26</option>
+          <!-- Populated dynamically via Javascript -->
         </select>
       </div>
     </div>
@@ -154,7 +152,7 @@
     <hr style="border-color: var(--border); margin: 2rem 0;">
 
     <h3 style="font-family: 'Syne', sans-serif; margin-bottom: 1rem; font-size: 1.2rem;">Test Content (JSON)</h3>
-    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">If updating an existing Test ID, leaving this blank will update the metadata without touching the questions.</p>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">If using an existing Test ID, leaving this blank updates metadata fields only without wiping your test questions.</p>
     
     <div class="form-group">
       <input type="file" id="test-questions-file" class="form-control" accept=".json">
@@ -246,6 +244,49 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
+  // ── DATA DICTIONARY: COHORT BATCH MAPPINGS ──
+  const batchMapping = {
+    "All": [{ value: "All", text: "All Batches (Public)" }],
+    "JEE Main": [
+      { value: "All", text: "All JEE Main Batches" },
+      { value: "DL695-INSW01-2025-117921", text: "Batch DL695-INSW01 (JEE)" },
+      { value: "JEE-Alpha-2026", text: "JEE Dropper Alpha" }
+    ],
+    "JEE Advanced": [
+      { value: "All", text: "All JEE Advanced Batches" },
+      { value: "IIT-Elite-30", text: "Super 30 Advanced Batch" }
+    ],
+    "NEET": [
+      { value: "All", text: "All NEET Batches" },
+      { value: "NEET-Med-Achievers", text: "NEET Medical Achievers" },
+      { value: "NEET-Crash-2026", text: "NEET Crash Course '26" }
+    ],
+    "MHT CET": [
+      { value: "All", text: "All MHT CET Batches" },
+      { value: "CET-Maharashtra-Booster", text: "MHT CET State Booster" }
+    ],
+    "BITSAT": [
+      { value: "All", text: "All BITSAT Batches" },
+      { value: "Bits-Pilani-Express", text: "BITS Pilani Express Cohort" }
+    ]
+  };
+
+  // Dynamic Batch Filter Execution Engine
+  window.filterBatchesByExam = function(selectedExam) {
+    const batchDropdown = document.getElementById('test-batch');
+    if (!batchDropdown) return;
+    
+    batchDropdown.innerHTML = '';
+    const availableBatches = batchMapping[selectedExam] || batchMapping["All"];
+    
+    availableBatches.forEach(batch => {
+      const opt = document.createElement('option');
+      opt.value = batch.value;
+      opt.textContent = batch.text;
+      batchDropdown.appendChild(opt);
+    });
+  };
+
   // ── ADMIN SECURITY CHECK ──
   onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = "/"; return; }
@@ -255,6 +296,9 @@
       if (userDoc.exists() && userDoc.data().role === "admin") {
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('admin-content').style.display = 'block';
+        
+        // Initialize the conditional batch filter with the initial default selection value
+        window.filterBatchesByExam(document.getElementById('test-exam').value);
       } else {
         alert("Access Denied: You do not have administrator privileges.");
         window.location.href = "/";
@@ -264,7 +308,7 @@
     }
   });
 
-  // ── UI LOGIC ──
+  // ── UI TAB RUNTIME LOGIC ──
   window.switchTab = function(tabName) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.admin-card').forEach(c => c.classList.remove('active'));
@@ -290,7 +334,7 @@
     container.appendChild(row);
   };
 
-  // ── FIREBASE UPLOAD LOGIC ──
+  // ── FIREBASE MUTATION ENGINE ──
   window.saveTest = async function() {
     const title = document.getElementById('test-title').value.trim();
     const customTestId = document.getElementById('custom-test-id').value.trim();
@@ -314,7 +358,6 @@
 
     let questionsArray = null;
 
-    // Check if a JSON file was uploaded
     if (fileInput.files.length > 0) {
       try {
         const file = fileInput.files[0];
@@ -331,14 +374,12 @@
         return;
       }
     } else if (!customTestId) {
-      // Cannot create a brand new test without questions
       alert("Please upload a .json file to create a new test, or provide an existing Test ID to update metadata.");
       btn.disabled = false;
       btn.textContent = "Push to Database";
       return;
     }
 
-    // Build the payload
     const testPayload = {
       title: title,
       examTag: exam,
@@ -351,27 +392,24 @@
       updatedAt: serverTimestamp()
     };
 
-    // If a new file was uploaded, attach it to the payload
     if (questionsArray) {
       testPayload.questions = questionsArray;
       testPayload.totalQuestions = questionsArray.length;
     }
 
-    // Upload to Firestore
     btn.textContent = "Updating Database...";
     try {
       if (customTestId) {
-        // OVERWRITE / UPDATE existing test
+        // OVERWRITE targeting explicit document key[cite: 2]
         await setDoc(doc(db, "tests", customTestId), testPayload, { merge: true });
         alert(`Success! Test '${customTestId}' has been updated.`);
       } else {
-        // CREATE new test
+        // CREATE generating random document ID
         testPayload.createdAt = serverTimestamp();
         await addDoc(collection(db, "tests"), testPayload);
         alert(`Success! New Mock Test published.`);
       }
       
-      // Reset UI
       document.getElementById('test-title').value = '';
       document.getElementById('custom-test-id').value = '';
       fileInput.value = '';
@@ -384,7 +422,6 @@
     btn.textContent = "Push to Database";
   };
 
-  // Masterclass Logic
   window.saveCourse = async function() {
     const title = document.getElementById('course-title').value;
     const desc = document.getElementById('course-desc').value;
