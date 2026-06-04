@@ -248,18 +248,26 @@
   </div>
 </div>
 
-<div class="filters-bar">
-  <span class="filter-label">Filter:</span>
-  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-  <button class="filter-btn" onclick="setFilter('free', this)">Free</button>
-  <button class="filter-btn" onclick="setFilter('new', this)">New</button>
-  <button class="filter-btn" onclick="setFilter('notAttempted', this)">Not Attempted</button>
-  <button class="filter-btn" onclick="setFilter('attempted', this)">Completed</button>
-  <div class="filter-spacer"></div>
-  <select class="sort-select" onchange="setSort(this.value)" id="sort-select">
-    <option value="newest">Newest first</option>
-    <option value="oldest">Oldest first</option>
-    <option value="title">A → Z</option>
+<div class="filters-bar" style="margin-top: 0; padding-top: 1rem; border-top: 1px solid var(--border);">
+  <span class="filter-label">Browse by:</span>
+  
+  <select class="sort-select" id="filter-class" onchange="setMetaFilters()">
+    <option value="All">All Classes</option>
+    <option value="11">Class 11</option>
+    <option value="12">Class 12</option>
+    <option value="12+">Dropper (12+)</option>
+  </select>
+  
+  <select class="sort-select" id="filter-type" onchange="setMetaFilters()">
+    <option value="All">All Test Types</option>
+    <option value="Full Syllabus">Full Syllabus</option>
+    <option value="Part Syllabus">Part Syllabus</option>
+    <option value="Chapter-wise">Chapter-wise</option>
+    <option value="PYQ">Previous Year Paper</option>
+  </select>
+
+  <select class="sort-select" id="filter-batch" onchange="setMetaFilters()">
+    <option value="All">All Batches</option>
   </select>
 </div>
 
