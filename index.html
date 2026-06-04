@@ -1092,7 +1092,7 @@ if (palette) {
 async function loadHomePageStats() {
   try {
     const studentsEl = document.getElementById('stat-students');
-    if (studentsEl) studentsEl.textContent = "200+"; 
+    if (studentsEl) studentsEl.textContent = "250+"; 
 
     const testsQuery = query(collection(db, 'tests'), where('isPublished', '==', true));
     const testsSnap = await getDocs(testsQuery);
