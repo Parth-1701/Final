@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5662933095045266"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5662933095045266" crossorigin="anonymous"></script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quizable — MHT CET Tests</title>
+  <title>Quizable — BITSAT Tests</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     :root {
@@ -15,7 +14,7 @@
       --green: #3ecf8e; --green-soft: rgba(62,207,142,0.1);
       --red: #f56565; --yellow: #f6c90e; --yellow-soft: rgba(246,201,14,0.1);
       --text: #e2e2f0; --text-dim: #9898b8; --text-muted: #52527a;
-      --exam-color: #3ecf8e; --exam-color-soft: rgba(62,207,142,0.1);
+      --exam-color: #f7971e; --exam-color-soft: rgba(247,151,30,0.1);
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
@@ -88,7 +87,7 @@
     .exam-stats-row {
       display:flex; gap:2rem; margin-top:1.8rem; flex-wrap:wrap;
     }
-    .exam-stat { text-align:center; }
+    .exam-stat { text-align:left; }
     .es-num {
       font-family:'DM Mono',monospace; font-size:1.3rem; font-weight:500;
       color:var(--exam-color);
@@ -225,7 +224,7 @@
 <nav>
   <a class="nav-logo" href="index.html"><span>Quizable</span></a>
   <span class="nav-sep">/</span>
-  <span class="nav-page">MHT CET</span>
+  <span class="nav-page">BITSAT</span>
   <div class="nav-spacer"></div>
   <div class="nav-user-area">
     <div id="nav-user"></div>
@@ -235,31 +234,39 @@
 <div class="exam-hero">
   <div class="hero-inner">
     <a href="index.html" class="back-crumb">← Back to home</a>
-    <div class="exam-hero-badge">🌿 MHT CET</div>
-    <h1>Maharashtra Common<br/>Entrance Test</h1>
-    <p>MH State board syllabus with PCM and PCB papers. No negative marking — all MCQ format. Based on Maharashtra HSC curriculum.</p>
+    <div class="exam-hero-badge">⚡ BITSAT</div>
+    <h1>BITS Pilani Admission<br/>Test (BITSAT)</h1>
+    <p>142 questions including English Proficiency & Logical Reasoning. All MCQ, no non-MCQ. Unique bonus section of 12 extra questions if you finish early.</p>
     <div class="exam-stats-row">
       <div class="exam-stat"><div class="es-num" id="stat-total">—</div><div class="es-label">Available Tests</div></div>
-      <div class="exam-stat"><div class="es-num">150</div><div class="es-label">Questions / Test</div></div>
-      <div class="exam-stat"><div class="es-num">3 hours</div><div class="es-label">Duration</div></div>
-      <div class="exam-stat"><div class="es-num">200</div><div class="es-label">Max Marks</div></div>
+      <div class="exam-stat"><div class="es-num">142</div><div class="es-label">Questions / Test</div></div>
+      <div class="exam-stat"><div class="es-num">3 hrs</div><div class="es-label">Duration</div></div>
+      <div class="exam-stat"><div class="es-num">426</div><div class="es-label">Max Marks</div></div>
       <div class="exam-stat"><div class="es-num" id="stat-completed">—</div><div class="es-label">Completed by you</div></div>
     </div>
   </div>
 </div>
 
-<div class="filters-bar">
-  <span class="filter-label">Filter:</span>
-  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-  <button class="filter-btn" onclick="setFilter('free', this)">Free</button>
-  <button class="filter-btn" onclick="setFilter('new', this)">New</button>
-  <button class="filter-btn" onclick="setFilter('notAttempted', this)">Not Attempted</button>
-  <button class="filter-btn" onclick="setFilter('attempted', this)">Completed</button>
-  <div class="filter-spacer"></div>
-  <select class="sort-select" onchange="setSort(this.value)" id="sort-select">
-    <option value="newest">Newest first</option>
-    <option value="oldest">Oldest first</option>
-    <option value="title">A → Z</option>
+<div class="filters-bar" style="margin-top: 0; padding-top: 1rem; border-top: 1px solid var(--border);">
+  <span class="filter-label">Browse by:</span>
+  
+  <select class="sort-select" id="filter-class" onchange="setMetaFilters()">
+    <option value="All">All Classes</option>
+    <option value="11">Class 11</option>
+    <option value="12">Class 12</option>
+    <option value="12+">Dropper (12+)</option>
+  </select>
+  
+  <select class="sort-select" id="filter-type" onchange="setMetaFilters()">
+    <option value="All">All Test Types</option>
+    <option value="Full Syllabus">Full Syllabus</option>
+    <option value="Part Syllabus">Part Syllabus</option>
+    <option value="Chapter-wise">Chapter-wise</option>
+    <option value="PYQ">Previous Year Paper</option>
+  </select>
+
+  <select class="sort-select" id="filter-batch" onchange="setMetaFilters()">
+    <option value="All">All Batches</option>
   </select>
 </div>
 
@@ -313,7 +320,7 @@ const firebaseConfig = {
 };
 // ──────────────────────────────────────────────────────────────
 
-const EXAM_TYPE = 'mht_cet'; // ← unique per page
+const EXAM_TYPE = 'BITSAT'; // ← unique per page
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -321,8 +328,37 @@ const db   = getFirestore(app);
 
 let allTests      = [];
 let userResults   = {};
-let activeFilter  = 'all';
 let activeSort    = 'newest';
+
+// --- NEW FILTER VARIABLES ---
+let activeClassFilter = 'All';
+let activeTypeFilter = 'All';
+let activeBatchFilter = 'All';
+
+window.setMetaFilters = () => {
+  activeClassFilter = document.getElementById('filter-class').value;
+  activeTypeFilter = document.getElementById('filter-type').value;
+  activeBatchFilter = document.getElementById('filter-batch').value;
+  renderTests();
+};
+
+// --- DYNAMIC BATCH EXTRACTOR ---
+function populateBatchFilter() {
+  const batchDropdown = document.getElementById('filter-batch');
+  if (!batchDropdown) return;
+
+  // Find all unique batch names currently attached to live tests
+  const uniqueBatches = [...new Set(allTests.map(t => t.targetBatch).filter(b => b && b !== 'All'))];
+
+  // Reset to default, then append active batches
+  batchDropdown.innerHTML = `<option value="All">All Batches</option>`;
+  uniqueBatches.forEach(batch => {
+    const opt = document.createElement('option');
+    opt.value = batch;
+    opt.textContent = `Batch: ${batch}`;
+    batchDropdown.appendChild(opt);
+  });
+}
 
 // ── Auth guard ─────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
@@ -356,10 +392,9 @@ onAuthStateChanged(auth, async user => {
 
 async function loadTests() {
   try {
-    // Simple single-field query avoids composite index requirement.
-    // isPublished filtering and sorting done client-side.
+    // UPDATED QUERY: Uses 'examTag' instead of 'examType' to match your Admin Panel logic
     const snap = await getDocs(
-      query(collection(db, 'tests'), where('examType', '==', EXAM_TYPE))
+      query(collection(db, 'tests'), where('examTag', '==', EXAM_TYPE))
     );
     allTests = snap.docs
       .map(d => ({ id: d.id, ...d.data() }))
@@ -370,6 +405,7 @@ async function loadTests() {
         return tb - ta;
       });
     document.getElementById('stat-total').textContent = allTests.length;
+    populateBatchFilter(); 
     hideSkeleton();
     renderTests();
   } catch(e) {
@@ -378,7 +414,7 @@ async function loadTests() {
     document.getElementById('error-area').innerHTML =
       '<div class="error-banner">' +
       '⚠️ <strong>Could not load tests.</strong> Open DevTools (F12 → Console) for details.<br/>' +
-      'Common causes: Firebase config not set · Firestore rules blocking reads · Wrong examType in document.<br/>' +
+      'Common causes: Firebase config not set · Firestore rules blocking reads · Wrong examTag in document.<br/>' +
       'Error: <code>' + e.message + '</code>' +
       '</div>';
   }
@@ -389,13 +425,6 @@ function hideSkeleton() {
   document.getElementById('tests-grid').style.display = 'grid';
 }
 
-window.setFilter = (filter, btn) => {
-  activeFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTests();
-};
-
 window.setSort = (sort) => {
   activeSort = sort;
   renderTests();
@@ -404,11 +433,16 @@ window.setSort = (sort) => {
 function renderTests() {
   let tests = [...allTests];
 
-  // Filter
-  if (activeFilter === 'free')         tests = tests.filter(t => t.isFree !== false);
-  if (activeFilter === 'new')          tests = tests.filter(t => t.isNew);
-  if (activeFilter === 'attempted')    tests = tests.filter(t => userResults[t.id]);
-  if (activeFilter === 'notAttempted') tests = tests.filter(t => !userResults[t.id]);
+  // --- NEW META FILTERS ---
+  if (activeClassFilter !== 'All') {
+    tests = tests.filter(t => t.classLevel === activeClassFilter);
+  }
+  if (activeTypeFilter !== 'All') {
+    tests = tests.filter(t => t.testType === activeTypeFilter);
+  }
+  if (activeBatchFilter !== 'All') {
+    tests = tests.filter(t => t.targetBatch === activeBatchFilter);
+  }
 
   // Sort
   if (activeSort === 'oldest') tests.reverse();
@@ -444,13 +478,19 @@ function renderTests() {
       <div class="tc-sub">${escHtml(t.description || t.year || '')}</div>
       <div class="tc-meta">
         <div class="tc-pill">⏱ ${duration} min</div>
-        <div class="tc-pill">❓ ${t.totalQuestions || 150} Qs</div>
-        <div class="tc-pill">📊 ${t.totalMarks || 200} marks</div>
+        <div class="tc-pill">❓ ${t.totalQuestions || 90} Qs</div>
+        <div class="tc-pill">📊 ${t.totalMarks || 300} marks</div>
+        
+        <!-- NEW PILLS GENERATED FROM ADMIN DATA -->
+        ${t.classLevel && t.classLevel !== 'All' ? `<div class="tc-pill">🎓 Class ${t.classLevel}</div>` : ''}
+        ${t.testType && t.testType !== 'All' ? `<div class="tc-pill">📝 ${t.testType}</div>` : ''}
+        ${t.targetBatch && t.targetBatch !== 'All' ? `<div class="tc-pill" style="color: var(--accent);">🏢 ${t.targetBatch}</div>` : ''}
+        
         ${t.sections ? `<div class="tc-pill">📚 ${t.sections.length} sections</div>` : ''}
       </div>
       <div class="tc-footer">
         ${result
-          ? `<div class="tc-completed">✓ ${result.score}/${t.totalMarks||200} · Best score</div>`
+          ? `<div class="tc-completed">✓ ${result.score}/${t.totalMarks||300} · Best score</div>`
           : `<div class="tc-attempts"><strong>${attempts.toLocaleString()}</strong> attempts</div>`
         }
         <button class="tc-start" onclick="event.stopPropagation();startTest('${t.id}','${escHtml(t.title)}')">
