@@ -160,7 +160,7 @@
       <button type="button" class="btn-secondary" style="margin-top: 10px; font-size: 0.8rem;" onclick="toggleGuide()">View JSON Format Guide</button>
       
       <div class="format-guide" id="json-guide">
-        <h4 style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">Engineering Exams (Text-Based)</h4>
+        <h4 style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">Engineering Exams (Standard Array Format)</h4>
         <pre>[
   {
     "id": 1,
@@ -174,18 +174,16 @@
   }
 ]</pre>
 
-        <h4 style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">NEET Exams (Image-Based)</h4>
-        <pre>[
-  {
-    "section": "Physics Section B",
-    "questionImage": "https://quizable.online/images/neet1/q1.webp",
-    "type": "single",
-    "options": { "1": "Option A", "2": "Option B", "3": "Option C", "4": "Option D" },
-    "answer": "3",
-    "positiveMarks": 4,
-    "negativePenalty": 1
-  }
-]</pre>
+        <h4 style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">NEET Exams (New Simplified Grouped Format)</h4>
+        <pre>{
+  "Physics Section A": [
+    { "qNo": 1, "image": "https://quizable.online/images/neet1/1.webp", "answer": "3" },
+    { "qNo": 2, "image": "https://quizable.online/images/neet1/2.webp", "answer": "1" }
+  ],
+  "Physics Section B": [
+    { "qNo": 36, "image": "https://quizable.online/images/neet1/36.webp", "answer": "4" }
+  ]
+}</pre>
       </div>
     </div>
 
@@ -362,13 +360,40 @@
       try {
         const file = fileInput.files[0];
         const text = await file.text();
-        questionsArray = JSON.parse(text);
+        const rawData = JSON.parse(text);
         
-        if (!Array.isArray(questionsArray)) {
-          throw new Error("JSON root must be an array.");
+        questionsArray = [];
+
+        // Scenario 1: It's the old flat array format (Backward Compatibility)
+        if (Array.isArray(rawData)) {
+          questionsArray = rawData;
+        } 
+        // Scenario 2: It's the new Simple Grouped Object format
+        else if (typeof rawData === 'object' && rawData !== null) {
+          for (const [sectionName, qs] of Object.entries(rawData)) {
+            qs.forEach(q => {
+              questionsArray.push({
+                qNo: q.qNo || null,
+                section: sectionName,
+                questionImage: q.image || q.questionImage || null,
+                question: q.question || null, // Fallback if using text instead of images
+                type: "single", // Forces NEET single-choice logic
+                
+                // Inject defaults if you omitted them to save time
+                options: q.options || { "1": "Option A", "2": "Option B", "3": "Option C", "4": "Option D" },
+                answer: String(q.answer), // Ensures the string-matching grader doesn't crash
+                positiveMarks: q.positiveMarks !== undefined ? q.positiveMarks : 4,
+                negativePenalty: q.negativePenalty !== undefined ? q.negativePenalty : 1
+              });
+            });
+          }
+        } else {
+            throw new Error("Invalid format");
         }
+
       } catch (e) {
-        alert("Error: The uploaded file is not a valid JSON array format.");
+        alert("Error Parsing JSON: Please check for missing commas or brackets.");
+        console.error(e);
         btn.disabled = false;
         btn.textContent = "Push to Database";
         return;
@@ -400,7 +425,7 @@
     btn.textContent = "Updating Database...";
     try {
       if (customTestId) {
-        // OVERWRITE targeting explicit document key[cite: 2]
+        // OVERWRITE targeting explicit document key
         await setDoc(doc(db, "tests", customTestId), testPayload, { merge: true });
         alert(`Success! Test '${customTestId}' has been updated.`);
       } else {
