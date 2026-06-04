@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5662933095045266"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5662933095045266" crossorigin="anonymous"></script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quizable — BITSAT Tests</title>
@@ -96,35 +95,28 @@
     .es-label { font-size:0.75rem; color:var(--text-muted); margin-top:1px; }
 
     /* FILTERS */
-    // --- NEW FILTER VARIABLES ---
-let activeClassFilter = 'All';
-let activeTypeFilter = 'All';
-let activeBatchFilter = 'All';
-
-window.setMetaFilters = () => {
-  activeClassFilter = document.getElementById('filter-class').value;
-  activeTypeFilter = document.getElementById('filter-type').value;
-  activeBatchFilter = document.getElementById('filter-batch').value;
-  renderTests();
-};
-
-// --- DYNAMIC BATCH EXTRACTOR ---
-function populateBatchFilter() {
-  const batchDropdown = document.getElementById('filter-batch');
-  if (!batchDropdown) return;
-
-  // Find all unique batch names currently attached to live tests
-  const uniqueBatches = [...new Set(allTests.map(t => t.targetBatch).filter(b => b && b !== 'All'))];
-
-  // Reset to default, then append active batches
-  batchDropdown.innerHTML = `<option value="All">All Batches</option>`;
-  uniqueBatches.forEach(batch => {
-    const opt = document.createElement('option');
-    opt.value = batch;
-    opt.textContent = `Batch: ${batch}`;
-    batchDropdown.appendChild(opt);
-  });
-}
+    .filters-bar {
+      max-width:1100px; margin:2rem auto 0; padding:0 2rem;
+      display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;
+    }
+    .filter-label { font-size:0.8rem; color:var(--text-muted); margin-right:0.25rem; }
+    .filter-btn {
+      padding:0.35rem 0.9rem; border-radius:7px;
+      font-family:'DM Sans',sans-serif; font-size:0.8rem;
+      cursor:pointer; border:1px solid var(--border);
+      background:none; color:var(--text-muted); transition:all 0.15s;
+    }
+    .filter-btn.active {
+      background:var(--accent-soft); border-color:var(--accent); color:var(--accent);
+    }
+    .filter-btn:hover:not(.active) { border-color:var(--border2); color:var(--text); }
+    .filter-spacer { flex:1; }
+    .sort-select {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:7px; padding:0.35rem 0.75rem;
+      color:var(--text-dim); font-family:'DM Sans',sans-serif; font-size:0.8rem;
+      outline:none; cursor:pointer;
+    }
 
     /* CONTENT */
     .content { max-width:1100px; margin:1.5rem auto 4rem; padding:0 2rem; }
@@ -336,8 +328,37 @@ const db   = getFirestore(app);
 
 let allTests      = [];
 let userResults   = {};
-let activeFilter  = 'all';
 let activeSort    = 'newest';
+
+// --- NEW FILTER VARIABLES ---
+let activeClassFilter = 'All';
+let activeTypeFilter = 'All';
+let activeBatchFilter = 'All';
+
+window.setMetaFilters = () => {
+  activeClassFilter = document.getElementById('filter-class').value;
+  activeTypeFilter = document.getElementById('filter-type').value;
+  activeBatchFilter = document.getElementById('filter-batch').value;
+  renderTests();
+};
+
+// --- DYNAMIC BATCH EXTRACTOR ---
+function populateBatchFilter() {
+  const batchDropdown = document.getElementById('filter-batch');
+  if (!batchDropdown) return;
+
+  // Find all unique batch names currently attached to live tests
+  const uniqueBatches = [...new Set(allTests.map(t => t.targetBatch).filter(b => b && b !== 'All'))];
+
+  // Reset to default, then append active batches
+  batchDropdown.innerHTML = `<option value="All">All Batches</option>`;
+  uniqueBatches.forEach(batch => {
+    const opt = document.createElement('option');
+    opt.value = batch;
+    opt.textContent = `Batch: ${batch}`;
+    batchDropdown.appendChild(opt);
+  });
+}
 
 // ── Auth guard ─────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
@@ -371,10 +392,9 @@ onAuthStateChanged(auth, async user => {
 
 async function loadTests() {
   try {
-    // Simple single-field query avoids composite index requirement.
-    // isPublished filtering and sorting done client-side.
+    // UPDATED QUERY: Uses 'examTag' instead of 'examType' to match your Admin Panel logic
     const snap = await getDocs(
-      query(collection(db, 'tests'), where('examType', '==', EXAM_TYPE))
+      query(collection(db, 'tests'), where('examTag', '==', EXAM_TYPE))
     );
     allTests = snap.docs
       .map(d => ({ id: d.id, ...d.data() }))
@@ -385,7 +405,7 @@ async function loadTests() {
         return tb - ta;
       });
     document.getElementById('stat-total').textContent = allTests.length;
-    populateBatchFilter(); // <-- ADD THIS LINE
+    populateBatchFilter(); 
     hideSkeleton();
     renderTests();
   } catch(e) {
@@ -394,7 +414,7 @@ async function loadTests() {
     document.getElementById('error-area').innerHTML =
       '<div class="error-banner">' +
       '⚠️ <strong>Could not load tests.</strong> Open DevTools (F12 → Console) for details.<br/>' +
-      'Common causes: Firebase config not set · Firestore rules blocking reads · Wrong examType in document.<br/>' +
+      'Common causes: Firebase config not set · Firestore rules blocking reads · Wrong examTag in document.<br/>' +
       'Error: <code>' + e.message + '</code>' +
       '</div>';
   }
@@ -404,13 +424,6 @@ function hideSkeleton() {
   document.getElementById('skeleton').style.display = 'none';
   document.getElementById('tests-grid').style.display = 'grid';
 }
-
-window.setFilter = (filter, btn) => {
-  activeFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTests();
-};
 
 window.setSort = (sort) => {
   activeSort = sort;
@@ -430,7 +443,7 @@ function renderTests() {
   if (activeBatchFilter !== 'All') {
     tests = tests.filter(t => t.targetBatch === activeBatchFilter);
   }
-  // (The old security line that hid batch tests is completely removed)
+
   // Sort
   if (activeSort === 'oldest') tests.reverse();
   if (activeSort === 'title')  tests.sort((a,b) => a.title.localeCompare(b.title));
@@ -467,6 +480,12 @@ function renderTests() {
         <div class="tc-pill">⏱ ${duration} min</div>
         <div class="tc-pill">❓ ${t.totalQuestions || 90} Qs</div>
         <div class="tc-pill">📊 ${t.totalMarks || 300} marks</div>
+        
+        <!-- NEW PILLS GENERATED FROM ADMIN DATA -->
+        ${t.classLevel && t.classLevel !== 'All' ? `<div class="tc-pill">🎓 Class ${t.classLevel}</div>` : ''}
+        ${t.testType && t.testType !== 'All' ? `<div class="tc-pill">📝 ${t.testType}</div>` : ''}
+        ${t.targetBatch && t.targetBatch !== 'All' ? `<div class="tc-pill" style="color: var(--accent);">🏢 ${t.targetBatch}</div>` : ''}
+        
         ${t.sections ? `<div class="tc-pill">📚 ${t.sections.length} sections</div>` : ''}
       </div>
       <div class="tc-footer">
