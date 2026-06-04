@@ -290,16 +290,31 @@
     });
   };
 
-  // ── ADMIN SECURITY CHECK ──
+// ── ADMIN SECURITY CHECK (DEBUG MODE) ──
   onAuthStateChanged(auth, async (user) => {
-    if (!user) { window.location.href = "/"; return; }
+    const loader = document.getElementById('loading-screen');
+    
+    if (!user) { 
+      loader.innerHTML = '<span style="color:#ff6b6b;">Error: You are not logged in! Please go to the homepage and log in first.</span>';
+      return; 
+    }
 
     try {
+      loader.innerText = `Checking permissions for UID: ${user.uid}...`;
       const userDoc = await getDoc(doc(db, "users", user.uid));
+      
       if (userDoc.exists() && userDoc.data().role === "admin") {
-        document.getElementById('loading-screen').style.display = 'none';
+        loader.style.display = 'none';
         document.getElementById('admin-content').style.display = 'block';
-        
+        window.filterBatchesByExam(document.getElementById('test-exam').value);
+      } else {
+        loader.innerHTML = `<span style="color:#ff6b6b;">Access Denied: Your account (${user.email}) does not have 'role: "admin"' set in Firestore.</span>`;
+      }
+    } catch (e) {
+      loader.innerHTML = `<span style="color:#ff6b6b;">Firebase Permissions Error: ${e.message} <br><br> Check your Firestore Rules!</span>`;
+      console.error(e);
+    }
+  });        
         // Initialize the conditional batch filter with the initial default selection value
         window.filterBatchesByExam(document.getElementById('test-exam').value);
       } else {
