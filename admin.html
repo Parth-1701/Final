@@ -92,9 +92,9 @@
         <label>Target Exam</label>
         <select id="test-exam" class="form-control" onchange="window.filterBatchesByExam(this.value)">
           <option value="JEE Main">JEE Main</option>
-          <option value="jee_adv">JEE Advanced</option>
+          <option value="JEE Advanced">JEE Advanced</option>
           <option value="NEET">NEET</option>
-          <option value="mht_cet">MHT CET</option>
+          <option value="MHT CET">MHT CET</option>
           <option value="BITSAT">BITSAT</option>
         </select>
       </div>
@@ -233,13 +233,9 @@
   import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
-    authDomain: "sigmascore300.firebaseapp.com",
-    projectId: "sigmascore300",
-    storageBucket: "sigmascore300.firebasestorage.app",
-    messagingSenderId: "293195338803",
-    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
-    measurementId: "G-MLZYWG2EEM"
+      apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+      authDomain: "sigmascore300.firebaseapp.com",
+      projectId: "sigmascore300"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -251,9 +247,8 @@
     "All": [{ value: "All", text: "All Batches (Public)" }],
     "JEE Main": [
       { value: "All", text: "All JEE Main Batches" },
-      { value: "Arjuna-jee", text: "Arjuna (JEE)" },
-      { value: "Lakshya-jee", text: "Lakshya (JEE)" }
-      { value: "Prayas-jee", text: "Prayas (JEE)" }
+      { value: "DL695-INSW01-2025-117921", text: "Batch DL695-INSW01 (JEE)" },
+      { value: "JEE-Alpha-2026", text: "JEE Dropper Alpha" }
     ],
     "JEE Advanced": [
       { value: "All", text: "All JEE Advanced Batches" },
@@ -261,8 +256,8 @@
     ],
     "NEET": [
       { value: "All", text: "All NEET Batches" },
-      { value: "Arjuna-neet", text: "Arjuna (NEET)" },
-      { value: "Lakshya-neet", text: "Lakshya (NEET)" }
+      { value: "NEET-Med-Achievers", text: "NEET Medical Achievers" },
+      { value: "NEET-Crash-2026", text: "NEET Crash Course '26" }
     ],
     "MHT CET": [
       { value: "All", text: "All MHT CET Batches" },
@@ -290,31 +285,16 @@
     });
   };
 
-// ── ADMIN SECURITY CHECK (DEBUG MODE) ──
+  // ── ADMIN SECURITY CHECK ──
   onAuthStateChanged(auth, async (user) => {
-    const loader = document.getElementById('loading-screen');
-    
-    if (!user) { 
-      loader.innerHTML = '<span style="color:#ff6b6b;">Error: You are not logged in! Please go to the homepage and log in first.</span>';
-      return; 
-    }
+    if (!user) { window.location.href = "/"; return; }
 
     try {
-      loader.innerText = `Checking permissions for UID: ${user.uid}...`;
       const userDoc = await getDoc(doc(db, "users", user.uid));
-      
       if (userDoc.exists() && userDoc.data().role === "admin") {
-        loader.style.display = 'none';
+        document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('admin-content').style.display = 'block';
-        window.filterBatchesByExam(document.getElementById('test-exam').value);
-      } else {
-        loader.innerHTML = `<span style="color:#ff6b6b;">Access Denied: Your account (${user.email}) does not have 'role: "admin"' set in Firestore.</span>`;
-      }
-    } catch (e) {
-      loader.innerHTML = `<span style="color:#ff6b6b;">Firebase Permissions Error: ${e.message} <br><br> Check your Firestore Rules!</span>`;
-      console.error(e);
-    }
-  });        
+        
         // Initialize the conditional batch filter with the initial default selection value
         window.filterBatchesByExam(document.getElementById('test-exam').value);
       } else {
