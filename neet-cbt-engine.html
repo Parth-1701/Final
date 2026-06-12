@@ -149,7 +149,9 @@
 
       <div class="q-container" id="q-scroll-area">
         <div class="q-number-bar" id="q-number">Question 1</div>
+        
         <div class="q-text" id="q-text">Loading question text...</div>
+        
         <div class="options-grid" id="options-container"></div>
 
         <div class="action-buttons">
@@ -348,7 +350,22 @@
       document.getElementById('marking-scheme').innerHTML = schemeHTML;
       
       let qTextHTML = (q.text || q.question || "");
-      document.getElementById('q-text').innerHTML = qTextHTML;
+      
+      // --- NEW MULTI-IMAGE RENDERING LOGIC ---
+      let imageHTML = "";
+      if (Array.isArray(q.questionImages) && q.questionImages.length > 0) {
+        imageHTML = `<div class="question-image-container" style="margin-top: 15px;">` + 
+          q.questionImages.map(url => `<img src="${url}" class="exam-img" style="max-width:100%; margin-bottom:10px;">`).join('') + 
+          `</div>`;
+      } else if (q.questionImage || q.image) {
+        const singleUrl = q.questionImage || q.image;
+        imageHTML = `<div class="question-image-container" style="margin-top: 15px;">
+                       <img src="${singleUrl}" class="exam-img" style="max-width:100%;">
+                     </div>`;
+      }
+
+      // Inject text and images
+      document.getElementById('q-text').innerHTML = qTextHTML + imageHTML;
 
       const optsContainer = document.getElementById('options-container');
       optsContainer.innerHTML = '';
