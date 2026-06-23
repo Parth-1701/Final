@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NEET JSON Generator (Smart Format)</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #0a0a0f; color: #e2e2f0; }
+    input, textarea, button { display: block; width: 100%; max-width: 600px; margin-bottom: 15px; padding: 12px; border-radius: 8px; border: 1px solid #2a2a3d; background: #1a1a26; color: white; }
+    textarea { height: 120px; }
+    button { background: #0ea5e9; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    button:hover { background: #0284c7; }
+    pre { background: #12121a; padding: 15px; overflow-x: auto; max-height: 500px; border: 1px solid #2a2a3d; border-radius: 8px; color: #3ecf8e;}
+    .info-badge { display: inline-block; background: #1a1a26; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; border: 1px solid #0ea5e9; color: #0ea5e9; margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+
+  <h2 style="color: #0ea5e9;">NEET CBT JSON Auto-Generator</h2>
+  <div class="info-badge">Auto-detects 180 (Old Pattern) vs 200 (New Pattern)</div>
+  <p style="font-size: 0.9rem; color: #9898b8;">Paste your answer key. If 200 answers, it generates Section A & B. If 180 answers, it drops Section B and assigns 45 Qs per subject.</p>
+  
+  <label>Base Image URL Directory</label>
+  <input type="text" id="base-url" value="https://quizable.online/images/neet-pyq-2020/">
+
+  <label>Answer Key (Comma separated, exactly 180 or 200 answers)</label>
+  <textarea id="answer-key" placeholder="1, 2, 4, 3, 1..."></textarea>
+
+  <button onclick="generateJSON()">Generate Grouped JSON</button>
+
+  <label>Output (Save as .json and upload via Admin Panel)</label>
+  <pre id="output"></pre>
+
+  <script>
+    function generateJSON() {
+      const baseUrl = document.getElementById('base-url').value.trim();
+      const rawAnswers = document.getElementById('answer-key').value;
+      const answers = rawAnswers.split(',').map(a => a.trim()).filter(a => a);
+      
+      let groupedJson = {};
+      let qIndex = 1;
+
+      if (answers.length === 200) {
+        // --- NEW PATTERN (Post-2021) ---
+        groupedJson = {
+          "Physics Section A": [], "Physics Section B": [],
+          "Chemistry Section A": [], "Chemistry Section B": [],
+          "Botany Section A": [], "Botany Section B": [],
+          "Zoology Section A": [], "Zoology Section B": []
+        };
+
+        const sections = [
+          { name: "Physics Section A", count: 35 }, { name: "Physics Section B", count: 15 },
+          { name: "Chemistry Section A", count: 35 }, { name: "Chemistry Section B", count: 15 },
+          { name: "Botany Section A", count: 35 }, { name: "Botany Section B", count: 15 },
+          { name: "Zoology Section A", count: 35 }, { name: "Zoology Section B", count: 15 }
+        ];
+
+        sections.forEach(sec => {
+          for (let i = 0; i < sec.count; i++) {
+            groupedJson[sec.name].push({
+              qNo: qIndex,
+              image: `${baseUrl}${qIndex}.webp`,
+              answer: answers[qIndex - 1]
+            });
+            qIndex++;
+          }
+        });
+
+      } else if (answers.length === 180) {
+        // --- OLD PATTERN (Pre-2021) ---
+        groupedJson = {
+          "Physics": [],
+          "Chemistry": [],
+          "Botany": [],
+          "Zoology": []
+        };
+
+        const sections = [
+          { name: "Physics", count: 45 },
+          { name: "Chemistry", count: 45 },
+          { name: "Botany", count: 45 },
+          { name: "Zoology", count: 45 }
+        ];
+
+        sections.forEach(sec => {
+          for (let i = 0; i < sec.count; i++) {
+            groupedJson[sec.name].push({
+              qNo: qIndex,
+              image: `${baseUrl}${qIndex}.webp`,
+              answer: answers[qIndex - 1]
+            });
+            qIndex++;
+          }
+        });
+
+      } else {
+        alert(`Error: You provided ${answers.length} answers.\n\nThe script expects exactly 180 (for classic pattern) or 200 (for modern pattern). Check for missing/extra commas.`);
+        return;
+      }
+
+      document.getElementById('output').textContent = JSON.stringify(groupedJson, null, 2);
+    }
+  </script>
+</body>
+</html>
