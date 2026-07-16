@@ -52,6 +52,93 @@
       pointer-events:none; z-index:0;
     }
 
+    /* --- Support Popup Styles --- */
+#support-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 15, 0.85); /* Dark overlay */
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Ensure it stays on top of everything */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#support-popup-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.support-popup-card {
+    background: var(--surface, #12121a);
+    border: 1px solid var(--border, #2a2a3d);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+#support-popup-overlay.show .support-popup-card {
+    transform: translateY(0);
+}
+
+.support-popup-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--text, #e2e2f0);
+    border: 1px solid var(--border, #2a2a3d);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.2s ease;
+}
+
+.support-popup-close-btn:hover {
+    background: var(--accent, #6c63ff); /* Adds your brand glow on hover */
+}
+
+.support-popup-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-bottom: 1px solid var(--border, #2a2a3d);
+}
+
+.support-popup-content {
+    padding: 20px;
+}
+
+.support-popup-content h3 {
+    color: var(--accent, #0ea5e9); /* Using the Cyan for emphasis */
+    margin: 0 0 10px 0;
+    font-family: 'Syne', sans-serif;
+}
+
+.support-popup-content p {
+    color: var(--text, #e2e2f0);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.5;
+}
+    
     /* ── NAV ── */
     nav {
       position: fixed; top:0; left:0; right:0; z-index:100;
@@ -346,6 +433,16 @@
 </head>
 <body>
 
+  <div id="support-popup-overlay">
+    <div class="support-popup-card">
+        <button id="support-popup-close" class="support-popup-close-btn">&times;</button>
+        <img src="assets/wangchuk-support.webp" alt="Support Sonam Wangchuk and NEET Aspirants" class="support-popup-img">
+        <div class="support-popup-content">
+            <h3>#SupportSonamWangchuk</h3>
+            <p>We stand in solidarity with Sonam Wangchuk and everyone fighting for transparency and fairness.</p>
+        </div>
+    </div>
+  </div>
 <nav>
   <div class="nav-logo">
     <div class="logo-dot"></div>
@@ -1121,5 +1218,34 @@ document.querySelectorAll('.exam-card,.feat-card,.step').forEach(el => {
   obs.observe(el);
 });
 </script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const popupOverlay = document.getElementById('support-popup-overlay');
+    const closeBtn = document.getElementById('support-popup-close');
+
+    // Only show if 'supportPopupShown' is NOT in sessionStorage
+    if (!sessionStorage.getItem('supportPopupShown')) {
+        // Delay by 800ms so it smoothly fades in after the page loads
+        setTimeout(() => {
+            popupOverlay.classList.add('show');
+        }, 800);
+    }
+
+    // When the user clicks the close button
+    closeBtn.addEventListener('click', () => {
+        popupOverlay.classList.remove('show');
+        // Set the flag in sessionStorage so it doesn't appear again
+        sessionStorage.setItem('supportPopupShown', 'true');
+    });
+
+    // Optional: Close if user clicks outside the card
+    popupOverlay.addEventListener('click', (e) => {
+        if (e.target === popupOverlay) {
+            popupOverlay.classList.remove('show');
+            sessionStorage.setItem('supportPopupShown', 'true');
+        }
+    });
+});
+  </script>
 </body>
 </html>
