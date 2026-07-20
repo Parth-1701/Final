@@ -217,7 +217,8 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    // Added setDoc for the leaderboard logic
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // ─── 1. PASTE YOUR EXACT FIREBASE CONFIG HERE ─────────────────
     const firebaseConfig = {
@@ -245,8 +246,7 @@
     let sections = [];
     let currentSection = "";
 
-    onAuthStateChanged(auth, async (user) => {
-    // UPGRADED AUTHENTICATION CHECK
+    // Fixed duplicate onAuthStateChanged nesting
     onAuthStateChanged(auth, async (user) => {
       // 1. Wait for Firebase to initialize
       if (user) {
@@ -271,7 +271,6 @@
       }
     });
 
-    // Move your fetching logic into this separate function
     async function loadTestData(testId) {
       try {
         const testSnap = await getDoc(doc(db, 'tests', testId));
@@ -301,7 +300,6 @@
         document.getElementById('load-text').style.color = "red";
       }
     }
-    });
 
     window.buildSectionDropdown = () => {
       const dropdown = document.getElementById('section-dropdown');
@@ -589,12 +587,31 @@
 
         const user = auth.currentUser;
         if (user) {
+          
+          // 1. Save standard attempt to the student's personal history
           await addDoc(collection(db, 'results'), {
             userId: user.uid, testId: testData.id, testTitle: testData.title, 
             score, correct, wrong, timeTaken, submittedAt: serverTimestamp(),
             responses: responses
-          }).catch(e => console.log(e));
+          }).catch(e => console.log("History error:", e));
+
+          // 2. Leaderboard First-Attempt Logic
+          const leaderboardRef = doc(db, "leaderboards", testData.id, "entries", user.uid);
+          const docSnap = await getDoc(leaderboardRef);
+
+          if (!docSnap.exists()) {
+             // If document doesn't exist, this is their first attempt. Lock it in.
+             await setDoc(leaderboardRef, {
+                 userName: user.email ? user.email.split('@')[0].toUpperCase() : "STUDENT",
+                 score: score,
+                 timestamp: serverTimestamp() // For tie-breaking
+             });
+             console.log("First attempt logged to leaderboard!");
+          } else {
+             console.log("Subsequent attempt. Leaderboard score remains unchanged.");
+          }
         }
+        
         window.location.href = 'result.html';
       } catch (err) {
         document.querySelector('.spinner').style.display = 'none'; 
