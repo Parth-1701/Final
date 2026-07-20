@@ -117,22 +117,38 @@
       </div>
 
       <!-- Turnkey PYQ -->
-      <div class="pricing-card card-gold">
-        <div class="popular-badge" style="background: var(--gold); color: #000;">Turnkey</div>
-        <h3 class="plan-name">PYQ Master</h3>
-        <div class="plan-price">₹29,999 <span>/ one-time</span></div>
+      <div class="pricing-card">
+        <h3 class="plan-name">Website Setup</h3>
+        <div class="plan-price">₹10,999 <span>/ one-time</span></div>
         <p class="plan-desc">Pre-loaded with 20 years of official NEET PYQs. Day one, your students have a massive test series ready to go.</p>
         
         <ul class="features-list">
-          <li><span class="check gold">✓</span> <strong>Everything in DIY Setup</strong></li>
-          <li><span class="check gold">✓</span> Pre-loaded with 4,000+ NEET/JEE PYQs</li>
-          <li><span class="check gold">✓</span> Instant 20-Year Test Series Library</li>
+          <li><span class="check">✓</span> <strong>Everything in DIY Setup</strong></li>
+          <li><span class="check">✓</span> Custom Website and Domain (1 year)</li>
+       </ul>
+        
+        <!-- Passes 'setup' as the type, and 'PYQ Master' as the plan name -->
+        <button class="btn-buy btn-standard" onclick="triggerEmail('setup', 'Website Setup')">Select PYQ Master</button>
+      </div>
+
+      <!-- Turnkey PYQ -->
+      <div class="pricing-card card-gold">
+        <div class="popular-badge" style="background: var(--gold); color: #000;">Turnkey</div>
+        <h3 class="plan-name">PYQ Master</h3>
+        <div class="plan-price">₹17,999 <span>/ one-time</span></div>
+        <p class="plan-desc">Pre-loaded with 20 years of official NEET PYQs. Day one, your students have a massive test series ready to go.</p>
+        
+        <ul class="features-list">
+          <li><span class="check gold">✓</span> <strong>Everything in Website Setup</strong></li>
+          <li><span class="check gold">✓</span> 3600+ NEET PYQs built right into the website</li>
+          <li><span class="check gold">✓</span> Instant 20-year Test library</li>
           <li><span class="check gold">✓</span> Save ₹15,000+ on manual data entry</li>
-        </ul>
+       </ul>
         
         <!-- Passes 'setup' as the type, and 'PYQ Master' as the plan name -->
         <button class="btn-buy btn-gold" onclick="triggerEmail('setup', 'PYQ Master')">Select PYQ Master</button>
       </div>
+      
 
     </div>
 
@@ -143,11 +159,11 @@
         <!-- Base Tier -->
         <div class="pricing-card">
           <h3 class="plan-name">Base</h3>
-          <div class="plan-price">₹4,999 <span>/ month</span></div>
+          <div class="plan-price">₹2,499 <span>/ month</span></div>
           <p class="plan-desc">Perfect for single-batch institutes or crash courses starting the digital shift.</p>
           
           <ul class="features-list">
-            <li><span class="check">✓</span> Up to 150 Active Students</li>
+            <li><span class="check">✓</span> Up to 250 Active Students</li>
             <li><span class="check">✓</span> Unlimited Mock Test Attempts</li>
             <li><span class="check">✓</span> Basic Leaderboard Analytics</li>
             <li><span class="check">✓</span> Standard Server Bandwidth</li>
@@ -160,7 +176,7 @@
         <div class="pricing-card card-platinum">
           <div class="popular-badge">Most Popular</div>
           <h3 class="plan-name">Pro</h3>
-          <div class="plan-price">₹9,999 <span>/ month</span></div>
+          <div class="plan-price">₹4,999 <span>/ month</span></div>
           <p class="plan-desc">For growing regional coachings running multiple batches simultaneously.</p>
           
           <ul class="features-list">
@@ -175,9 +191,9 @@
 
         <!-- Elite Tier -->
         <div class="pricing-card">
-            <h3 class="plan-name">Elite</h3>
-            <div class="plan-price">₹14,999 <span>/ month</span></div>
-            <p class="plan-desc">For multi-branch institutes needing unlimited scale and heavy API access.</p>
+            <h3 class="plan-name">Custom</h3>
+            <div class="plan-price">Contact for price <span></span></div>
+            <p class="plan-desc">For multi-branch institutes needing large scale and heavy API access.</p>
             
             <ul class="features-list">
               <li><span class="check">✓</span> Unlimited Students</li>
@@ -186,7 +202,7 @@
               <li><span class="check">✓</span> Enterprise Firebase Bandwidth</li>
             </ul>
 
-            <button class="btn-buy btn-standard" onclick="triggerEmail('monthly', 'Elite')">Select Elite Tier</button>
+            <button class="btn-buy btn-standard" onclick="triggerEmail('monthly', 'Custom')">Select Custom Tier</button>
         </div>
   
       </div>
@@ -199,10 +215,10 @@
   window.triggerEmail = function(selectionType, planName) {
     // Determine which field to pre-fill based on what they clicked
     let setupPlan = (selectionType === 'setup') ? planName : "[Specify DIY Setup or PYQ Master]";
-    let monthlyPlan = (selectionType === 'monthly') ? planName : "[Specify Base, Pro, or Elite]";
+    let monthlyPlan = (selectionType === 'monthly') ? planName : "[Specify Base, Pro, or Custom]";
 
     // The email address you want to receive inquiries at
-    const contactEmail = "contact@quizable.online"; 
+    const contactEmail = "sales@quizable.online"; 
     
     // Encode the subject and body to ensure spaces and line breaks work in the email client
     const subject = encodeURIComponent(`Quizable Institute Partnership - ${planName} Plan`);
