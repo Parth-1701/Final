@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quizable for Institutes — Pricing</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
-    /* Variables and Core from Source[cite: 1] */
+    /* Variables and Core */
     :root {
       --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
       --border: #2a2a3d; --accent: #6c63ff; 
@@ -18,14 +17,14 @@
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
     
-    /* SVG Noise Background[cite: 1] */
+    /* SVG Noise Background */
     body::before {
       content:''; position:fixed; inset:0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
       pointer-events:none; z-index:0;
     }
 
-    /* ── NAV ──[cite: 1] */
+    /* ── NAV ── */
     nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; gap: 1rem; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
     .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
     .nav-logo span { color:var(--accent); }
@@ -33,7 +32,7 @@
     .nav-back { color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s; }
     .nav-back:hover { color: var(--accent); }
 
-    /* ── PRICING LAYOUT ──[cite: 1] */
+    /* ── PRICING LAYOUT ── */
     .page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; }
     .container { max-width: 1000px; margin: 0 auto; text-align: center; }
     .hero-glow { position:absolute; width:600px; height:600px; background: radial-gradient(circle, rgba(108,99,255,0.1) 0%, transparent 60%); top: 0; left:50%; transform:translate(-50%,-20%); pointer-events:none; z-index: -1; }
@@ -44,7 +43,7 @@
     /* B2B Section Titles */
     .section-title { font-family: 'Syne', sans-serif; font-size: 1.5rem; color: #fff; text-align: left; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin: 3rem 0 2rem 0; animation: fadeUp 0.6s 0.15s ease both; }
 
-    /* ── PRICING CARDS ──[cite: 1] */
+    /* ── PRICING CARDS ── */
     .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; align-items: stretch; animation: fadeUp 0.6s 0.2s ease both; margin-bottom: 2rem;}
     .pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 3rem 2rem; display: flex; flex-direction: column; text-align: left; position: relative; transition: all 0.3s ease; }
     .pricing-card:hover { transform: translateY(-5px); }
@@ -67,7 +66,7 @@
     .check { color: var(--success); font-weight: bold; }
     .check.gold { color: var(--gold); }
 
-    .btn-buy { width: 100%; border: none; padding: 1.2rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-buy { width: 100%; border: none; padding: 1.2rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: auto; }
     
     .btn-standard { background: transparent; color: #fff; border: 1px solid var(--border); }
     .btn-standard:hover { background: var(--surface2); }
@@ -107,13 +106,14 @@
         <p class="plan-desc">We give you the custom-branded CBT portal and an Admin Panel. You have total freedom to upload your own mock tests.</p>
         
         <ul class="features-list">
-          <li><span class="check">✓</span> Custom URL & Institute Branding (Logo/Colors)</li>
+          <li><span class="check">✓</span> Custom URL & Institute Branding</li>
           <li><span class="check">✓</span> Isolated Firebase Database Environment</li>
           <li><span class="check">✓</span> Full Admin Panel Access</li>
           <li><span class="check">✓</span> Manual Mock Test Upload Engine</li>
         </ul>
         
-        <button class="btn-buy btn-standard" onclick="triggerPayment('setup_diy', 14999)">Select DIY Setup</button>
+        <!-- Passes 'setup' as the type, and 'DIY Setup' as the plan name -->
+        <button class="btn-buy btn-standard" onclick="triggerEmail('setup', 'DIY Setup')">Select DIY Setup</button>
       </div>
 
       <!-- Turnkey PYQ -->
@@ -130,7 +130,8 @@
           <li><span class="check gold">✓</span> Save ₹15,000+ on manual data entry</li>
         </ul>
         
-        <button class="btn-buy btn-gold" onclick="triggerPayment('setup_pyq', 29999)">Select PYQ Master</button>
+        <!-- Passes 'setup' as the type, and 'PYQ Master' as the plan name -->
+        <button class="btn-buy btn-gold" onclick="triggerEmail('setup', 'PYQ Master')">Select PYQ Master</button>
       </div>
 
     </div>
@@ -151,6 +152,8 @@
             <li><span class="check">✓</span> Basic Leaderboard Analytics</li>
             <li><span class="check">✓</span> Standard Server Bandwidth</li>
           </ul>
+
+          <button class="btn-buy btn-standard" onclick="triggerEmail('monthly', 'Base')">Select Base Tier</button>
         </div>
   
         <!-- Pro Tier -->
@@ -167,7 +170,7 @@
             <li><span class="check">✓</span> High-Capacity Server Bandwidth</li>
           </ul>
           
-          <button class="btn-buy btn-platinum" onclick="triggerPayment('monthly_pro', 9999)">Select Pro Tier</button>
+          <button class="btn-buy btn-platinum" onclick="triggerEmail('monthly', 'Pro')">Select Pro Tier</button>
         </div>
 
         <!-- Elite Tier -->
@@ -182,6 +185,8 @@
               <li><span class="check">✓</span> Custom Subdomain Setup</li>
               <li><span class="check">✓</span> Enterprise Firebase Bandwidth</li>
             </ul>
+
+            <button class="btn-buy btn-standard" onclick="triggerEmail('monthly', 'Elite')">Select Elite Tier</button>
         </div>
   
       </div>
@@ -189,48 +194,22 @@
   </div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<script>
+  // ── PRE-WRITTEN EMAIL LOGIC ──
+  window.triggerEmail = function(selectionType, planName) {
+    // Determine which field to pre-fill based on what they clicked
+    let setupPlan = (selectionType === 'setup') ? planName : "[Specify DIY Setup or PYQ Master]";
+    let monthlyPlan = (selectionType === 'monthly') ? planName : "[Specify Base, Pro, or Elite]";
 
-  // Replace with your actual Firebase config[cite: 1]
-  const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "your-project.firebaseapp.com",
-      projectId: "your-project"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // ── PAYMENT GATEWAY LOGIC ──[cite: 1]
-  window.triggerPayment = function(planId, priceInRupees) {
-    const currentUser = auth.currentUser;
+    // The email address you want to receive inquiries at
+    const contactEmail = "contact@quizable.online"; 
     
-    // Convert to paise for Razorpay[cite: 1]
-    const amountPaise = priceInRupees * 100;
+    // Encode the subject and body to ensure spaces and line breaks work in the email client
+    const subject = encodeURIComponent(`Quizable Institute Partnership - ${planName} Plan`);
+    const body = encodeURIComponent(`Name: \nContact: \nPlan needed: ${setupPlan}\nMonthly plan: ${monthlyPlan}\n\n`);
 
-    var options = {
-      "key": "rzp_live_YOUR_KEY_HERE",
-      "amount": amountPaise, 
-      "currency": "INR",
-      "name": "Quizable B2B",
-      "description": `Institute Plan: ${planId.replace('_', ' ').toUpperCase()}`,
-      "theme": {
-        "color": planId.includes('pyq') ? "#ffd700" : "#6c63ff"
-      },
-      "notes": {
-        "firebase_uid": currentUser ? currentUser.uid : "guest_institute",
-        "plan_type": planId 
-      },
-      "handler": function (response) {
-        alert(`Payment Successful! We will contact you shortly to begin setup.`);
-        // Redirect to a success/onboarding form
-      }
-    };
-
-    var rzp = new Razorpay(options);
-    rzp.open();
+    // Trigger the default mail client
+    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
   };
 </script>
 
