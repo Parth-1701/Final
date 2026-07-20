@@ -32,6 +32,51 @@
 
     .btn { display: inline-block; width: 100%; background: var(--accent); color: white; text-decoration: none; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 1.1rem; transition: 0.2s; border: none; cursor: pointer; }
     .btn:hover { background: #5a52d5; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(108,99,255,0.2); }
+
+    .leaderboard-container {
+    background-color: var(--surface); /* Inherits your #12121a */
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+}
+
+.leaderboard-header h2 {
+    font-family: 'Syne', sans-serif;
+    color: var(--accent); /* Inherits your purple/cyan */
+    margin-bottom: 0.2rem;
+}
+
+.leaderboard-header p {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard-table th, .leaderboard-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.leaderboard-table th {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: #a0a0b0;
+}
+
+/* Gold, Silver, Bronze highlighting for Top 3 */
+.rank-1 td { color: #FFD700; font-weight: bold; }
+.rank-2 td { color: #C0C0C0; font-weight: bold; }
+.rank-3 td { color: #CD7F32; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -67,7 +112,69 @@
     </div>
   </div>
 
+  <div class="leaderboard-container">
+    <div class="leaderboard-header">
+        <h2>🏆 Top Scorers</h2>
+        <p>Only your first attempt is ranked.</p>
+    </div>
+    <table class="leaderboard-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Student</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+            <tr><td colspan="3" style="text-align: center;">Loading rankings...</td></tr>
+        </tbody>
+    </table>
+  </div>
+
   <script>
+    import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+
+async function renderLeaderboard(testId) {
+    const tbody = document.getElementById("leaderboard-body");
+    
+    try {
+        const entriesRef = collection(db, "leaderboards", testId, "entries");
+        // Get Top 50 students, sorted by highest score, then by earliest completion time
+        const q = query(entriesRef, orderBy("score", "desc"), orderBy("timestamp", "asc"), limit(50));
+        
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">No attempts yet. Be the first!</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = ""; // Clear loader
+        let rank = 1;
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            
+            // Add specific CSS classes for the top 3 spots
+            let rowClass = "";
+            if (rank === 1) rowClass = "rank-1";
+            if (rank === 2) rowClass = "rank-2";
+            if (rank === 3) rowClass = "rank-3";
+
+            tbody.innerHTML += `
+                <tr class="${rowClass}">
+                    <td>#${rank}</td>
+                    <td>${data.userName}</td>
+                    <td>${data.score}</td>
+                </tr>
+            `;
+            rank++;
+        });
+    } catch (error) {
+        console.error("Failed to load leaderboard:", error);
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">Failed to load rankings.</td></tr>`;
+    }
+}
     document.addEventListener("DOMContentLoaded", () => {
       // Pull the data package we saved in test.html
       const resultData = sessionStorage.getItem('examResult');
