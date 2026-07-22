@@ -85,7 +85,7 @@
     <div class="header-tag" id="exam-tag">Exam Completed</div>
     <h1>Your Score</h1>
     
-    <div class="score-display" id="final-score">--</div>
+    <div class="score-display" id="score-display">--</div>
     
     <div class="stats-grid">
       <div class="stat-box">
@@ -93,15 +93,15 @@
         <div class="stat-label">Correct Answers</div>
       </div>
       <div class="stat-box">
-        <div class="stat-value wrong" id="stat-wrong">--</div>
+        <div class="stat-value wrong" id="wrong-display">--</div>
         <div class="stat-label">Incorrect Answers</div>
       </div>
       <div class="stat-box">
-        <div class="stat-value neutral" id="stat-accuracy">--%</div>
+        <div class="stat-value neutral" id="accuracy-display">--%</div>
         <div class="stat-label">Accuracy</div>
       </div>
       <div class="stat-box">
-        <div class="stat-value" id="stat-time" style="color: white;">--:--</div>
+        <div class="stat-value" id="time-display" style="color: white;">--:--</div>
         <div class="stat-label">Time Taken</div>
       </div>
     </div>
@@ -174,7 +174,7 @@
 
         // 3. Inject into your HTML 
         document.getElementById('score-display').innerText = data.score;
-        document.getElementById('stat-correct').innerText = data.correct;
+        document.getElementById('correct-display').innerText = data.correct;
         document.getElementById('wrong-display').innerText = data.wrong;
         document.getElementById('accuracy-display').innerText = `${accuracy}%`;
         document.getElementById('time-display').innerText = formattedTime;
