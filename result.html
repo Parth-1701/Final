@@ -131,84 +131,96 @@
     </table>
   </div>
 
-  <script>
-    import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+  <script type="module">
+    // Import Firestore if you are rendering the leaderboard on this page
+    import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-async function renderLeaderboard(testId) {
-    const tbody = document.getElementById("leaderboard-body");
+    // Initialize Firebase (Paste your config here again so the leaderboard works)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+        authDomain: "sigmascore300.firebaseapp.com",
+        projectId: "sigmascore300",
+        storageBucket: "sigmascore300.firebasestorage.app",
+        messagingSenderId: "293195338803",
+        appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
+        measurementId: "G-MLZYWG2EEM"
+    };
     
-    try {
-        const entriesRef = collection(db, "leaderboards", testId, "entries");
-        // Get Top 50 students, sorted by highest score, then by earliest completion time
-        const q = query(entriesRef, orderBy("score", "desc"), orderBy("timestamp", "asc"), limit(50));
-        
-        const querySnapshot = await getDocs(q);
-        
-        if (querySnapshot.empty) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">No attempts yet. Be the first!</td></tr>`;
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // 1. Pull the data we temporarily saved in the browser during submit
+        const resultData = sessionStorage.getItem('examResult');
+
+        if (!resultData) {
+            console.error("No test data found in session.");
+            document.getElementById('score-display').innerText = "Error";
             return;
         }
 
-        tbody.innerHTML = ""; // Clear loader
-        let rank = 1;
+        const data = JSON.parse(resultData);
 
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            
-            // Add specific CSS classes for the top 3 spots
-            let rowClass = "";
-            if (rank === 1) rowClass = "rank-1";
-            if (rank === 2) rowClass = "rank-2";
-            if (rank === 3) rowClass = "rank-3";
+        // 2. Calculate extra stats
+        // Prevent dividing by zero if they skipped everything
+        const totalAttempted = data.correct + data.wrong;
+        const accuracy = totalAttempted > 0 ? ((data.correct / totalAttempted) * 100).toFixed(1) : 0;
+        
+        // Format seconds into MM:SS
+        const minutes = Math.floor(data.timeTaken / 60);
+        const seconds = data.timeTaken % 60;
+        const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-            tbody.innerHTML += `
-                <tr class="${rowClass}">
-                    <td>#${rank}</td>
-                    <td>${data.userName}</td>
-                    <td>${data.score}</td>
-                </tr>
-            `;
-            rank++;
-        });
-    } catch (error) {
-        console.error("Failed to load leaderboard:", error);
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">Failed to load rankings.</td></tr>`;
-    }
-}
-    document.addEventListener("DOMContentLoaded", () => {
-      // Pull the data package we saved in test.html
-      const resultData = sessionStorage.getItem('examResult');
-      
-      if (!resultData) {
-        alert("No recent test results found.");
-        window.location.href = 'index.html';
-        return;
-      }
+        // 3. Inject into your HTML 
+        document.getElementById('score-display').innerText = data.score;
+        document.getElementById('stat-correct').innerText = data.correct;
+        document.getElementById('wrong-display').innerText = data.wrong;
+        document.getElementById('accuracy-display').innerText = `${accuracy}%`;
+        document.getElementById('time-display').innerText = formattedTime;
 
-      const data = JSON.parse(resultData);
-
-      // Populate UI
-      document.getElementById('final-score').innerText = data.score;
-      document.getElementById('stat-correct').innerText = data.correct;
-      document.getElementById('stat-wrong').innerText = data.wrong;
-      
-      // Calculate Accuracy (Prevent dividing by zero if they skipped everything)
-      const attempted = data.correct + data.wrong;
-      const accuracy = attempted > 0 ? Math.round((data.correct / attempted) * 100) : 0;
-      document.getElementById('stat-accuracy').innerText = `${accuracy}%`;
-
-      // Format Time Taken (Convert seconds to HH:MM:SS)
-      const timeTaken = data.timeTaken || 0;
-      const h = Math.floor(timeTaken / 3600);
-      const m = Math.floor((timeTaken % 3600) / 60).toString().padStart(2, '0');
-      const s = (timeTaken % 60).toString().padStart(2, '0');
-      document.getElementById('stat-time').innerText = h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
-
-      // Show Exam Type tag if available
-      if(data.examType) {
-        document.getElementById('exam-tag').innerText = data.examType.toUpperCase().replace('_', ' ');
-      }
+        // 4. Trigger the leaderboard render
+        if(data.testId) {
+            renderLeaderboard(data.testId);
+        }
     });
+
+    // 5. The Leaderboard Engine (from earlier)
+    async function renderLeaderboard(testId) {
+        const tbody = document.getElementById("leaderboard-body");
+        if (!tbody) return; // Skip if you haven't added the leaderboard HTML yet
+
+        try {
+            const entriesRef = collection(db, "leaderboards", testId, "entries");
+            const q = query(entriesRef, orderBy("score", "desc"), orderBy("timestamp", "asc"), limit(10));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">No attempts yet.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = ""; 
+            let rank = 1;
+
+            querySnapshot.forEach((doc) => {
+                const rowData = doc.data();
+                let rowClass = rank === 1 ? "rank-1" : rank === 2 ? "rank-2" : rank === 3 ? "rank-3" : "";
+                
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td>#${rank}</td>
+                        <td>${rowData.userName}</td>
+                        <td>${rowData.score}</td>
+                    </tr>
+                `;
+                rank++;
+            });
+        } catch (error) {
+            console.error("Failed to load leaderboard:", error);
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">Failed to load rankings.</td></tr>`;
+        }
+    }
   </script>
 </body>
 </html>
