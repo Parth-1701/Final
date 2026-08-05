@@ -249,54 +249,50 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(33,30,23,.08)}
   color: var(--text-muted); text-transform: uppercase; 
 }
 
-/* ============ Qwen Hall Ticket (Square & Centered) ============ */
-.hall-ticket {
+/* admit-card stat block */
+.hall-ticket{
   background:var(--paper-hi);
-  border:1.5px solid var(--border);
-  border-radius:6px !important;
-  box-shadow:6px 6px 0 var(--border);
+  border:1.5px solid var(--ink);
+  border-radius:6px;
+  box-shadow:var(--hard-shadow);
   transform:rotate(-1.4deg);
   transition:transform .3s ease;
   position:relative;
-  width: 100%;
-  max-width: 420px; /* Reduced from 650px to force a perfect square */
-  margin: 4rem auto 0;
 }
 .hall-ticket:hover{transform:rotate(0deg)}
-.ht-head {
+.ht-head{
   display:flex;justify-content:space-between;align-items:center;
-  border-bottom:1.5px dashed var(--border);
-  padding:1rem 1.5rem;
-  font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;color:var(--text-muted);
+  border-bottom:1.5px dashed var(--line-hard);
+  padding:.85rem 1.3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;color:var(--ink-2);
 }
-.ht-stamp {
+.ht-stamp{
   font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;
-  color:var(--accent);border:1.5px solid var(--accent);border-radius:3px !important;
-  padding:.2rem .5rem;transform:rotate(3deg); font-weight: bold;
+  color:var(--red);border:1.5px solid var(--red);border-radius:3px;
+  padding:.2rem .5rem;transform:rotate(3deg);
 }
-.stats { display:grid;grid-template-columns:1fr 1fr; }
-.stats > div {
-  padding:1.5rem 1.25rem; /* Better vertical padding to square out the boxes */
-  border-bottom:1px dashed var(--border);
-  text-align: left;
+.stats{display:grid;grid-template-columns:1fr 1fr;}
+.stats > div{
+  padding:1.25rem 1.3rem;
+  border-bottom:1px dashed var(--line);
 }
-.stats > div:nth-child(odd){border-right:1px dashed var(--border)}
-.stats dd {
+.stats > div:nth-child(odd){border-right:1px dashed var(--line)}
+.stats dd{
   font-family:var(--serif);font-size:2.3rem;font-weight:600;line-height:1;
-  color:var(--text); margin: 0;
+  color:var(--ink);
 }
-.stats dd small { font-size:1.2rem;color:var(--accent); font-family: 'Space Grotesk', sans-serif; font-weight: 800; vertical-align: super; }
-.stats dt { font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;color:var(--text-muted);margin-top:.35rem;text-transform:uppercase; font-weight: bold; }
-.barcode {
+.stats dd small{font-size:1.2rem;color:var(--red)}
+.stats dt{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;color:var(--ink-2);margin-top:.35rem;text-transform:uppercase}
+.barcode{
   height:38px;margin:1.1rem 1.3rem .35rem;
   background:repeating-linear-gradient(90deg,
-    var(--border) 0 2px, transparent 2px 5px,
-    var(--border) 5px 6px, transparent 6px 11px,
-    var(--border) 11px 14px, transparent 14px 17px);
+    var(--ink) 0 2px, transparent 2px 5px,
+    var(--ink) 5px 6px, transparent 6px 11px,
+    var(--ink) 11px 14px, transparent 14px 17px);
   opacity:.8;
 }
-.ht-num { font-family:var(--mono);font-size:.62rem;color:var(--text-muted);text-align:center;padding-bottom:1rem;letter-spacing:.28em; font-weight: bold;}
-
+.ht-num{font-family:var(--mono);font-size:.62rem;color:var(--ink-2);text-align:center;padding-bottom:1rem;letter-spacing:.28em}
+   
 /* ============ Qwen Sections & Layout ============ */
 section{padding:4.6rem 0}
 .sec-head{max-width:44rem;margin-bottom:2.6rem}
