@@ -12,11 +12,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 
 <style>
-/* ============================================================
-   QUIZABLE — Hybrid Theme (Gemini Hero & Background + Qwen Interface)
-   ============================================================ */
 :root {
-  /* Qwen Base Paper Theme Variables */
+  
   --paper:      #F3EEE1;   
   --paper-hi:   #FBF8EF;   
   --paper-lo:   #E9E2D0;   
@@ -33,7 +30,7 @@
   --mono:  "IBM Plex Mono", "Courier New", monospace;
   --hard-shadow: 5px 5px 0 var(--ink);
 
-  /* Gemini Specific Colors & Variables */
+  
   --bg: #F4F2EC;
   --surface: #FFFFFF;
   --surface2: #EAE8E1;
@@ -52,7 +49,7 @@ body{
   font-family:var(--sans);
   color:var(--ink);
   
-  /* Gemini Dot Grid Background */
+  
   background-color: var(--bg);
   background-image: radial-gradient(#D1CDBE 1px, transparent 1px);
   background-size: 24px 24px;
@@ -69,7 +66,7 @@ body{
 img{max-width:100%}
 a{color:inherit}
 
-/* ============ Gemini Support Popup ============ */
+/* Pop-up 
 #support-popup-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.7);
@@ -107,9 +104,9 @@ a{color:inherit}
 
 .support-popup-content { padding: 20px; }
 .support-popup-content h3 { color: var(--accent); margin: 0 0 10px 0; font-size: 1.2rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; }
-.support-popup-content p { color: var(--text); font-size: 14px; margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+.support-popup-content p { color: var(--text); font-size: 14px; margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 600; } */
 
-/* ============ Qwen Type Helpers ============ */
+/* ============ Qwen Helpers ============ */
 .kicker{
   font-family:var(--mono);
   font-size:.8rem;
@@ -131,7 +128,7 @@ mark.hl{
   color:inherit;
 }
 
-/* ============ Qwen Base Buttons ============ */
+/* ============ Base Buttons ============ */
 .btn{
   display:inline-flex;align-items:center;gap:.5rem;
   font-family:var(--sans);font-weight:600;font-size:.95rem;
@@ -163,7 +160,7 @@ mark.hl{
   background:var(--bg);padding:0 8px;
 }
 
-/* ============ Qwen Header & Ribbon ============ */
+/* ============ Header & Ribbon ============ */
 .ribbon{
   background:var(--ink);color:var(--paper);
   font-family:var(--mono);font-size:.78rem;
@@ -204,7 +201,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(33,30,23,.08)}
 }
 .nav-link:hover{color:var(--red)}
 
-/* ============ Gemini Hero & Actions ============ */
+/* ============ Hero & Actions ============ */
 .hero {
   position:relative; z-index:1; min-height: 100vh;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -250,7 +247,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(33,30,23,.08)}
   color: var(--text-muted); text-transform: uppercase; 
 }
 
-/* ============ Qwen Hall Ticket (Square & Centered) ============ */
+/* ============ Hall Ticket ============ */
 .hall-ticket {
   background:var(--paper-hi);
   border:1.5px solid var(--border);
@@ -302,12 +299,12 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(33,30,23,.08)}
 }
 .ht-num { font-family:var(--mono);font-size:.65rem;color:var(--text-muted);text-align:center;padding-bottom:1.2rem;letter-spacing:.28em; font-weight: bold;}
 
-/* ============ Qwen Sections & Layout ============ */
+/* ============ Sections & Layout ============ */
 section{padding:4.6rem 0}
 .sec-head{max-width:44rem;margin-bottom:2.6rem}
 .sec-head p{color:var(--ink-2);margin-top:.7rem}
 
-/* ============ Qwen Exam Cards ============ */
+/* ============ Sections Cards ============ */
 .exam-grid{
   display:grid;grid-template-columns:repeat(6,1fr);gap:1.2rem;
 }
@@ -360,7 +357,7 @@ section{padding:4.6rem 0}
 }
 .exam-card:hover .omr i:nth-child(2){background:var(--ink);border-color:var(--ink)}
 
-/* ============ Qwen CBT Demo ============ */
+/* ========= CBT Demo ============ */
 .cbt{background:linear-gradient(transparent, rgba(33,30,23,.03))}
 .exam-window{
   border:1.5px solid var(--ink);border-radius:8px;
