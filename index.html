@@ -168,7 +168,18 @@ mark.hl{
 }
 
 /* ============ Header & Nav Integration ============ */
-header.nav{
+.nav-logo {
+  gap: 0.6rem; /* Adds perfect spacing between the image and text */
+}
+
+.logo-image {
+  height: 36px; /* Keeps the logo cleanly fitted inside the 64px header */
+  width: auto;
+  display: block;
+  /* Optional: Add a brutalist border to the image if it fits your brand */
+  /* border: 2px solid var(--border); box-shadow: 2px 2px 0px #000; */
+}
+     header.nav{
   position:sticky;top:0;z-index:900;
   background:var(--surface);
   border-bottom:2px solid var(--border);
@@ -659,8 +670,10 @@ footer{
 
 <header class="nav" id="navbar">
   <div class="wrap nav-inner">
-    <a href="#" class="nav-logo">Quizable<span></span></a>
-    
+    <a href="#" class="nav-logo">
+  <img src="favicon.png" alt="Quizable Logo" class="logo-image">
+  Quizable<span>.</span>
+</a>    
     <div class="nav-spacer"></div>
     
   <!--  <div class="nav-right">
