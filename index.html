@@ -3,22 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Quizable — Mock Test Platform</title>
+<title>Quizable — Mock Test Platform for JEE · NEET · MHTCET · BITSAT</title>
 <meta name="description" content="Timed mock tests, detailed analytics and leaderboards for JEE Mains, JEE Advanced, NEET, MHT CET and BITSAT. Train with real pressure." />
 
-    <link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
-</script>
-<link rel="apple-touch-icon" href="favicon.png">
-  
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Combined Fonts: Fraunces, Archivo, Plex Mono (Qwen) + Space Grotesk, DM Mono (Gemini) -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 
 <style>
+/* ============================================================
+   QUIZABLE — Hybrid Theme 
+   ============================================================ */
 :root {
-  /* Neo-Brutalist "Print" Palette */
+  /* Neo-Brutalist "Print" Palette (Gemini) */
   --bg: #F4F2EC;
   --surface: #FFFFFF;
   --surface2: #EAE8E1;
@@ -29,7 +26,7 @@
   --text-muted: #555555;
   --accent3: #10B981;
 
-  /* Variable Mappings (Ensuring seamless integration) */
+  /* Qwen Variable Mappings (Ensuring seamless integration) */
   --paper: var(--bg);
   --paper-hi: var(--surface);
   --paper-lo: var(--surface2);
@@ -63,6 +60,7 @@ body{
   font-size:16.5px;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
+  overflow-x: hidden;
 }
 
 ::selection{background:var(--yellow); color:var(--ink)}
@@ -90,6 +88,7 @@ a{color:inherit}
     transform: translateY(10px);
     transition: transform 0.2s ease;
     text-align: center;
+    border-radius: 0;
 }
 #support-popup-overlay.show .support-popup-card { transform: translateY(0); }
 
@@ -99,6 +98,7 @@ a{color:inherit}
     border: 2px solid var(--border);
     width: 32px; height: 32px; font-size: 18px; font-weight: bold; cursor: pointer; z-index: 2;
     box-shadow: 2px 2px 0px #000000;
+    border-radius: 0;
 }
 .support-popup-close-btn:hover { background: var(--accent); color: #fff; }
 
@@ -106,8 +106,8 @@ a{color:inherit}
 .support-popup-img:hover { filter: none; }
 
 .support-popup-content { padding: 20px; }
-.support-popup-content h3 { color: var(--accent); margin: 0 0 10px 0; font-size: 1.2rem; font-family: var(--sans); font-weight: 800; text-transform: uppercase; }
-.support-popup-content p { color: var(--text); font-size: 14px; margin: 0; font-weight: 600; }
+.support-popup-content h3 { color: var(--accent); margin: 0 0 10px 0; font-size: 1.2rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; }
+.support-popup-content p { color: var(--text); font-size: 14px; margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
 
 /* ============ Qwen Type Helpers ============ */
 .kicker{
@@ -153,7 +153,7 @@ mark.hl{
 
 .cutline{
   border:none;border-top:1.5px dashed var(--line-hard);
-  position:relative;margin:0;
+  position:relative;margin:0; width: 100%;
 }
 .cutline::before{
   content:"✂";
@@ -197,10 +197,11 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
 
 .dropdown { position: relative; }
 .dropdown-btn { 
-  background: var(--surface); color: var(--text); border: 2px solid var(--border); 
-  padding: 8px 16px; font-family: var(--sans); font-size: 0.9rem; font-weight: 800; 
-  cursor: pointer; display: flex; align-items: center; gap: 8px; text-transform: uppercase; 
-  box-shadow: 2px 2px 0px #000000;
+  background: var(--bg); color: var(--text); border: 2px solid var(--border); 
+  padding: 8px 16px; font-family: 'DM Mono', monospace; 
+  font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; text-transform: uppercase; 
+  box-shadow: 2px 2px 0px #000000; border-radius: 0;
+  margin: 0 4px 4px 0; /* Prevents box-shadow cropping */
 }
 .dropdown-btn:hover { background: var(--surface2); }
 .arrow { font-size: 0.7rem; }
@@ -210,7 +211,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   background: var(--surface); border: 2px solid var(--border); 
   width: 240px; overflow: hidden; 
   opacity: 0; visibility: hidden; transform: translateY(-5px);
-  box-shadow: 6px 6px 0px #000000; z-index: 1000;
+  box-shadow: 6px 6px 0px #000000; z-index: 1000; border-radius: 0;
 }
 .dropdown.active .dropdown-content { opacity: 1; visibility: visible; transform: translateY(0); }
 
@@ -226,30 +227,32 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
 .nav-cta { display:flex; gap:1rem; align-items:center; }
 .btn-ghost {
   background:transparent; border:2px solid var(--border); color:var(--text); padding:0.45rem 1.1rem;
-  font-family:var(--sans); font-weight: 800; text-transform: uppercase;
-  font-size:0.875rem; cursor:pointer; box-shadow: 2px 2px 0px #000000; 
+  font-family:'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase;
+  font-size:0.875rem; cursor:pointer; box-shadow: 2px 2px 0px #000000; border-radius: 0;
+  margin: 0 4px 4px 0; /* Prevents box-shadow cropping */
 }
 .btn-ghost:hover { background: var(--surface2); transform: translate(1px, 1px); box-shadow: 1px 1px 0px #000000; }
 
 .btn-primary {
   background:var(--accent); border:2px solid var(--border); color:#fff; padding:0.45rem 1.2rem;
-  font-family:var(--sans); font-size:0.875rem; font-weight:800; text-transform: uppercase; cursor:pointer;
-  box-shadow: 4px 4px 0px #000000; transition: transform 0.1s, box-shadow 0.1s; 
+  font-family:'Space Grotesk', sans-serif; font-size:0.875rem; font-weight:800; text-transform: uppercase; cursor:pointer;
+  box-shadow: 4px 4px 0px #000000; transition: transform 0.1s, box-shadow 0.1s; border-radius: 0;
+  margin: 0 4px 4px 0; /* Prevents box-shadow cropping */
 }
 .btn-primary:hover { background: var(--accent-hover); transform:translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
 
 /* ============ Gemini Hero & Actions ============ */
 .hero {
-  position:relative; z-index:1; min-height: 100vh;
+  position:relative; z-index:1; min-height: 85vh; /* Reduced height to remove empty space */
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; padding: 8rem 24px 4rem; max-width: 1200px; margin: 0 auto;
+  text-align:center; padding: 4rem 24px 2rem; max-width: 1200px; margin: 0 auto;
 }
 
 .hero-badge {
   display:inline-flex; align-items:center; gap:0.5rem; background:var(--surface); 
   border:2px solid var(--border); padding:0.4rem 1rem; font-size:0.8rem; color:var(--text); 
   margin-bottom:1.5rem; text-transform: uppercase; font-weight: 800; box-shadow: 3px 3px 0px #000000;
-  font-family: var(--sans);
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .hero h1 { 
@@ -273,7 +276,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   font-weight:800; text-transform: uppercase; cursor:pointer; transition:all 0.1s; 
   border: 2px solid var(--border); text-decoration: none; display:inline-block; 
 }
-.btn-big.primary { background:var(--accent); color:#fff; box-shadow: 6px 6px 0px #000000; }
+.btn-big.primary { background:var(--text); color:#fff; box-shadow: 6px 6px 0px #000000; }
 .btn-big.primary:hover { transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; color:#fff;}
 .btn-big.outline { background:var(--surface); color:var(--text); box-shadow: 6px 6px 0px #000000; }
 .btn-big.outline:hover { background:var(--surface2); transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; }
@@ -293,7 +296,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   transition:transform .3s ease;
   position:relative;
   width: 100%;
-  max-width: 420px; 
+  max-width: 420px; /* Restricting width forces the 2x2 grid into a perfect square */
   margin: 4rem auto 0;
 }
 .hall-ticket:hover{transform:rotate(0deg)}
@@ -389,7 +392,7 @@ section{padding:4.6rem 0}
 }
 .exam-card:hover .omr i:nth-child(2){background:var(--ink);border-color:var(--ink)}
 
-/* ============ Qwen CBT Demo ============ */
+/* ============ Exact Qwen CBT Demo ============ */
 .cbt{background:linear-gradient(transparent, rgba(33,30,23,.03))}
 .exam-window{
   border:1.5px solid var(--ink);border-radius:8px !important;
@@ -541,7 +544,7 @@ section{padding:4.6rem 0}
 .row.you a{color:var(--red);font-weight:600;text-decoration:none;font-size:.85rem;white-space:nowrap}
 .row.you a:hover{text-decoration:underline}
 
-/* ============ Qwen Footer ============ */
+/* ============ Exact Qwen Footer ============ */
 footer{
   background:var(--ink);color:var(--paper);
   padding:3.6rem 0 2rem;margin-top:2rem;
@@ -617,12 +620,12 @@ footer{
 @media (max-width:768px) {
   /* Hide the upgrade link so the menu button doesn't overflow on small screens */
   .upgrade-link { display: none !important; }
-  .dropdown-btn { margin-right: 4px; }
-  
+  nav { padding: 0 1.2rem; }
+  .nav-right { gap: 0.5rem; }
   .dropdown-content { right: 0; width: 220px; }
   .nav-cta { display: none !important; }
   .mobile-only { display: block; }
-  .hero { padding-top: 6rem; }
+  .hero { padding-top: 3rem; }
 }
 @media (max-width:640px){
   .exam-card,.exam-card.wide{grid-column:span 6}
@@ -638,7 +641,6 @@ footer{
 </head>
 <body>
 
-<!-- Gemini Support popup overlay 
 <div id="support-popup-overlay">
   <div class="support-popup-card">
       <button id="support-popup-close" class="support-popup-close-btn">&times;</button>
@@ -648,9 +650,8 @@ footer{
           <p>We stand in solidarity with Sonam Wangchuk and everyone fighting for transparency and fairness.</p>
       </div>
   </div>
-</div> -->
+</div>
 
-<!-- Qwen Header with Gemini Firebase Nav Integration -->
 <header class="nav" id="navbar">
   <div class="wrap nav-inner">
     <a href="#" class="nav-logo">Quizable<span>.</span></a>
@@ -665,23 +666,20 @@ footer{
           Menu ▼
         </button>
         <div class="dropdown-content" id="dropdown-menu">
-          <!-- Populated by JS -->
-        </div>
+          </div>
       </div>
 
       <div class="nav-cta" id="nav-cta">
-        <!-- Populated by JS -->
-      </div>
+        </div>
     </div>
 
   </div>
 </header>
 
-<!-- Gemini hero & Qwen hall-ticket (Square) -->
 <section class="hero">
-  <div class="hero-badge"><span>JEE · NEET · MHTCET · BITSAT</div>
+  <div class="hero-badge">PAPER &amp; INK EDITION</div>
   
-  <h1>CRACK YOUR EXAM.<br/>TRAIN WITH <em style="transform: rotate(-2deg); display: inline-block; padding: 0 0.5rem; border: 4px solid var(--border); background: var(--accent); color: var(--surface); box-shadow: 6px 6px 0px #000000; font-style: normal;">PRESSURE</em></h1>
+  <h1>CRACK YOUR EXAM.<br/>TRAIN WITH <em style="transform: rotate(-2deg); display: inline-block; padding: 0 0.5rem; border: 4px solid var(--border); background: var(--accent); color: var(--surface); box-shadow: 6px 6px 0px #000000; font-style: normal;">PRESSURE</em>.</h1>
   <p class="lede">Timed mock tests, detailed analytics, and leaderboards — built for serious aspirants who want to go beyond the textbook.</p>
   
   <div class="hero-actions">
@@ -695,7 +693,6 @@ footer{
     <span><span style="color:var(--accent3);">✓</span> Free tests forever</span>
   </div>
 
-  <!-- Qwen hall-ticket stats (Strictly Square format) -->
   <div class="hall-ticket">
     <div class="ht-head">
       <span>HALL TICKET · QUIZABLE 2026</span>
@@ -712,9 +709,8 @@ footer{
   </div>
 </section>
 
-<hr class="cutline wrap" />
+<hr class="cutline" />
 
-<!-- Qwen pick your exam -->
 <section id="exams">
   <div class="wrap">
     <header class="sec-head reveal">
@@ -777,7 +773,6 @@ footer{
   </div>
 </section>
 
-<!-- Qwen real exam interface -->
 <section class="cbt">
   <div class="wrap">
     <header class="sec-head reveal">
@@ -843,9 +838,8 @@ footer{
   </div>
 </section>
 
-<hr class="cutline wrap" />
+<hr class="cutline" />
 
-<!-- Qwen features
 <section>
   <div class="wrap">
     <header class="sec-head reveal">
@@ -889,7 +883,6 @@ footer{
   </div>
 </section>
 
-<!-- Qwen how it works 
 <section>
   <div class="wrap">
     <header class="sec-head reveal">
@@ -917,9 +910,8 @@ footer{
   </div>
 </section>
 
-<hr class="cutline wrap" />
+<hr class="cutline" />
 
-<!-- Qwen leaderboard 
 <section id="leaderboard">
   <div class="wrap">
     <header class="sec-head reveal">
@@ -960,9 +952,8 @@ footer{
       </div>
     </div>
   </div>
-</section> -->
+</section>
 
-<!-- Qwen footer -->
 <footer>
   <div class="wrap">
     <div class="f-grid">
@@ -978,12 +969,12 @@ footer{
       </nav>
     </div>
     <div class="f-bottom">
+      <span>⚡ JEE · NEET · MHTCET · BITSAT · ADVANCED</span>
       <span>© 2026 Quizable. All rights reserved.</span>
     </div>
   </div>
 </footer>
 
-<!-- Gemini Auth Modal -->
 <div class="modal-overlay" id="authModal" onclick="closeModalOutside(event)">
   <div class="modal-card">
     <button class="modal-close" onclick="closeModal()">✕</button>
@@ -995,7 +986,6 @@ footer{
       <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Register</button>
     </div>
 
-    <!-- login -->
     <div id="loginForm">
       <div class="form-group">
         <label class="form-label">Email Address</label>
@@ -1017,7 +1007,6 @@ footer{
       </button>
     </div>
 
-    <!-- signup -->
     <div id="signupForm" style="display:none">
       <div class="form-group">
         <label class="form-label">Full Name</label>
@@ -1111,7 +1100,7 @@ onAuthStateChanged(auth, async user => {
         <div style="width:36px;height:36px;background:var(--surface);
              border:2px solid var(--border);display:flex;align-items:center;
              justify-content:center;font-weight:bold;font-size:1rem;
-             color:var(--text);box-shadow: 2px 2px 0px #000000;">${initials}</div>
+             color:var(--text);box-shadow: 2px 2px 0px #000000; margin-right: 4px; margin-bottom: 2px;">${initials}</div>
       </div>`;
 
     dropdownMenu.innerHTML = `
@@ -1156,7 +1145,7 @@ onAuthStateChanged(auth, async user => {
       <a href="#exams">Mock Tests</a>
       <a href="#features">Features</a>
       <a href="/pricing">Pricing</a>
-      <a href="/history.html">Test History</a>
+      <a href="predictor.html">Predictor</a>
       <a href="/contact">Support</a>
       
       <div class="mobile-only">
