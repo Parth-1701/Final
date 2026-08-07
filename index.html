@@ -3,13 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Quizable — Mock Test Platform</title>
+<title>Quizable — Mock Test Platform for JEE · NEET · MHTCET · BITSAT</title>
 <meta name="description" content="Timed mock tests, detailed analytics and leaderboards for JEE Mains, JEE Advanced, NEET, MHT CET and BITSAT. Train with real pressure." />
-
-     <link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
-</script>
-<link rel="apple-touch-icon" href="favicon.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +15,7 @@
    QUIZABLE — Hybrid Theme 
    ============================================================ */
 :root {
-  /* Neo-Brutalist "Print" Palette */
+  /* Neo-Brutalist "Print" Palette (Gemini) */
   --bg: #F4F2EC;
   --surface: #FFFFFF;
   --surface2: #EAE8E1;
@@ -31,7 +26,7 @@
   --text-muted: #555555;
   --accent3: #10B981;
 
-  /* Variable Mappings (Ensuring seamless integration) */
+  /* Qwen Variable Mappings (Ensuring seamless integration) */
   --paper: var(--bg);
   --paper-hi: var(--surface);
   --paper-lo: var(--surface2);
@@ -74,7 +69,7 @@ body{
 img{max-width:100%}
 a{color:inherit}
 
-/* ============ Popup ============ */
+/* ============ Support Popup ============ */
 #support-popup-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.7);
@@ -86,7 +81,7 @@ a{color:inherit}
 
 .support-popup-card {
     background: var(--surface);
-    border: 2px solid var(--border);
+    border: 4px solid var(--border);
     width: 90%; max-width: 400px;
     position: relative;
     box-shadow: 8px 8px 0px #000000;
@@ -107,7 +102,7 @@ a{color:inherit}
 }
 .support-popup-close-btn:hover { background: var(--accent); color: #fff; }
 
-.support-popup-img { width: 100%; height: 220px; object-fit: cover; border-bottom: 2px solid var(--border); filter: grayscale(100%) contrast(1.2); }
+.support-popup-img { width: 100%; height: 220px; object-fit: cover; border-bottom: 4px solid var(--border); filter: grayscale(100%) contrast(1.2); }
 .support-popup-img:hover { filter: none; }
 
 .support-popup-content { padding: 20px; }
@@ -130,111 +125,58 @@ h2 em{font-style:italic;font-weight:480;color:var(--red)}
 
 mark.hl{
   background:linear-gradient(104deg, transparent 2%, var(--yellow) 3%, var(--yellow) 97%, transparent 98%);
-  padding:.05em .18em;
-  margin:0 -.05em;
-  box-decoration-break:clone;
-  color:inherit;
+  padding:.05em .18em; margin:0 -.05em; box-decoration-break:clone; color:inherit;
 }
 
-/* ============ Base Buttons ============ */
-.btn{
-  display:inline-flex;align-items:center;gap:.5rem;
-  font-family:var(--sans);font-weight:600;font-size:.95rem;
-  padding:.78rem 1.35rem;
-  border:1.5px solid var(--ink);
-  background:var(--paper-hi);
-  color:var(--ink);
-  text-decoration:none;cursor:pointer;
-  box-shadow:3px 3px 0 var(--ink);
-  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
-}
-.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
-.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
-.btn-solid{background:var(--ink);color:var(--paper-hi)}
-.btn-solid:hover{background:#33301F}
-.btn-red{background:var(--red);border-color:var(--ink);color:#FFF6EC}
-.btn-red:hover{background:#B23A17}
-.btn-sm{padding:.5rem .95rem;font-size:.85rem;box-shadow:2px 2px 0 var(--ink)}
-
-.cutline{
-  border:none;border-top:1.5px dashed var(--line-hard);
-  position:relative;margin:0; width: 100%;
-}
-.cutline::before{
-  content:"✂";
-  position:absolute;left:26px;top:-13px;
-  font-size:.95rem;color:var(--ink-2);
-  background:var(--bg);padding:0 8px;
+/* ============ Header & Nav (Old Index Structure + Neo Brutalist) ============ */
+nav {
+  position: sticky; top:0; left:0; right:0; z-index:900;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 2.5rem; height: 76px;
+  background: var(--surface); border-bottom: 4px solid var(--border);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.05);
 }
 
-/* ============ Header & Nav Integration ============ */
-.nav-logo {
-  gap: 0.6rem; /* Adds perfect spacing between the image and text */
+.nav-logo { 
+  font-family:'Space Grotesk', sans-serif; font-size: 2.2rem; font-weight:800; 
+  letter-spacing:-0.02em; display:flex; align-items:center; gap:0.5rem; 
+  color: var(--text); text-decoration: none; text-transform: uppercase;
 }
+.nav-logo span { color:var(--accent); }
+.logo-dot { width: 14px; height: 14px; background: var(--accent); border: 2px solid var(--border); }
 
-.logo-image {
-  height: 64px; /* Keeps the logo cleanly fitted inside the 64px header */
-  width: auto;
-  display: block;
-  /* Optional: Add a brutalist border to the image if it fits your brand */
-  /* border: 2px solid var(--border); box-shadow: 2px 2px 0px #000; */
-}
-     header.nav{
-  position:sticky;top:0;z-index:900;
-  background:var(--surface);
-  border-bottom:2px solid var(--border);
-  transition:box-shadow .25s ease;
-}
-header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
-.nav-inner{display:flex;align-items:center;gap:1.2rem;padding:.85rem 0}
-
-.nav-logo {
-  font-family: var(--serif);
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: var(--text);
-}
-.nav-logo span { color: var(--accent); }
-.nav-spacer{flex:1}
-
-.nav-right { display:flex; align-items:center; gap:1rem; }
+.nav-right { display:flex; align-items:center; gap:1.2rem; }
 
 .upgrade-link { 
   background: var(--accent); color: #fff; border: 2px solid var(--border); 
-  padding: 8px 16px; font-family: var(--sans); font-size: 0.9rem; font-weight: 800; 
+  padding: 8px 16px; font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 800; 
   text-decoration: none; text-transform: uppercase; box-shadow: 2px 2px 0px var(--border); 
-  display: none; transition: transform 0.1s;
+  display: none; transition: transform 0.1s; margin: 0 4px 4px 0;
 }
-.upgrade-link:hover { background: var(--accent-hover); color: #fff; transform: translate(1px,1px); box-shadow: 1px 1px 0px var(--border); }
+.upgrade-link:hover { background: var(--accent-hover); transform: translate(2px,2px); box-shadow: 0px 0px 0px var(--border); }
 
 .dropdown { position: relative; }
 .dropdown-btn { 
   background: var(--bg); color: var(--text); border: 2px solid var(--border); 
-  padding: 8px 16px; font-family: 'DM Mono', monospace; 
-  font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; text-transform: uppercase; 
-  box-shadow: 2px 2px 0px #000000; border-radius: 0;
-  margin: 0 4px 4px 0; /* Prevents box-shadow cropping */
+  padding: 8px 16px; font-family: 'Space Grotesk', sans-serif; 
+  font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; text-transform: uppercase; 
+  box-shadow: 2px 2px 0px #000000; border-radius: 0; margin: 0 4px 4px 0;
 }
 .dropdown-btn:hover { background: var(--surface2); }
 .arrow { font-size: 0.7rem; }
 
 .dropdown-content { 
   position: absolute; top: calc(100% + 10px); right: 0; 
-  background: var(--surface); border: 2px solid var(--border); 
-  width: 240px; overflow: hidden; 
-  opacity: 0; visibility: hidden; transform: translateY(-5px);
-  box-shadow: 6px 6px 0px #000000; z-index: 1000; border-radius: 0;
+  background: var(--surface); border: 4px solid var(--border); 
+  width: 240px; overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-5px);
+  box-shadow: 8px 8px 0px #000000; z-index: 1000; border-radius: 0;
 }
 .dropdown.active .dropdown-content { opacity: 1; visibility: visible; transform: translateY(0); }
 
 .dropdown-content a, .dropdown-logout { 
   display: block; width: 100%; text-align: left; padding: 12px 16px; 
   color: var(--text); text-decoration: none; font-family: 'DM Mono', monospace; font-weight: 700;
-  font-size: 0.9rem; background: transparent; border: none; border-bottom: 2px solid var(--border); cursor: pointer; 
+  font-size: 0.95rem; background: transparent; border: none; border-bottom: 2px solid var(--border); cursor: pointer; 
 }
 .dropdown-content a:hover { background: var(--accent); color: #fff; }
 .dropdown-logout { color: var(--accent); font-weight: bold; border-bottom: none; }
@@ -242,24 +184,24 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
 
 .nav-cta { display:flex; gap:1rem; align-items:center; }
 .btn-ghost {
-  background:transparent; border:2px solid var(--border); color:var(--text); padding:0.45rem 1.1rem;
+  background:transparent; border:2px solid var(--border); color:var(--text); padding:0.45rem 1.2rem;
   font-family:'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase;
-  font-size:0.875rem; cursor:pointer; box-shadow: 2px 2px 0px #000000; border-radius: 0;
-  margin: 0 4px 4px 0; /* Prevents box-shadow cropping */
+  font-size:0.9rem; cursor:pointer; box-shadow: 2px 2px 0px #000000; border-radius: 0;
+  margin: 0 4px 4px 0;
 }
-.btn-ghost:hover { background: var(--surface2); transform: translate(1px, 1px); box-shadow: 1px 1px 0px #000000; }
+.btn-ghost:hover { background: var(--surface2); transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000000; }
 
 .btn-primary {
   background:var(--accent); border:2px solid var(--border); color:#fff; padding:0.45rem 1.2rem;
-  font-family:'Space Grotesk', sans-serif; font-size:0.875rem; font-weight:800; text-transform: uppercase; cursor:pointer;
-  box-shadow: 4px 4px 0px #000000; transition: transform 0.1s, box-shadow 0.1s; border-radius: 0;
-  margin: 0 4px 4px 0; /* Prevents box-shadow cropping */
+  font-family:'Space Grotesk', sans-serif; font-size:0.9rem; font-weight:800; text-transform: uppercase; cursor:pointer;
+  box-shadow: 2px 2px 0px #000000; transition: transform 0.1s, box-shadow 0.1s; border-radius: 0;
+  margin: 0 4px 4px 0; 
 }
-.btn-primary:hover { background: var(--accent-hover); transform:translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
+.btn-primary:hover { background: var(--accent-hover); transform:translate(2px, 2px); box-shadow: 0px 0px 0px #000000; }
 
 /* ============ Hero & Actions ============ */
 .hero {
-  position:relative; z-index:1; min-height: 85vh; /* Reduced height to remove empty space */
+  position:relative; z-index:1; min-height: 80vh; 
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; padding: 4rem 24px 2rem; max-width: 1200px; margin: 0 auto;
 }
@@ -272,7 +214,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
 }
 
 .hero h1 { 
-  font-family:var(--sans); font-size: clamp(3.5rem, 8vw, 6.5rem); 
+  font-family:var(--sans); font-size: clamp(3rem, 8vw, 6.5rem); 
   font-weight:800; line-height:0.95; letter-spacing:-0.04em; margin-bottom: 1.5rem; 
   text-transform:uppercase; color: var(--text); 
 }
@@ -292,7 +234,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   font-weight:800; text-transform: uppercase; cursor:pointer; transition:all 0.1s; 
   border: 2px solid var(--border); text-decoration: none; display:inline-block; 
 }
-.btn-big.primary { background:var(--accent); color:#fff; box-shadow: 6px 6px 0px #000000; }
+.btn-big.primary { background:var(--text); color:#fff; box-shadow: 6px 6px 0px #000000; }
 .btn-big.primary:hover { transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; color:#fff;}
 .btn-big.outline { background:var(--surface); color:var(--text); box-shadow: 6px 6px 0px #000000; }
 .btn-big.outline:hover { background:var(--surface2); transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; }
@@ -303,10 +245,10 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   color: var(--text-muted); text-transform: uppercase; 
 }
 
-/* ============ Hall Ticket ============ */
+/* ============ Hall Ticket (Strictly Square) ============ */
 .hall-ticket{
   background:var(--paper-hi);
-  border:1.5px solid var(--ink);
+  border:2px solid var(--ink);
   box-shadow:var(--hard-shadow);
   transform:rotate(-1.4deg);
   transition:transform .3s ease;
@@ -318,42 +260,53 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
 .hall-ticket:hover{transform:rotate(0deg)}
 .ht-head{
   display:flex;justify-content:space-between;align-items:center;
-  border-bottom:1.5px dashed var(--line-hard);
-  padding:.85rem 1.3rem;
-  font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;color:var(--ink-2);
+  border-bottom:2px dashed var(--line-hard);
+  padding:1rem 1.3rem;
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.1em;color:var(--ink-2); font-weight: bold;
 }
 .ht-stamp{
-  font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;
-  color:var(--red);border:1.5px solid var(--red);
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.14em;
+  color:var(--red);border:2px solid var(--red);
   padding:.2rem .5rem;transform:rotate(3deg); font-weight: bold;
 }
 .stats{display:grid;grid-template-columns:1fr 1fr;}
 .stats > div{
   padding:1.5rem 1.3rem;
-  border-bottom:1px dashed var(--line);
+  border-bottom:2px dashed var(--line);
   text-align: left;
 }
-.stats > div:nth-child(odd){border-right:1px dashed var(--line)}
+.stats > div:nth-child(odd){border-right:2px dashed var(--line)}
 .stats dd{
-  font-family:var(--serif);font-size:2.3rem;font-weight:600;line-height:1;
+  font-family:var(--serif);font-size:2.5rem;font-weight:700;line-height:1;
   color:var(--ink); margin: 0;
 }
 .stats dd small{font-size:1.2rem;color:var(--red); vertical-align: super; font-family: var(--sans);}
-.stats dt{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;color:var(--ink-2);margin-top:.35rem;text-transform:uppercase; font-weight: bold;}
+.stats dt{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;color:var(--ink-2);margin-top:.4rem;text-transform:uppercase; font-weight: bold;}
 .barcode{
-  height:38px;margin:1.1rem 1.3rem .35rem;
+  height:38px;margin:1.2rem 1.3rem .35rem;
   background:repeating-linear-gradient(90deg,
     var(--ink) 0 2px, transparent 2px 5px,
     var(--ink) 5px 6px, transparent 6px 11px,
     var(--ink) 11px 14px, transparent 14px 17px);
   opacity:.8;
 }
-.ht-num{font-family:var(--mono);font-size:.62rem;color:var(--ink-2);text-align:center;padding-bottom:1rem;letter-spacing:.28em; font-weight: bold;}
+.ht-num{font-family:var(--mono);font-size:.65rem;color:var(--ink-2);text-align:center;padding-bottom:1rem;letter-spacing:.28em; font-weight: bold;}
 
 /* ============ Sections & Layout ============ */
 section{padding:4.6rem 0}
 .sec-head{max-width:44rem;margin-bottom:2.6rem}
 .sec-head p{color:var(--ink-2);margin-top:.7rem}
+
+.cutline{
+  border:none;border-top:1.5px dashed var(--line-hard);
+  position:relative;margin:0; width: 100%;
+}
+.cutline::before{
+  content:"✂";
+  position:absolute;left:26px;top:-13px;
+  font-size:.95rem;color:var(--ink-2);
+  background:var(--bg);padding:0 8px;
+}
 
 /* ============ Exam Cards ============ */
 .exam-grid{
@@ -400,7 +353,6 @@ section{padding:4.6rem 0}
 .exam-link:hover{gap:.7rem}
 .exam-link{transition:gap .2s ease}
 
-/* OMR bubbles deco */
 .omr{display:flex;gap:6px;margin-top:.9rem}
 .omr i{
   width:14px;height:14px;border-radius:50% !important;
@@ -449,16 +401,13 @@ section{padding:4.6rem 0}
 .opt:hover{border-color:var(--ink)}
 .opt .bub{
   width:26px;height:26px;flex:none;border-radius:50% !important;
-  border:1.5px solid var(--ink);
-  display:grid;place-items:center;
+  border:1.5px solid var(--ink); display:grid;place-items:center;
   font-family:var(--mono);font-size:.72rem;font-weight:600;
   transition:background .15s ease,color .15s ease;
 }
 .opt.selected{border-color:var(--red);background:#FFF6F1}
 .opt.selected .bub{background:var(--red);border-color:var(--red);color:#fff}
-.ew-actions{
-  display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.7rem;
-}
+.ew-actions{ display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.7rem; }
 .ew-side{padding:1.3rem 1.2rem;background:var(--paper-hi)}
 .ew-side h5{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin-bottom:.8rem}
 .palette{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
@@ -476,9 +425,7 @@ section{padding:4.6rem 0}
 .legend .l-ans{background:var(--green);border-color:var(--green)}
 .legend .l-cur{background:var(--yellow)}
 .legend .l-skip{background:#fff;border-color:var(--red)}
-.marking{
-  margin-top:1.2rem;border-top:1.5px dashed var(--line-hard);padding-top:1rem;
-}
+.marking{ margin-top:1.2rem;border-top:1.5px dashed var(--line-hard);padding-top:1rem; }
 .marking .chips{display:flex;flex-direction:column;gap:.4rem;margin-top:.6rem}
 .marking .chip{font-family:var(--mono);font-size:.7rem;display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:4px !important;padding:.32rem .6rem;background:#fff}
 .chip b.pos{color:var(--green)} .chip b.neg{color:var(--red)}
@@ -490,10 +437,7 @@ section{padding:4.6rem 0}
   background:var(--paper-hi);overflow:hidden;
 }
 .feature{
-  padding:1.9rem 1.7rem;
-  border-right:1px dashed var(--line-hard);
-  border-bottom:1px dashed var(--line-hard);
-  position:relative;
+  padding:1.9rem 1.7rem; border-right:1px dashed var(--line-hard); border-bottom:1px dashed var(--line-hard); position:relative;
 }
 .feature:nth-child(3n){border-right:none}
 .feature:nth-child(n+4){border-bottom:none}
@@ -506,8 +450,7 @@ section{padding:4.6rem 0}
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1.6rem;counter-reset:step}
 .step{position:relative;padding-top:.4rem}
 .step::before{
-  content:attr(data-n);
-  font-family:var(--serif);font-style:italic;font-weight:400;
+  content:attr(data-n); font-family:var(--serif);font-style:italic;font-weight:400;
   font-size:3.2rem;color:var(--red);display:block;line-height:1;margin-bottom:.9rem;
 }
 .step:not(:last-child)::after{
@@ -560,7 +503,7 @@ section{padding:4.6rem 0}
 .row.you a{color:var(--red);font-weight:600;text-decoration:none;font-size:.85rem;white-space:nowrap}
 .row.you a:hover{text-decoration:underline}
 
-/* ============ Exact Qwen Footer ============ */
+/* ============ Footer ============ */
 footer{
   background:var(--ink);color:var(--paper);
   padding:3.6rem 0 2rem;margin-top:2rem;
@@ -586,9 +529,13 @@ footer{
 }
 
 /* ============ Auth Modal ============ */
-.modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; }
+.modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding: 1rem; }
 .modal-overlay.open { display:flex; }
-.modal-card { background:var(--bg); border:4px solid var(--border); padding:3rem; width:100%; max-width:480px; position:relative; box-shadow: 12px 12px 0px #000000; animation:pop .25s ease; border-radius: 0; }
+.modal-card { 
+  background:var(--bg); border:4px solid var(--border); padding:3rem; width:100%; max-width:480px; 
+  position:relative; box-shadow: 12px 12px 0px #000000; animation:pop .25s ease; border-radius: 0; 
+  max-height: 90vh; overflow-y: auto;
+}
 @keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
 .modal-close { position:absolute; top:1rem; right:1rem; background:var(--surface); border: 2px solid var(--border); width: 36px; height: 36px; cursor:pointer; color:var(--text); font-size:1.2rem; font-weight: bold; box-shadow: 2px 2px 0px #000000; border-radius: 0; }
 .modal-close:hover { background: var(--accent); color: #fff; }
@@ -609,7 +556,6 @@ footer{
 .tab-btn.active { background:var(--text); color:#fff; border-color:var(--text); transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000000;}
 .divider-text { text-align:center; margin:1.5rem 0; font-size:0.85rem; color:var(--text-muted); text-transform: uppercase; font-weight: 800; background: var(--surface); border: 2px solid var(--border); padding: 0.5rem; box-shadow: 2px 2px 0px #000000; }
 
-/* ── TOAST ── */
 #toast {
   position:fixed; bottom:2rem; left:2rem; transform: translateY(150px);
   background:var(--surface); border:4px solid var(--border);
@@ -618,8 +564,9 @@ footer{
   box-shadow:8px 8px 0px #000000; white-space:nowrap; pointer-events:none; border-radius: 0;
 }
 
-/* ============ responsive ============ */
+/* ============ Responsive Rules ============ */
 .mobile-only { display: none; }
+
 @media (max-width:1000px){
   .exam-card,.exam-card.wide{grid-column:span 3}
   .ew-body{grid-template-columns:1fr}
@@ -633,16 +580,43 @@ footer{
   .steps{grid-template-columns:repeat(2,1fr)}
   .step::after{display:none}
 }
+
 @media (max-width:768px) {
-  /* Hide the upgrade link so the menu button doesn't overflow on small screens */
+  /* Give the inner wrapper custom padding on mobile to prevent flex overflow */
+  .wrap { padding: 0 12px; }
+  
+  nav { padding: 0 12px; height: 68px; }
+  .nav-logo { font-size: 1.6rem; gap: 0.4rem; }
+  .logo-dot { width: 10px; height: 10px; }
+  
+  .nav-right { gap: 0.4rem; }
   .upgrade-link { display: none !important; }
-  nav { padding: 0 1.2rem; }
-  .nav-right { gap: 0.5rem; }
-  .dropdown-content { right: 0; width: 220px; }
-  .nav-cta { display: none !important; }
+  
+  /* Compact buttons to perfectly fit screen widths without clipping shadows */
+  .nav-cta { gap: 0.4rem; }
+  .btn-ghost, .btn-primary { 
+    padding: 0.4rem 0.6rem; font-size: 0.8rem; border-width: 1.5px; 
+    box-shadow: 2px 2px 0px #000; letter-spacing: -0.02em; margin-right: 2px;
+  }
+  .dropdown-btn { 
+    padding: 0.4rem 0.6rem; font-size: 0.8rem; border-width: 1.5px; 
+    box-shadow: 2px 2px 0px #000; margin-right: 2px; letter-spacing: -0.02em; 
+  }
+  
+  .dropdown-content { right: 0; width: 200px; }
   .mobile-only { display: block; }
-  .hero { padding-top: 3rem; }
+  
+  /* Reduced padding so it doesn't leave massive empty space above the H1 */
+  .hero { padding: 3rem 16px 2rem; min-height: auto; }
+  .hero h1 { font-size: clamp(2.2rem, 9vw, 4rem); }
+  
+  /* Modal responsive sizing */
+  .modal-card { padding: 1.5rem; box-shadow: 6px 6px 0px #000000; border-width: 2px; }
+  .modal-title { font-size: 1.5rem; }
+  .form-input { padding: 0.75rem; font-size: 0.9rem; }
+  .modal-btn { padding: 0.75rem; font-size: 1rem; }
 }
+
 @media (max-width:640px){
   .exam-card,.exam-card.wide{grid-column:span 6}
   .row{grid-template-columns:36px 40px 1fr;grid-auto-rows:auto}
@@ -657,7 +631,7 @@ footer{
 </head>
 <body>
 
-<!-- <div id="support-popup-overlay">
+<div id="support-popup-overlay">
   <div class="support-popup-card">
       <button id="support-popup-close" class="support-popup-close-btn">&times;</button>
       <img src="images/wangchuk-support.webp" alt="Support Sonam Wangchuk and NEET Aspirants" class="support-popup-img">
@@ -666,39 +640,35 @@ footer{
           <p>We stand in solidarity with Sonam Wangchuk and everyone fighting for transparency and fairness.</p>
       </div>
   </div>
-</div> -->
+</div>
 
-<header class="nav" id="navbar">
-  <div class="wrap nav-inner">
-    <a href="#" class="nav-logo">
-  <img src="favicon.png" alt="Quizable Logo" class="logo-image">
-  Quizable<span>.</span>
-</a>    
-    <div class="nav-spacer"></div>
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="logo-dot"></div>
+    Quizable<span>.</span>
+  </a>
+  
+  <div class="nav-right">
+    <a href="/pricing" class="upgrade-link" id="nav-upgrade">Upgrade</a>
     
-  <!--  <div class="nav-right">
-      <a href="/pricing" class="upgrade-link" id="nav-upgrade">Upgrade</a> -->
-      
-      <div class="dropdown">
-        <button class="dropdown-btn" id="menu-btn" onclick="toggleMenu()">
-          Menu ▼
-        </button>
-        <div class="dropdown-content" id="dropdown-menu">
-          </div>
-      </div>
-
-      <div class="nav-cta" id="nav-cta">
+    <div class="dropdown">
+      <button class="dropdown-btn" id="menu-btn" onclick="toggleMenu()">
+        Menu <span class="arrow">▼</span>
+      </button>
+      <div class="dropdown-content" id="dropdown-menu">
         </div>
     </div>
 
+    <div class="nav-cta" id="nav-cta">
+      </div>
   </div>
-</header>
+</nav>
 
 <section class="hero">
-  <div class="hero-badge">JEE · NEET · MHTCET · BITSAT</div>
+  <div class="hero-badge">PAPER &amp; INK EDITION</div>
   
-  <h1>CRACK YOUR EXAM.<br/>TRAIN WITH <em style="transform: rotate(-2deg); display: inline-block; padding: 0 0.5rem; border: 4px solid var(--border); background: var(--accent); color: var(--surface); box-shadow: 6px 6px 0px #000000; font-style: normal;">PRESSURE</em></h1>
-  <p class="lede">Timed mock tests, detailed analytics, and leaderboards built for serious aspirants who want to go beyond the textbook.</p>
+  <h1>CRACK YOUR EXAM.<br/>TRAIN WITH <em style="transform: rotate(-2deg); display: inline-block; padding: 0 0.5rem; border: 4px solid var(--border); background: var(--accent); color: var(--surface); box-shadow: 6px 6px 0px #000000; font-style: normal;">PRESSURE</em>.</h1>
+  <p class="lede">Timed mock tests, detailed analytics, and leaderboards — built for serious aspirants who want to go beyond the textbook.</p>
   
   <div class="hero-actions">
     <button class="btn-big primary" onclick="window.location.href='/courses'">Browse Courses</button>
@@ -706,7 +676,7 @@ footer{
   </div>
 
   <div class="hero-perks">
-    <span><span style="color:var(--accent3);">✓</span> Accurate Test Interface</span>
+    <span><span style="color:var(--accent3);">✓</span> No credit card required</span>
     <span style="color:var(--text-muted)">·</span>
     <span><span style="color:var(--accent3);">✓</span> Free tests forever</span>
   </div>
@@ -858,7 +828,7 @@ footer{
 
 <hr class="cutline" />
 
-<!-- <section>
+<section>
   <div class="wrap">
     <header class="sec-head reveal">
       <span class="kicker">// Under the hood</span>
@@ -899,9 +869,9 @@ footer{
       </div>
     </div>
   </div>
-</section> -->
+</section>
 
-<!-- <section>
+<section>
   <div class="wrap">
     <header class="sec-head reveal">
       <span class="kicker">// The process</span>
@@ -926,7 +896,7 @@ footer{
       </div>
     </div>
   </div>
-</section> 
+</section>
 
 <hr class="cutline" />
 
@@ -970,7 +940,7 @@ footer{
       </div>
     </div>
   </div>
-</section> -->
+</section>
 
 <footer>
   <div class="wrap">
@@ -987,6 +957,7 @@ footer{
       </nav>
     </div>
     <div class="f-bottom">
+      <span>⚡ JEE · NEET · MHTCET · BITSAT · ADVANCED</span>
       <span>© 2026 Quizable. All rights reserved.</span>
     </div>
   </div>
@@ -999,7 +970,7 @@ footer{
     <div class="modal-sub" id="modalSub">Authenticate to continue</div>
 
     <div class="tab-row">
-      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Login</button>
+      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Auth</button>
       <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Register</button>
     </div>
 
@@ -1044,7 +1015,6 @@ footer{
           <option value="">Select Exam</option>
           <option value="JEE Mains">JEE Mains</option>
           <option value="JEE Advanced">JEE Advanced</option>
-           <option value="NEET">NEET</option>
           <option value="MHT CET">MHT CET</option>
           <option value="BITSAT">BITSAT</option>
         </select>
@@ -1118,7 +1088,7 @@ onAuthStateChanged(auth, async user => {
         <div style="width:36px;height:36px;background:var(--surface);
              border:2px solid var(--border);display:flex;align-items:center;
              justify-content:center;font-weight:bold;font-size:1rem;
-             color:var(--text);box-shadow: 2px 2px 0px #000000; margin-right: 4px; margin-bottom: 2px;">${initials}</div>
+             color:var(--text);box-shadow: 2px 2px 0px #000000; margin-right: 2px; margin-bottom: 2px;">${initials}</div>
       </div>`;
 
     dropdownMenu.innerHTML = `
@@ -1127,10 +1097,11 @@ onAuthStateChanged(auth, async user => {
         <span style="font-size:0.9rem;color:var(--text);font-weight:800;font-family:'Space Grotesk', sans-serif;">${user.displayName || user.email.split('@')[0]}</span>
       </div>
       <a href="/profile">User Profile</a>
+      <a href="/mhtcet-calculator">Score Calculator</a>
       <a href="/courses">Course List</a>
       <a href="#exams">Mock Tests</a>
-      <a href="/history">Test History</a>
-      <a href="/pricing">Quizable for Businesses</a>
+      <a href="/history">Run Logs</a>
+      <a href="/pricing">Plans & Pricing</a>
       <a href="/contact">Support</a>
       <button class="dropdown-logout" onclick="handleLogout()">Logout</button>
     `;
@@ -1160,12 +1131,14 @@ onAuthStateChanged(auth, async user => {
 
     dropdownMenu.innerHTML = `
       <a href="#exams">Mock Tests</a>
+      <a href="#features">Features</a>
       <a href="/pricing">Pricing</a>
+      <a href="predictor.html">Predictor</a>
       <a href="/contact">Support</a>
       
       <div class="mobile-only">
-        <a onclick="openModal('login')" style="color:var(--accent);">Login</a>
-        <a onclick="openModal('signup')" style="color:var(--accent);">Sign Up</a>
+        <a href="javascript:void(0)" onclick="openModal('login')" style="color:var(--accent);">Login</a>
+        <a href="javascript:void(0)" onclick="openModal('signup')" style="color:var(--accent);">Sign Up</a>
       </div>
     `;
   }
@@ -1340,7 +1313,7 @@ async function loadHomePageStats() {
 loadHomePageStats();
 </script>
 <script>
-// ==================== Popup ====================
+// ==================== Gemini Support Popup ====================
 document.addEventListener('DOMContentLoaded', () => {
     const popupOverlay = document.getElementById('support-popup-overlay');
     const closeBtn = document.getElementById('support-popup-close');
@@ -1368,7 +1341,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ==================== JS functionality ====================
+// ==================== Qwen JS functionality ====================
 /* nav shadow */
 const nav = document.getElementById('navbar');
 addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8));
