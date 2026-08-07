@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Quizable — Mock Test Platform for JEE · NEET · MHTCET · BITSAT</title>
 <meta name="description" content="Timed mock tests, detailed analytics and leaderboards for JEE Mains, JEE Advanced, NEET, MHT CET and BITSAT. Train with real pressure." />
-
+  <link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+</script>
+<link rel="apple-touch-icon" href="favicon.png">
+   
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
@@ -234,7 +238,7 @@ nav {
   font-weight:800; text-transform: uppercase; cursor:pointer; transition:all 0.1s; 
   border: 2px solid var(--border); text-decoration: none; display:inline-block; 
 }
-.btn-big.primary { background:var(--text); color:#fff; box-shadow: 6px 6px 0px #000000; }
+.btn-big.primary { background:var(--accent); color:#fff; box-shadow: 6px 6px 0px #000000; }
 .btn-big.primary:hover { transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; color:#fff;}
 .btn-big.outline { background:var(--surface); color:var(--text); box-shadow: 6px 6px 0px #000000; }
 .btn-big.outline:hover { background:var(--surface2); transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; }
@@ -518,7 +522,7 @@ footer{
 .f-tag{font-family:var(--mono);font-size:.72rem;color:rgba(243,238,225,.6);margin-top:.5rem;max-width:20rem}
 .f-links{display:flex;gap:1.6rem;flex-wrap:wrap}
 .f-links a{
-  color:var(--paper);text-decoration:none;font-family:var(--mono);font-size:.8rem;
+  color:var(--border);text-decoration:none;font-family:var(--mono);font-size:.8rem;
   border-bottom:1px solid transparent;
 }
 .f-links a:hover{border-bottom-color:var(--yellow);color:var(--yellow)}
@@ -631,7 +635,7 @@ footer{
 </head>
 <body>
 
-<div id="support-popup-overlay">
+<!-- <div id="support-popup-overlay">
   <div class="support-popup-card">
       <button id="support-popup-close" class="support-popup-close-btn">&times;</button>
       <img src="images/wangchuk-support.webp" alt="Support Sonam Wangchuk and NEET Aspirants" class="support-popup-img">
@@ -640,7 +644,7 @@ footer{
           <p>We stand in solidarity with Sonam Wangchuk and everyone fighting for transparency and fairness.</p>
       </div>
   </div>
-</div>
+</div> -->
 
 <nav>
   <a href="#" class="nav-logo">
@@ -648,8 +652,8 @@ footer{
     Quizable<span>.</span>
   </a>
   
-  <div class="nav-right">
-    <a href="/pricing" class="upgrade-link" id="nav-upgrade">Upgrade</a>
+<!--  <div class="nav-right">
+    <a href="/pricing" class="upgrade-link" id="nav-upgrade">Upgrade</a> -->
     
     <div class="dropdown">
       <button class="dropdown-btn" id="menu-btn" onclick="toggleMenu()">
@@ -668,7 +672,7 @@ footer{
   <div class="hero-badge">PAPER &amp; INK EDITION</div>
   
   <h1>CRACK YOUR EXAM.<br/>TRAIN WITH <em style="transform: rotate(-2deg); display: inline-block; padding: 0 0.5rem; border: 4px solid var(--border); background: var(--accent); color: var(--surface); box-shadow: 6px 6px 0px #000000; font-style: normal;">PRESSURE</em>.</h1>
-  <p class="lede">Timed mock tests, detailed analytics, and leaderboards — built for serious aspirants who want to go beyond the textbook.</p>
+  <p class="lede">Timed mock tests, detailed analytics, and leaderboards built for serious aspirants who want to go beyond the textbook.</p>
   
   <div class="hero-actions">
     <button class="btn-big primary" onclick="window.location.href='/courses'">Browse Courses</button>
@@ -676,7 +680,7 @@ footer{
   </div>
 
   <div class="hero-perks">
-    <span><span style="color:var(--accent3);">✓</span> No credit card required</span>
+    <span><span style="color:var(--accent3);">✓</span> Accurate Test Interface</span>
     <span style="color:var(--text-muted)">·</span>
     <span><span style="color:var(--accent3);">✓</span> Free tests forever</span>
   </div>
@@ -828,7 +832,7 @@ footer{
 
 <hr class="cutline" />
 
-<section>
+<!-- <section>
   <div class="wrap">
     <header class="sec-head reveal">
       <span class="kicker">// Under the hood</span>
@@ -940,7 +944,7 @@ footer{
       </div>
     </div>
   </div>
-</section>
+</section> -->
 
 <footer>
   <div class="wrap">
@@ -957,7 +961,7 @@ footer{
       </nav>
     </div>
     <div class="f-bottom">
-      <span>⚡ JEE · NEET · MHTCET · BITSAT · ADVANCED</span>
+     <!-- <span>⚡ JEE · NEET · MHTCET · BITSAT · ADVANCED</span> -->
       <span>© 2026 Quizable. All rights reserved.</span>
     </div>
   </div>
