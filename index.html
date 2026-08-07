@@ -1037,18 +1037,28 @@ onAuthStateChanged(auth, async user => {
   const navCta = document.getElementById('nav-cta');
   const upgradeBtn = document.getElementById('nav-upgrade');
   const dropdownMenu = document.getElementById('dropdown-menu');
+  const userDropdown = document.getElementById('user-dropdown');
 
   if (user) {
+    // 1. USER IS LOGGED IN: Show dropdown container
+    if (userDropdown) userDropdown.style.display = 'block';
+    
+    // 2. Generate Avatar initials
     const initials = (user.displayName || user.email || 'U')
       .split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    
+    // 3. Inject Avatar and REMOVE Login/Signup buttons
     navCta.innerHTML = `
       <div style="display:flex;align-items:center;gap:0.75rem">
         <div style="width:36px;height:36px;background:var(--surface);
              border:2px solid var(--border);display:flex;align-items:center;
              justify-content:center;font-weight:bold;font-size:1rem;
-             color:var(--text);box-shadow: 2px 2px 0px #000000; margin-right: 2px; margin-bottom: 2px;">${initials}</div>
+             color:var(--text);box-shadow: 2px 2px 0px #000000; margin-right: 2px; margin-bottom: 2px;">
+             ${initials}
+        </div>
       </div>`;
 
+    // 4. Populate Dropdown Menu
     dropdownMenu.innerHTML = `
       <div class="mobile-only" style="padding: 12px 16px; display:flex; align-items:center; gap:1rem; border-bottom:2px solid var(--border);">
         <div style="width:32px;height:32px;background:var(--surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:0.9rem;color:var(--text);box-shadow: 2px 2px 0px #000000;">${initials}</div>
@@ -1064,41 +1074,31 @@ onAuthStateChanged(auth, async user => {
       <button class="dropdown-logout" onclick="handleLogout()">Logout</button>
     `;
 
+    // 5. Check Subscription Tier
     try {
       const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const plan = userDoc.data().plan || "free";
-        if (plan === "free") {
-          upgradeBtn.style.display = "block";
-        } else {
-          upgradeBtn.style.display = "none";
-        }
+      if (userDoc.exists() && (userDoc.data().plan || "free") === "free") {
+        if (upgradeBtn) upgradeBtn.style.display = "block";
       } else {
-        upgradeBtn.style.display = "block";
+        if (upgradeBtn) upgradeBtn.style.display = "none";
       }
     } catch (e) {
       console.error("Failed to fetch plan:", e);
     }
 
   } else {
+    // 1. USER IS LOGGED OUT: Hide the user dropdown
+    if (userDropdown) userDropdown.style.display = 'none';
+    if (upgradeBtn) upgradeBtn.style.display = "none";
+
+    // 2. Inject the Login/Signup buttons back into the header
     navCta.innerHTML = `
       <button class="btn-ghost" onclick="openModal('login')">Log In</button>
-      <button class="btn-primary" onclick="openModal('signup')">Sign Up</button>`;
-    
-    upgradeBtn.style.display = "none";
-
-    dropdownMenu.innerHTML = `
-      <a href="#exams">Mock Tests</a>
-      <a href="#features">Features</a>
-      <a href="/pricing">Pricing</a>
-      <a href="predictor.html">Predictor</a>
-      <a href="/contact">Support</a>
-      
-      <div class="mobile-only">
-        <a href="javascript:void(0)" onclick="openModal('login')" style="color:var(--accent);">Login</a>
-        <a href="javascript:void(0)" onclick="openModal('signup')" style="color:var(--accent);">Sign Up</a>
-      </div>
+      <button class="btn-primary" onclick="openModal('signup')">Sign Up</button>
     `;
+    
+    // 3. Clear out the dropdown menu
+    dropdownMenu.innerHTML = '';
   }
 });
 
