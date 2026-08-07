@@ -133,60 +133,33 @@ mark.hl{
 }
 
 /* ============ Header & Nav (Old Index Structure + Neo Brutalist) ============ */
-nav {
-  position: sticky; top:0; left:0; right:0; z-index:900;
-  display:flex; align-items:center; justify-content:space-between;
-  padding: 0 2.5rem; height: 76px;
-  background: var(--surface); border-bottom: 4px solid var(--border);
-  box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+header.nav{
+  position:sticky;top:0;z-index:900;
+  background:var(--bg);
+  border-bottom:1.5px solid var(--ink);
+  transition:box-shadow .25s ease;
 }
-
-.nav-logo { 
-  font-family:'Space Grotesk', sans-serif; font-size: 2.2rem; font-weight:800; 
-  letter-spacing:-0.02em; display:flex; align-items:center; gap:0.5rem; 
-  color: var(--text); text-decoration: none; text-transform: uppercase;
+header.nav.scrolled{box-shadow:0 4px 0 rgba(33,30,23,.08)}
+.nav-inner{display:flex;align-items:center;gap:1.2rem;padding:.85rem 0}
+.logo{
+  font-family:var(--serif);font-weight:700;font-size:1.55rem;
+  text-decoration:none;letter-spacing:-.02em;
 }
-.nav-logo span { color:var(--accent); }
-.logo-dot { width: 14px; height: 14px; background: var(--accent); border: 2px solid var(--border); }
-
-.nav-right { display:flex; align-items:center; gap:1.2rem; }
-
-.upgrade-link { 
-  background: var(--accent); color: #fff; border: 2px solid var(--border); 
-  padding: 8px 16px; font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 800; 
-  text-decoration: none; text-transform: uppercase; box-shadow: 2px 2px 0px var(--border); 
-  display: none; transition: transform 0.1s; margin: 0 4px 4px 0;
+.logo span{color:var(--red)}
+.exam-badge{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;
+  border:1px solid var(--line-hard);border-radius:99px;
+  padding:.35rem .8rem;color:var(--ink-2);white-space:nowrap;
 }
-.upgrade-link:hover { background: var(--accent-hover); transform: translate(2px,2px); box-shadow: 0px 0px 0px var(--border); }
-
-.dropdown { position: relative; }
-.dropdown-btn { 
-  background: var(--bg); color: var(--text); border: 2px solid var(--border); 
-  padding: 8px 16px; font-family: 'Space Grotesk', sans-serif; 
-  font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; text-transform: uppercase; 
-  box-shadow: 2px 2px 0px #000000; border-radius: 0; margin: 0 4px 4px 0;
+.nav-spacer{flex:1}
+.nav-link{
+  font-family:var(--mono);font-size:.82rem;text-decoration:none;
+  color:var(--ink-2);padding:.4rem .2rem;
+  background:none;border:none;cursor:pointer;
 }
-.dropdown-btn:hover { background: var(--surface2); }
-.arrow { font-size: 0.7rem; }
-
-.dropdown-content { 
-  position: absolute; top: calc(100% + 10px); right: 0; 
-  background: var(--surface); border: 4px solid var(--border); 
-  width: 240px; overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-5px);
-  box-shadow: 8px 8px 0px #000000; z-index: 1000; border-radius: 0;
-}
-.dropdown.active .dropdown-content { opacity: 1; visibility: visible; transform: translateY(0); }
-
-.dropdown-content a, .dropdown-logout { 
-  display: block; width: 100%; text-align: left; padding: 12px 16px; 
-  color: var(--text); text-decoration: none; font-family: 'DM Mono', monospace; font-weight: 700;
-  font-size: 0.95rem; background: transparent; border: none; border-bottom: 2px solid var(--border); cursor: pointer; 
-}
-.dropdown-content a:hover { background: var(--accent); color: #fff; }
-.dropdown-logout { color: var(--accent); font-weight: bold; border-bottom: none; }
-.dropdown-logout:hover { background: var(--accent); color: #fff; }
-
-.nav-cta { display:flex; gap:1rem; align-items:center; }
+.nav-link:hover{color:var(--red)}
+  
+  .nav-cta { display:flex; gap:1rem; align-items:center; }
 .btn-ghost {
   background:transparent; border:2px solid var(--border); color:var(--text); padding:0.45rem 1.2rem;
   font-family:'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase;
@@ -532,41 +505,62 @@ footer{
   font-family:var(--mono);font-size:.68rem;color:rgba(243,238,225,.55);
 }
 
-/* ============ Auth Modal ============ */
-.modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding: 1rem; }
-.modal-overlay.open { display:flex; }
-.modal-card { 
-  background:var(--bg); border:4px solid var(--border); padding:3rem; width:100%; max-width:480px; 
-  position:relative; box-shadow: 12px 12px 0px #000000; animation:pop .25s ease; border-radius: 0; 
-  max-height: 90vh; overflow-y: auto;
+/* ============ Qwen Auth Modal ============ */
+.modal{
+  position:fixed;inset:0;z-index:9999;display:none;
+  align-items:center;justify-content:center;padding:1.4rem;
+}
+.modal.open{display:flex}
+.modal-veil{position:absolute;inset:0;background:rgba(33,30,23,.55)}
+.modal-card{
+  position:relative;width:min(430px,100%);
+  background:var(--paper-hi);border:1.5px solid var(--ink);border-radius:8px;
+  box-shadow:8px 8px 0 rgba(33,30,23,.85);
+  padding:2rem 1.9rem;
+  animation:pop .25s ease;
 }
 @keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
-.modal-close { position:absolute; top:1rem; right:1rem; background:var(--surface); border: 2px solid var(--border); width: 36px; height: 36px; cursor:pointer; color:var(--text); font-size:1.2rem; font-weight: bold; box-shadow: 2px 2px 0px #000000; border-radius: 0; }
-.modal-close:hover { background: var(--accent); color: #fff; }
-.modal-title { font-family:var(--sans); font-size:2rem; font-weight:800; margin-bottom:0.5rem; text-transform: uppercase; color: var(--text); background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
-.modal-sub { color:var(--text-muted); font-size:0.9rem; margin-top: 1rem; margin-bottom:2.5rem; text-transform: uppercase; border-bottom: 2px dashed var(--border); padding-bottom: 1rem; font-weight: 700; }
-
-.form-group { margin-bottom:1.5rem; }
-.form-label { font-size:0.85rem; font-weight:bold; color:var(--text); display:block; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em; background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
-.form-input { width:100%; background:var(--surface); border:2px solid var(--border); padding:1rem; color:var(--text); font-family:var(--mono); font-size:1rem; outline:none; font-weight: 700; box-shadow: 4px 4px 0px #000000; transition: transform 0.1s; border-radius: 0; }
-.form-input:focus { border-color:var(--accent); background: var(--surface); transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
-
-.modal-btn { width:100%; background:var(--accent); color:#fff; border:2px solid var(--border); padding:1rem; font-family:var(--sans); font-size:1.1rem; font-weight:800; text-transform: uppercase; cursor:pointer; margin-top:1rem; box-shadow: 6px 6px 0px #000000; transition: transform 0.1s; display: flex; justify-content: center; align-items: center; gap: 0.8rem; border-radius: 0; }
-.modal-btn:hover { background: var(--accent-hover); transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; }
-
-.tab-row { display:flex; gap:1rem; margin-bottom:2rem; }
-.tab-btn { flex:1; padding:0.8rem; font-family:var(--sans); font-size:1rem; font-weight:800; text-transform: uppercase; cursor:pointer; border:2px solid var(--border); background:var(--surface); color:var(--text-muted); box-shadow: 4px 4px 0px #000000; transition: transform 0.1s; border-radius: 0; }
-.tab-btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
-.tab-btn.active { background:var(--text); color:#fff; border-color:var(--text); transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000000;}
-.divider-text { text-align:center; margin:1.5rem 0; font-size:0.85rem; color:var(--text-muted); text-transform: uppercase; font-weight: 800; background: var(--surface); border: 2px solid var(--border); padding: 0.5rem; box-shadow: 2px 2px 0px #000000; }
-
-#toast {
-  position:fixed; bottom:2rem; left:2rem; transform: translateY(150px);
-  background:var(--surface); border:4px solid var(--border);
-  padding:1rem 1.5rem; font-size:1rem; color:var(--text); font-weight: 800; font-family: var(--sans); text-transform: uppercase;
-  transition:transform 0.2s ease; z-index:500;
-  box-shadow:8px 8px 0px #000000; white-space:nowrap; pointer-events:none; border-radius: 0;
+.modal-card h3{font-size:1.7rem; font-family: var(--serif); line-height: 1.2;}
+.modal-card .sub{color:var(--ink-2);font-size:.9rem;margin:.4rem 0 1.3rem}
+.modal-x{
+  position:absolute;top:.8rem;right:.9rem;background:none;border:none;
+  font-size:1.25rem;cursor:pointer;color:var(--ink-2);
 }
+.tabs{display:flex;gap:1.4rem;border-bottom:1.5px solid var(--line);margin-bottom:1.3rem}
+.tabs button{
+  background:none;border:none;cursor:pointer;
+  font-family:var(--mono);font-size:.8rem;letter-spacing:.05em;
+  padding:.5rem 0;color:var(--ink-2);
+  border-bottom:2px solid transparent;margin-bottom:-1.5px;
+}
+.tabs button.active{color:var(--red);border-bottom-color:var(--red)}
+.field{margin-bottom:.95rem}
+.field label{
+  display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-2);margin-bottom:.35rem;
+}
+.field input,.field select{
+  width:100%;padding:.7rem .85rem;
+  border:1.5px solid var(--line-hard);border-radius:4px;
+  background:#fff;font-family:var(--sans);font-size:.95rem;color:var(--ink);
+}
+.field input:focus,.field select:focus{
+  outline:none;border-color:var(--red);
+  box-shadow:3px 3px 0 rgba(240,180,41,.55);
+}
+.or{
+  display:flex;align-items:center;gap:.9rem;margin:1.1rem 0;
+  font-family:var(--mono);font-size:.68rem;color:var(--ink-2);
+}
+.or::before,.or::after{content:"";flex:1;border-top:1px dashed var(--line-hard)}
+.g-btn{
+  width:100%;justify-content:center;background:#fff;
+}
+.g-btn .g{
+  font-family:var(--serif);font-weight:700;color:var(--red);
+}
+.panel{display:none}
+.panel.active{display:block}
 
 /* ============ Responsive Rules ============ */
 .mobile-only { display: none; }
@@ -646,27 +640,15 @@ footer{
   </div>
 </div> -->
 
-<nav>
-  <a href="#" class="nav-logo">
-    <div class="logo-dot"></div>
-    Quizable<span>.</span>
-  </a>
-  
-<!--  <div class="nav-right">
-    <a href="/pricing" class="upgrade-link" id="nav-upgrade">Upgrade</a> -->
-    
-    <div class="dropdown">
-      <button class="dropdown-btn" id="menu-btn" onclick="toggleMenu()">
-        Menu <span class="arrow">▼</span>
-      </button>
-      <div class="dropdown-content" id="dropdown-menu">
-        </div>
-    </div>
-
-    <div class="nav-cta" id="nav-cta">
-      </div>
+<header class="nav" id="navbar">
+  <div class="wrap nav-inner">
+    <a href="#" class="logo">Quizable<span>.</span></a>
+    <div class="nav-spacer"></div>
+    <button class="nav-link" data-open-auth>Log in</button>
+<!--    <a href="/pricing" class="btn btn-red btn-sm">Upgrade</a> -->
+    <button class="nav-link" aria-label="Menu">Menu ▼</button>
   </div>
-</nav>
+</header>
 
 <section class="hero">
   <div class="hero-badge">PAPER &amp; INK EDITION</div>
@@ -967,72 +949,44 @@ footer{
   </div>
 </footer>
 
-<div class="modal-overlay" id="authModal" onclick="closeModalOutside(event)">
+<div class="modal" id="authModal" role="dialog" aria-modal="true">
+  <div class="modal-veil" data-close-auth></div>
   <div class="modal-card">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title" id="modalTitle">Welcome Back</div>
-    <div class="modal-sub" id="modalSub">Authenticate to continue</div>
+    <button class="modal-x" data-close-auth aria-label="Close">✕</button>
+    <h3>Welcome back</h3>
+    <p class="sub">Log in to continue your preparation</p>
 
-    <div class="tab-row">
-      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Auth</button>
-      <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Register</button>
+    <div class="tabs">
+      <button class="active" data-tab="login">Log in</button>
+      <button data-tab="signup">Sign up</button>
     </div>
 
-    <div id="loginForm">
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" type="email" id="login-email" placeholder="user@domain.com"
-               onkeydown="if(event.key==='Enter') handleLogin()"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input class="form-input" type="password" id="login-password" placeholder="••••••••"
-               onkeydown="if(event.key==='Enter') handleLogin()"/>
-      </div>
-      <div id="login-error" style="color:var(--accent);font-size:0.9rem;min-height:18px;margin-bottom:0.5rem;font-weight:bold;font-family: var(--sans); text-transform: uppercase;"></div>
-      <button class="modal-btn" id="login-btn" onclick="handleLogin()">Execute Login</button>
-      <div class="divider-text">OR USE PROVIDER</div>
-      <button class="modal-btn" id="google-login-btn" onclick="handleGoogleAuth()"
-              style="background:var(--surface);color:var(--text);border:2px solid var(--border);">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Auth with Google
-      </button>
-    </div>
+    <form class="panel active" id="panel-login">
+      <div class="field"><label for="li-email">Email</label><input id="li-email" type="email" required placeholder="you@example.com"></div>
+      <div class="field"><label for="li-pass">Password</label><input id="li-pass" type="password" required placeholder="••••••••"></div>
+      <button class="btn btn-solid" style="width:100%;justify-content:center" type="submit">Log in →</button>
+      <div class="or">or</div>
+      <button class="btn g-btn" type="button"><span class="g">G</span> Continue with Google</button>
+    </form>
 
-    <div id="signupForm" style="display:none">
-      <div class="form-group">
-        <label class="form-label">Full Name</label>
-        <input class="form-input" type="text" id="signup-name" placeholder="User Name"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" type="email" id="signup-email" placeholder="user@domain.com"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Set Password</label>
-        <input class="form-input" type="password" id="signup-password" placeholder="Min 6 Chars"
-               onkeydown="if(event.key==='Enter') handleSignup()"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Target Exam</label>
-        <select class="form-input" id="signup-exam">
-          <option value="">Select Exam</option>
-          <option value="JEE Mains">JEE Mains</option>
-          <option value="JEE Advanced">JEE Advanced</option>
-          <option value="MHT CET">MHT CET</option>
-          <option value="BITSAT">BITSAT</option>
+    <form class="panel" id="panel-signup">
+      <div class="field"><label for="su-name">Full Name</label><input id="su-name" type="text" required placeholder="Your name"></div>
+      <div class="field"><label for="su-email">Email</label><input id="su-email" type="email" required placeholder="you@example.com"></div>
+      <div class="field"><label for="su-pass">Password</label><input id="su-pass" type="password" required placeholder="••••••••"></div>
+      <div class="field">
+        <label for="su-exam">Target Exam</label>
+        <select id="su-exam">
+          <option value="" selected>Select your primary exam</option>
+          <option>JEE Mains</option>
+          <option>JEE Advanced</option>
+          <option>MHT CET</option>
+          <option>BITSAT</option>
         </select>
       </div>
-      <div id="signup-error" style="color:var(--accent);font-size:0.9rem;min-height:18px;margin-bottom:0.5rem;font-weight:bold;font-family: var(--sans); text-transform: uppercase;"></div>
-      <button class="modal-btn" id="signup-btn" onclick="handleSignup()">Initialize User</button>
-      
-      <div class="divider-text">OR USE PROVIDER</div>
-      <button class="modal-btn" onclick="handleGoogleAuth()"
-              style="background:var(--surface);color:var(--text);border:2px solid var(--border);">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Sign up with Google
-      </button>
-    </div>
+      <button class="btn btn-red" style="width:100%;justify-content:center" type="submit">Create Account →</button>
+      <div class="or">or</div>
+      <button class="btn g-btn" type="button"><span class="g">G</span> Sign up with Google</button>
+    </form>
   </div>
 </div>
 
@@ -1148,6 +1102,27 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
+  /* nav shadow */
+const nav = document.getElementById('navbar');
+addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8));
+
+/* modal */
+const modal = document.getElementById('authModal');
+document.querySelectorAll('[data-open-auth]').forEach(el =>
+  el.addEventListener('click', e => { e.preventDefault(); modal.classList.add('open'); document.body.style.overflow='hidden'; }));
+document.querySelectorAll('[data-close-auth]').forEach(el =>
+  el.addEventListener('click', () => { modal.classList.remove('open'); document.body.style.overflow=''; }));
+addEventListener('keydown', e => { if(e.key==='Escape'){ modal.classList.remove('open'); document.body.style.overflow=''; }});
+
+/* tabs */
+document.querySelectorAll('.tabs button').forEach(btn =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  }));
+  
 function setLoading(btnId, loading, defaultText) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
