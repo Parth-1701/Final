@@ -656,21 +656,19 @@ footer{
   <div class="wrap nav-inner">
     <a href="#" class="nav-logo">Quizable<span></span></a>
     
-    <div class="nav-spacer"></div>
-    
- <!--   <div class="nav-right">
-      <a href="/pricing" class="upgrade-link" id="nav-upgrade">Upgrade</a> -->
-      
-      <div class="dropdown">
+    <div class="nav-right">
+      <div class="dropdown" id="user-dropdown" style="display: none;">
         <button class="dropdown-btn" id="menu-btn" onclick="toggleMenu()">
           Menu ▼
         </button>
         <div class="dropdown-content" id="dropdown-menu">
-          </div>
+        </div>
       </div>
 
       <div class="nav-cta" id="nav-cta">
-        </div>
+        <button class="btn-ghost" onclick="openModal('login')">Log In</button>
+        <button class="btn-primary" onclick="openModal('signup')">Sign Up</button>
+      </div>
     </div>
 
   </div>
