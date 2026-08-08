@@ -570,39 +570,70 @@ footer {
 }
 
 /* ============ Auth Modal ============ */
-.modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; }
+/* ============ Ultra-Compact Auth Modal ============ */
+.modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.75); align-items:center; justify-content:center; padding: 1rem; }
 .modal-overlay.open { display:flex; }
-.modal-card { 
-  background:var(--bg); 
-  border:4px solid var(--border); 
-  padding:2rem; /* Reduced from 3rem */
-  width:100%; 
-  max-width:380px; /* Reduced from 480px */
-  position:relative; 
-  box-shadow: 8px 8px 0px #000000; /* Slightly smaller shadow to match the smaller card */
-  animation:pop .25s ease; 
-  border-radius: 0; 
+
+.compact-card {
+  background: var(--surface);
+  border: 3px solid var(--border);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 320px; /* Force it to stay narrow */
+  box-shadow: 6px 6px 0px #000000;
+  position: relative;
+  animation: pop .25s ease;
 }
-  @keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
-.modal-close { position:absolute; top:1rem; right:1rem; background:var(--surface); border: 2px solid var(--border); width: 36px; height: 36px; cursor:pointer; color:var(--text); font-size:1.2rem; font-weight: bold; box-shadow: 2px 2px 0px #000000; border-radius: 0; }
+
+@keyframes pop { from{transform:translateY(14px) scale(.98);opacity:0} to{transform:none;opacity:1} }
+
+.modal-close { 
+  position: absolute; top: -12px; right: -12px; 
+  background: var(--surface); border: 2px solid var(--border); 
+  width: 30px; height: 30px; cursor: pointer; color: var(--text); 
+  font-size: 1rem; font-weight: bold; box-shadow: 2px 2px 0px #000000; 
+}
 .modal-close:hover { background: var(--accent); color: #fff; }
-.modal-title { font-family:var(--sans); font-size:1.6rem; font-weight:800; margin-bottom:0.5rem; text-transform: uppercase; color: var(--text); background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
-.modal-sub { color:var(--text-muted); font-size:0.85rem; margin-top: 0.5rem; margin-bottom:1.5rem; text-transform: uppercase; border-bottom: 2px dashed var(--border); padding-bottom: 1rem; font-weight: 700; }
+
+.compact-tabs { display: flex; margin-bottom: 1.2rem; border-bottom: 2px solid var(--border); }
+.c-tab { 
+  flex: 1; background: none; border: none; font-family: var(--sans); 
+  font-size: 1.1rem; font-weight: 800; text-transform: uppercase; 
+  padding: 0.5rem 0; cursor: pointer; color: var(--text-muted); 
+  border-bottom: 3px solid transparent; margin-bottom: -2px; 
+}
+.c-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+.c-input-group { margin-bottom: 0.75rem; }
+.c-input { 
+  width: 100%; padding: 0.75rem; font-family: var(--mono); 
+  font-size: 0.9rem; border: 2px solid var(--border); 
+  background: var(--bg); outline: none; font-weight: 600; color: var(--text);
+}
+.c-input:focus { border-color: var(--accent); background: var(--surface); }
+
+.c-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.c-btn { 
+  padding: 0.7rem; font-family: var(--sans); font-size: 0.9rem; 
+  font-weight: 800; text-transform: uppercase; cursor: pointer; 
+  border: 2px solid var(--border); display: flex; align-items: center; justify-content: center;
+}
+.c-btn.primary { 
+  flex: 1; background: var(--accent); color: #fff; 
+  box-shadow: 3px 3px 0px #000000; transition: transform 0.1s; 
+}
+.c-btn.primary:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000000; }
+.c-btn.ghost { 
+  background: var(--surface); width: 44px; /* Square Google Button */
+  box-shadow: 3px 3px 0px #000000; transition: transform 0.1s; 
+}
+.c-btn.ghost:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000000; }
+
+.c-error { 
+  color: var(--accent); font-size: 0.75rem; font-family: var(--sans); 
+  font-weight: 800; min-height: 16px; margin-bottom: 0.5rem; text-transform: uppercase; 
+}
   
-.form-group { margin-bottom:1.5rem; }
-.form-label { font-size:0.85rem; font-weight:bold; color:var(--text); display:block; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em; background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
-.form-input { width:100%; background:var(--surface); border:2px solid var(--border); padding:1rem; color:var(--text); font-family:var(--mono); font-size:1rem; outline:none; font-weight: 700; box-shadow: 4px 4px 0px #000000; transition: transform 0.1s; border-radius: 0; }
-.form-input:focus { border-color:var(--accent); background: var(--surface); transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
-
-.modal-btn { width:100%; background:var(--accent); color:#fff; border:2px solid var(--border); padding:1rem; font-family:var(--sans); font-size:1.1rem; font-weight:800; text-transform: uppercase; cursor:pointer; margin-top:1rem; box-shadow: 6px 6px 0px #000000; transition: transform 0.1s; display: flex; justify-content: center; align-items: center; gap: 0.8rem; border-radius: 0; }
-.modal-btn:hover { background: var(--accent-hover); transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; }
-
-.tab-row { display:flex; gap:1rem; margin-bottom:2rem; }
-.tab-btn { flex:1; padding:0.8rem; font-family:var(--sans); font-size:1rem; font-weight:800; text-transform: uppercase; cursor:pointer; border:2px solid var(--border); background:var(--surface); color:var(--text-muted); box-shadow: 4px 4px 0px #000000; transition: transform 0.1s; border-radius: 0; }
-.tab-btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
-.tab-btn.active { background:var(--text); color:#fff; border-color:var(--text); transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000000;}
-.divider-text { text-align:center; margin:1.5rem 0; font-size:0.85rem; color:var(--text-muted); text-transform: uppercase; font-weight: 800; background: var(--surface); border: 2px solid var(--border); padding: 0.5rem; box-shadow: 2px 2px 0px #000000; }
-
 /* ── TOAST ── */
 #toast {
   position:fixed; bottom:2rem; left:2rem; transform: translateY(150px);
@@ -982,70 +1013,60 @@ footer {
 </footer>
 
 <div class="modal-overlay" id="authModal" onclick="closeModalOutside(event)">
-  <div class="modal-card">
+  <div class="modal-card compact-card">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title" id="modalTitle">Welcome Back</div>
-    <div class="modal-sub" id="modalSub">Authenticate to continue</div>
 
-    <div class="tab-row">
-      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Login</button>
-      <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Register</button>
+    <div class="compact-tabs">
+      <button class="c-tab active" id="tabLogin" onclick="switchTab('login')">Log In</button>
+      <button class="c-tab" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
     </div>
 
     <div id="loginForm">
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" type="email" id="login-email" placeholder="user@domain.com"
-               onkeydown="if(event.key==='Enter') handleLogin()"/>
+      <div class="c-input-group">
+        <input class="c-input" type="email" id="login-email" placeholder="Email Address" onkeydown="if(event.key==='Enter') handleLogin()"/>
       </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input class="form-input" type="password" id="login-password" placeholder="••••••••"
-               onkeydown="if(event.key==='Enter') handleLogin()"/>
+      <div class="c-input-group">
+        <input class="c-input" type="password" id="login-password" placeholder="Password" onkeydown="if(event.key==='Enter') handleLogin()"/>
       </div>
-      <div id="login-error" style="color:var(--accent);font-size:0.9rem;min-height:18px;margin-bottom:0.5rem;font-weight:bold;font-family: var(--sans); text-transform: uppercase;"></div>
-      <button class="modal-btn" id="login-btn" onclick="handleLogin()">Execute Login</button>
-      <div class="divider-text">OR USE PROVIDER</div>
-      <button class="modal-btn" id="google-login-btn" onclick="handleGoogleAuth()"
-              style="background:var(--surface);color:var(--text);border:2px solid var(--border);">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Auth with Google
-      </button>
+      
+      <div id="login-error" class="c-error"></div>
+      
+      <div class="c-actions">
+        <button class="c-btn primary" id="login-btn" onclick="handleLogin()">Login</button>
+        <button class="c-btn ghost" id="google-login-btn" onclick="handleGoogleAuth()" title="Log in with Google">
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        </button>
+      </div>
     </div>
 
     <div id="signupForm" style="display:none">
-      <div class="form-group">
-        <label class="form-label">Full Name</label>
-        <input class="form-input" type="text" id="signup-name" placeholder="User Name"/>
+      <div class="c-input-group">
+        <input class="c-input" type="text" id="signup-name" placeholder="Full Name"/>
       </div>
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" type="email" id="signup-email" placeholder="user@domain.com"/>
+      <div class="c-input-group">
+        <input class="c-input" type="email" id="signup-email" placeholder="Email Address"/>
       </div>
-      <div class="form-group">
-        <label class="form-label">Set Password</label>
-        <input class="form-input" type="password" id="signup-password" placeholder="Min 6 Chars"
-               onkeydown="if(event.key==='Enter') handleSignup()"/>
+      <div class="c-input-group">
+        <input class="c-input" type="password" id="signup-password" placeholder="Password (Min 6)" onkeydown="if(event.key==='Enter') handleSignup()"/>
       </div>
-      <div class="form-group">
-        <label class="form-label">Target Exam</label>
-        <select class="form-input" id="signup-exam">
-          <option value="">Select Exam</option>
+      <div class="c-input-group">
+        <select class="c-input" id="signup-exam">
+          <option value="">Select Target Exam...</option>
           <option value="JEE Mains">JEE Mains</option>
           <option value="JEE Advanced">JEE Advanced</option>
           <option value="MHT CET">MHT CET</option>
           <option value="BITSAT">BITSAT</option>
         </select>
       </div>
-      <div id="signup-error" style="color:var(--accent);font-size:0.9rem;min-height:18px;margin-bottom:0.5rem;font-weight:bold;font-family: var(--sans); text-transform: uppercase;"></div>
-      <button class="modal-btn" id="signup-btn" onclick="handleSignup()">Initialize User</button>
       
-      <div class="divider-text">OR USE PROVIDER</div>
-      <button class="modal-btn" onclick="handleGoogleAuth()"
-              style="background:var(--surface);color:var(--text);border:2px solid var(--border);">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Sign up with Google
-      </button>
+      <div id="signup-error" class="c-error"></div>
+      
+      <div class="c-actions">
+        <button class="c-btn primary" id="signup-btn" onclick="handleSignup()">Sign Up</button>
+        <button class="c-btn ghost" onclick="handleGoogleAuth()" title="Sign up with Google">
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        </button>
+      </div>
     </div>
   </div>
 </div>
