@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard | Quizable Business</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #F4F2EC;
+            --text: #111111;
+            --border: #111111;
+            --surface: #ffffff;
+            --accent: #0ea5e9; /* Cyan for data highlights */
+            --danger: #ef4444; /* Red for missed questions */
+            --shadow: 4px 4px 0px #111111;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            background-image: radial-gradient(rgba(17, 17, 17, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            font-family: 'DM Mono', monospace;
+            font-weight: 500;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            box-shadow: 2px 2px 0px var(--border);
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* KPI Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .metric-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        /* Data Tables */
+        .data-section {
+            margin-bottom: 3rem;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .data-section-header {
+            background: var(--border);
+            color: var(--bg);
+            padding: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .data-table th, .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            background-color: rgba(0,0,0,0.02);
+            border-right: 1px solid var(--border);
+        }
+        
+        .data-table td {
+            border-right: 1px solid var(--border);
+        }
+
+        .data-table th:last-child, .data-table td:last-child {
+            border-right: none;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: rgba(14, 165, 233, 0.05);
+        }
+
+        .tag {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .tag.danger {
+            background: #fee2e2;
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .header-section { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <header class="header-section">
+            <div>
+                <h1>Batch Analytics</h1>
+                <p>Real-time performance data for your students</p>
+            </div>
+            <select class="filter-select" id="testFilter">
+                <option value="test_1">Select a Test...</option>
+                <option value="NEET_MOCK_1">NEET Full Mock - Alpha</option>
+                <option value="JEE_MAINS_PHASE1">JEE Mains - Phase 1</option>
+            </select>
+        </header>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <span class="metric-title">Total Students Appeared</span>
+                <span class="metric-value" id="totalStudents">--</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-title">Batch Average Score</span>
+                <span class="metric-value" id="avgScore">--</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-title">Avg Time Taken</span>
+                <span class="metric-value" id="avgTime">--</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-title">Highest Score</span>
+                <span class="metric-value" id="highScore" style="color: var(--accent);">--</span>
+            </div>
+        </div>
+
+        <section class="data-section">
+            <div class="data-section-header">
+                <h2>Student Performance</h2>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Student Name</th>
+                        <th>Total Score</th>
+                        <th>Accuracy</th>
+                        <th>Time Taken</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody">
+                    <tr><td colspan="5">Select a test from the dropdown to load data.</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="data-section">
+            <div class="data-section-header">
+                <h2>Most Missed/Skipped Questions</h2>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Question ID</th>
+                        <th>Subject</th>
+                        <th>Wrong %</th>
+                        <th>Skipped %</th>
+                        <th>Action Needed</th>
+                    </tr>
+                </thead>
+                <tbody id="questionTableBody">
+                    </tbody>
+            </table>
+        </section>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // 1. PASTE YOUR FIREBASE CONFIG HERE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // 2. LISTEN FOR DROPDOWN CHANGES
+        document.getElementById('testFilter').addEventListener('change', (e) => {
+            if(e.target.value !== "test_1") {
+                fetchAnalytics(e.target.value);
+            }
+        });
+
+        // 3. FETCH AND PROCESS DATA
+        async function fetchAnalytics(testId) {
+            // Show loading state
+            document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">Loading secure data from Firebase...</td></tr>';
+            document.getElementById('questionTableBody').innerHTML = '';
+            
+            try {
+                // CHANGE 'results' to your exact collection name if different!
+                const snapshot = await db.collection('results')
+                                         .where('testId', '==', testId)
+                                         .get();
+
+                if (snapshot.empty) {
+                    document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">No data found for this test.</td></tr>';
+                    resetMetrics();
+                    return;
+                }
+
+                let totalScoreAcc = 0;
+                let totalTimeAcc = 0;
+                let highScore = 0;
+                let students = [];
+                let questionStats = {};
+
+                // Process each document
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    const numericScore = parseInt(data.score) || 0;
+                    totalScoreAcc += numericScore;
+                    if (numericScore > highScore) highScore = numericScore;
+
+                    // Handle time logic depending on how you store it
+                    let rawTime = data.timeTaken || 0;
+                    
+                    students.push({
+                        name: data.userName || data.studentName || "Anonymous",
+                        score: numericScore,
+                        accuracy: calculateAccuracy(data.score, data.totalQuestions),
+                        time: formatTime(rawTime), 
+                        rawResponses: data.responses || []
+                    });
+
+                    // Track Question Analytics
+                    if (data.responses && Array.isArray(data.responses)) {
+                        data.responses.forEach(resp => {
+                            const qId = resp.questionId || "Unknown";
+                            if (!questionStats[qId]) {
+                                questionStats[qId] = { subject: resp.subject || 'Unknown', wrong: 0, skipped: 0, total: 0 };
+                            }
+                            
+                            questionStats[qId].total++;
+                            
+                            if (resp.selectedOption === null || resp.selectedOption === "") {
+                                questionStats[qId].skipped++;
+                            } else if (resp.isCorrect === false) {
+                                questionStats[qId].wrong++;
+                            }
+                        });
+                    }
+                });
+
+                // Sort students by highest score
+                students.sort((a, b) => b.score - a.score);
+
+                // Build Final Data Object
+                const batchData = {
+                    overview: {
+                        totalStudents: students.length,
+                        avgScore: Math.round(totalScoreAcc / students.length).toString(),
+                        avgTime: "--", // You can average out totalTimeAcc here if needed
+                        highScore: highScore.toString()
+                    },
+                    students: students,
+                    questions: analyzeQuestions(questionStats, students.length)
+                };
+
+                // Render to UI
+                renderDashboard(batchData);
+
+            } catch (error) {
+                console.error("Error fetching analytics:", error);
+                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:red;">Error loading data. Check console.</td></tr>';
+            }
+        }
+
+        // --- HELPER FUNCTIONS ---
+        function resetMetrics() {
+            document.getElementById('totalStudents').innerText = "--";
+            document.getElementById('avgScore').innerText = "--";
+            document.getElementById('avgTime').innerText = "--";
+            document.getElementById('highScore').innerText = "--";
+            document.getElementById('questionTableBody').innerHTML = '';
+        }
+
+        function calculateAccuracy(score, total) {
+            if(!total) return "N/A";
+            // Update this based on how you grade. Assuming score isn't straightforward percentage.
+            return "Calculated%"; 
+        }
+
+        function formatTime(timeVal) {
+            if (!timeVal) return "--";
+            if (typeof timeVal === 'string') return timeVal;
+            const h = Math.floor(timeVal / 3600);
+            const m = Math.floor((timeVal % 3600) / 60);
+            return `${h > 0 ? h + 'h ' : ''}${m}m`;
+        }
+
+        function analyzeQuestions(stats, totalStudents) {
+            let qArray = [];
+            for (let qId in stats) {
+                let q = stats[qId];
+                if (q.total === 0) continue;
+
+                let wrongPercent = Math.round((q.wrong / q.total) * 100);
+                let skippedPercent = Math.round((q.skipped / q.total) * 100);
+                
+                let status = "On Track";
+                if (wrongPercent > 50) status = "Revise Concept";
+                if (skippedPercent > 40) status = "Time Sink";
+
+                qArray.push({
+                    id: qId,
+                    subject: q.subject,
+                    wrong: wrongPercent + "%",
+                    skipped: skippedPercent + "%",
+                    status: status,
+                    rawWrong: wrongPercent // Hidden field for sorting
+                });
+            }
+            
+            // Sort by worst performing questions first
+            qArray.sort((a, b) => b.rawWrong - a.rawWrong);
+            return qArray.slice(0, 10); // Show top 10 worst
+        }
+
+        // --- RENDER ENGINE ---
+        function renderDashboard(data) {
+            document.getElementById('totalStudents').innerText = data.overview.totalStudents;
+            document.getElementById('avgScore').innerText = data.overview.avgScore;
+            // document.getElementById('avgTime').innerText = data.overview.avgTime;
+            document.getElementById('highScore').innerText = data.overview.highScore;
+
+            // Render Students
+            const studentBody = document.getElementById('studentTableBody');
+            studentBody.innerHTML = ''; 
+            
+            data.students.forEach((student, index) => {
+                studentBody.innerHTML += `<tr>
+                    <td>#${index + 1}</td>
+                    <td><strong>${student.name}</strong></td>
+                    <td>${student.score}</td>
+                    <td>${student.accuracy}</td>
+                    <td>${student.time}</td>
+                </tr>`;
+            });
+
+            // Render Questions
+            const questionBody = document.getElementById('questionTableBody');
+            questionBody.innerHTML = '';
+
+            if(data.questions.length === 0) {
+                questionBody.innerHTML = '<tr><td colspan="5">No question data available.</td></tr>';
+                return;
+            }
+
+            data.questions.forEach(q => {
+                const wrongVal = parseInt(q.wrong);
+                const tagClass = wrongVal > 50 ? 'tag danger' : 'tag';
+                questionBody.innerHTML += `<tr>
+                    <td><strong>${q.id}</strong></td>
+                    <td>${q.subject}</td>
+                    <td style="color: var(--danger); font-weight: 700;">${q.wrong}</td>
+                    <td>${q.skipped}</td>
+                    <td><span class="${tagClass}">${q.status}</span></td>
+                </tr>`;
+            });
+        }
+    </script>
+</body>
+</html>
