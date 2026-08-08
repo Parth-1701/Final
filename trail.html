@@ -3,19 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Quizable — Mock Test Platform</title>
+<title>Quizable — Mock Test Platform for JEE · NEET · MHTCET · BITSAT</title>
 <meta name="description" content="Timed mock tests, detailed analytics and leaderboards for JEE Mains, JEE Advanced, NEET, MHT CET and BITSAT. Train with real pressure." />
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Quizable",
-  "url": "https://quizable.online/"
-}
-  <link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
-</script>
-   
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
@@ -25,7 +15,7 @@
    QUIZABLE — Hybrid Theme 
    ============================================================ */
 :root {
-  /* Neo-Brutalist "Print" Palette */
+  /* Neo-Brutalist "Print" Palette (Gemini) */
   --bg: #F4F2EC;
   --surface: #FFFFFF;
   --surface2: #EAE8E1;
@@ -36,7 +26,7 @@
   --text-muted: #555555;
   --accent3: #10B981;
 
-  /* Variable Mappings (Ensuring seamless integration) */
+  /* Qwen Variable Mappings (Ensuring seamless integration) */
   --paper: var(--bg);
   --paper-hi: var(--surface);
   --paper-lo: var(--surface2);
@@ -61,7 +51,7 @@ body{
   font-family:var(--sans);
   color:var(--ink);
   
-  /* Dot Grid Background */
+  /* Gemini Dot Grid Background */
   background-color: var(--bg);
   background-image: radial-gradient(#D1CDBE 1px, transparent 1px);
   background-size: 24px 24px;
@@ -79,7 +69,7 @@ body{
 img{max-width:100%}
 a{color:inherit}
 
-/* ============ Support Popup ============ */
+/* ============ Gemini Support Popup ============ */
 #support-popup-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.7);
@@ -119,7 +109,7 @@ a{color:inherit}
 .support-popup-content h3 { color: var(--accent); margin: 0 0 10px 0; font-size: 1.2rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; }
 .support-popup-content p { color: var(--text); font-size: 14px; margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
 
-/* ============ Type Helpers ============ */
+/* ============ Qwen Type Helpers ============ */
 .kicker{
   font-family:var(--mono);
   font-size:.8rem;
@@ -141,7 +131,7 @@ mark.hl{
   color:inherit;
 }
 
-/* ============ Base Buttons ============ */
+/* ============ Qwen Base Buttons ============ */
 .btn{
   display:inline-flex;align-items:center;gap:.5rem;
   font-family:var(--sans);font-weight:600;font-size:.95rem;
@@ -172,7 +162,7 @@ mark.hl{
   background:var(--bg);padding:0 8px;
 }
 
-/* ============ Header & Nav Integration ============ */
+/* ============ Header & Gemini Nav Integration ============ */
 header.nav{
   position:sticky;top:0;z-index:900;
   background:var(--surface);
@@ -243,7 +233,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
 }
 .btn-primary:hover { background: var(--accent-hover); transform:translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
 
-/* ============ Hero & Actions ============ */
+/* ============ Gemini Hero & Actions ============ */
 .hero {
   position:relative; z-index:1; min-height: 85vh; /* Reduced height to remove empty space */
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -278,7 +268,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   font-weight:800; text-transform: uppercase; cursor:pointer; transition:all 0.1s; 
   border: 2px solid var(--border); text-decoration: none; display:inline-block; 
 }
-.btn-big.primary { background:var(--accent); color:#fff; box-shadow: 6px 6px 0px #000000; }
+.btn-big.primary { background:var(--text); color:#fff; box-shadow: 6px 6px 0px #000000; }
 .btn-big.primary:hover { transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; color:#fff;}
 .btn-big.outline { background:var(--surface); color:var(--text); box-shadow: 6px 6px 0px #000000; }
 .btn-big.outline:hover { background:var(--surface2); transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; }
@@ -289,7 +279,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   color: var(--text-muted); text-transform: uppercase; 
 }
 
-/* ============ Hall Ticket ============ */
+/* ============ Qwen Hall Ticket (Strictly Square) ============ */
 .hall-ticket{
   background:var(--paper-hi);
   border:1.5px solid var(--ink);
@@ -336,12 +326,12 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
 }
 .ht-num{font-family:var(--mono);font-size:.62rem;color:var(--ink-2);text-align:center;padding-bottom:1rem;letter-spacing:.28em; font-weight: bold;}
 
-/* ============ Sections & Layout ============ */
+/* ============ Qwen Sections & Layout ============ */
 section{padding:4.6rem 0}
 .sec-head{max-width:44rem;margin-bottom:2.6rem}
 .sec-head p{color:var(--ink-2);margin-top:.7rem}
 
-/* ============ Exam Cards ============ */
+/* ============ Qwen Exam Cards ============ */
 .exam-grid{
   display:grid;grid-template-columns:repeat(6,1fr);gap:1.2rem;
 }
@@ -394,7 +384,7 @@ section{padding:4.6rem 0}
 }
 .exam-card:hover .omr i:nth-child(2){background:var(--ink);border-color:var(--ink)}
 
-/* ============ CBT Demo ============ */
+/* ============ Exact Qwen CBT Demo ============ */
 .cbt{background:linear-gradient(transparent, rgba(33,30,23,.03))}
 .exam-window{
   border:1.5px solid var(--ink);border-radius:8px !important;
@@ -469,7 +459,7 @@ section{padding:4.6rem 0}
 .marking .chip{font-family:var(--mono);font-size:.7rem;display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:4px !important;padding:.32rem .6rem;background:#fff}
 .chip b.pos{color:var(--green)} .chip b.neg{color:var(--red)}
 
-/* ============ Features ============ */
+/* ============ Qwen Features ============ */
 .feature-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
   border:1.5px solid var(--ink);border-radius:6px !important;
@@ -488,7 +478,7 @@ section{padding:4.6rem 0}
 .feature h4{font-family:var(--serif);font-size:1.25rem;font-weight:600;margin-bottom:.45rem}
 .feature p{font-size:.9rem;color:var(--ink-2)}
 
-/* ============ Steps ============ */
+/* ============ Qwen Steps ============ */
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1.6rem;counter-reset:step}
 .step{position:relative;padding-top:.4rem}
 .step::before{
@@ -503,7 +493,7 @@ section{padding:4.6rem 0}
 .step h4{font-size:1.15rem;font-family:var(--serif);font-weight:600;margin-bottom:.4rem}
 .step p{font-size:.9rem;color:var(--ink-2)}
 
-/* ============ Leaderboard ============ */
+/* ============ Qwen Leaderboard ============ */
 .board{
   background:var(--paper-hi);border:1.5px solid var(--ink);border-radius:6px !important;
   box-shadow:var(--hard-shadow);overflow:hidden;
@@ -546,94 +536,61 @@ section{padding:4.6rem 0}
 .row.you a{color:var(--red);font-weight:600;text-decoration:none;font-size:.85rem;white-space:nowrap}
 .row.you a:hover{text-decoration:underline}
 
-/* ============ Footer ============ */
-footer {
-  background: #211E17 !important; color: #F3EEE1 !important;
-  padding: 3.6rem 0 2rem; margin-top: 2rem;
-  background-image: linear-gradient(rgba(243,238,225,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(243,238,225,.04) 1px, transparent 1px) !important;
-  background-size: 34px 34px !important; border: none !important;
+/* ============ Exact Qwen Footer ============ */
+footer{
+  background:var(--ink);color:var(--paper);
+  padding:3.6rem 0 2rem;margin-top:2rem;
+  background-image:
+    linear-gradient(rgba(243,238,225,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243,238,225,.04) 1px, transparent 1px);
+  background-size:34px 34px;
 }
-.f-grid { display:flex; justify-content:space-between; gap:2rem; flex-wrap:wrap; align-items:flex-start; }
-.f-logo { font-family:var(--serif) !important; font-size:2.2rem !important; font-weight:700 !important; text-transform:none !important; background:transparent !important; border:none !important; padding:0 !important; box-shadow:none !important; display:block; }
-.f-logo span { color:#F0B429 !important; }
-.f-tag { font-family:var(--mono) !important; font-size:.75rem !important; color:rgba(243,238,225,.6) !important; margin-top:.5rem; max-width:20rem; font-weight:normal !important; line-height:1.5 !important; }
-.f-links { display:flex; gap:1.6rem; flex-wrap:wrap; }
-.f-links a {
-  color:#F3EEE1 !important; text-decoration:none !important; font-family:var(--mono) !important; font-size:.85rem !important;
-  border:none !important; padding:0 !important; font-weight:normal !important; text-transform:none !important; border-bottom:1px solid transparent !important; box-shadow:none !important; background:transparent !important;
+.f-grid{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;align-items:flex-start}
+.f-logo{font-family:var(--serif);font-size:2rem;font-weight:700}
+.f-logo span{color:var(--yellow)}
+.f-tag{font-family:var(--mono);font-size:.72rem;color:rgba(243,238,225,.6);margin-top:.5rem;max-width:20rem}
+.f-links{display:flex;gap:1.6rem;flex-wrap:wrap}
+.f-links a{
+  color:var(--paper);text-decoration:none;font-family:var(--mono);font-size:.8rem;
+  border-bottom:1px solid transparent;
 }
-.f-links a:hover { border-bottom-color:#F0B429 !important; color:#F0B429 !important; background:transparent !important; box-shadow:none !important; transform:none !important; }
-.f-bottom {
-  margin-top:2.6rem; padding-top:1.4rem; border-top:1px solid rgba(243,238,225,.15) !important;
-  display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
-  font-family:var(--mono) !important; font-size:.7rem !important; color:rgba(243,238,225,.55) !important; font-weight:normal !important;
+.f-links a:hover{border-bottom-color:var(--yellow);color:var(--yellow)}
+.f-bottom{
+  margin-top:2.6rem;padding-top:1.4rem;border-top:1px solid rgba(243,238,225,.15);
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  font-family:var(--mono);font-size:.68rem;color:rgba(243,238,225,.55);
 }
 
-/* ============ Auth Modal ============ */
-/* ============ Ultra-Compact Auth Modal ============ */
-.modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.75); align-items:center; justify-content:center; padding: 1rem; }
+/* ============ Original Gemini Auth Modal (Mobile Safe) ============ */
+.modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding: 1rem; }
 .modal-overlay.open { display:flex; }
-
-.compact-card {
-  background: var(--surface);
-  border: 3px solid var(--border);
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 320px; /* Force it to stay narrow */
-  box-shadow: 6px 6px 0px #000000;
-  position: relative;
-  animation: pop .25s ease;
+.modal-card { 
+  background:var(--bg); border:4px solid var(--border); padding:2.5rem; 
+  width:100%; max-width:460px; position:relative; box-shadow: 10px 10px 0px #000000; 
+  animation:pop .25s ease; border-radius: 0; 
+  max-height: 90vh; /* The magic fix */
+  overflow-y: auto; /* The magic fix */
 }
-
-@keyframes pop { from{transform:translateY(14px) scale(.98);opacity:0} to{transform:none;opacity:1} }
-
-.modal-close { 
-  position: absolute; top: -12px; right: -12px; 
-  background: var(--surface); border: 2px solid var(--border); 
-  width: 30px; height: 30px; cursor: pointer; color: var(--text); 
-  font-size: 1rem; font-weight: bold; box-shadow: 2px 2px 0px #000000; 
-}
+@keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal-close { position:absolute; top:1rem; right:1rem; background:var(--surface); border: 2px solid var(--border); width: 36px; height: 36px; cursor:pointer; color:var(--text); font-size:1.2rem; font-weight: bold; box-shadow: 2px 2px 0px #000000; border-radius: 0; }
 .modal-close:hover { background: var(--accent); color: #fff; }
+.modal-title { font-family:var(--sans); font-size:1.8rem; font-weight:800; margin-bottom:0.5rem; text-transform: uppercase; color: var(--text); background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
+.modal-sub { color:var(--text-muted); font-size:0.85rem; margin-top: 1rem; margin-bottom:2rem; text-transform: uppercase; border-bottom: 2px dashed var(--border); padding-bottom: 1rem; font-weight: 700; }
 
-.compact-tabs { display: flex; margin-bottom: 1.2rem; border-bottom: 2px solid var(--border); }
-.c-tab { 
-  flex: 1; background: none; border: none; font-family: var(--sans); 
-  font-size: 1.1rem; font-weight: 800; text-transform: uppercase; 
-  padding: 0.5rem 0; cursor: pointer; color: var(--text-muted); 
-  border-bottom: 3px solid transparent; margin-bottom: -2px; 
-}
-.c-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.form-group { margin-bottom:1.2rem; }
+.form-label { font-size:0.85rem; font-weight:bold; color:var(--text); display:block; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em; background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
+.form-input { width:100%; background:var(--surface); border:2px solid var(--border); padding:0.9rem; color:var(--text); font-family:var(--mono); font-size:0.95rem; outline:none; font-weight: 700; box-shadow: 3px 3px 0px #000000; transition: transform 0.1s; border-radius: 0; }
+.form-input:focus { border-color:var(--accent); background: var(--surface); transform: translate(1px, 1px); box-shadow: 2px 2px 0px #000000; }
 
-.c-input-group { margin-bottom: 0.75rem; }
-.c-input { 
-  width: 100%; padding: 0.75rem; font-family: var(--mono); 
-  font-size: 0.9rem; border: 2px solid var(--border); 
-  background: var(--bg); outline: none; font-weight: 600; color: var(--text);
-}
-.c-input:focus { border-color: var(--accent); background: var(--surface); }
+.modal-btn { width:100%; background:var(--accent); color:#fff; border:2px solid var(--border); padding:0.9rem; font-family:var(--sans); font-size:1rem; font-weight:800; text-transform: uppercase; cursor:pointer; margin-top:0.5rem; box-shadow: 4px 4px 0px #000000; transition: transform 0.1s; display: flex; justify-content: center; align-items: center; gap: 0.8rem; border-radius: 0; }
+.modal-btn:hover { background: var(--accent-hover); transform:translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
 
-.c-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-.c-btn { 
-  padding: 0.7rem; font-family: var(--sans); font-size: 0.9rem; 
-  font-weight: 800; text-transform: uppercase; cursor: pointer; 
-  border: 2px solid var(--border); display: flex; align-items: center; justify-content: center;
-}
-.c-btn.primary { 
-  flex: 1; background: var(--accent); color: #fff; 
-  box-shadow: 3px 3px 0px #000000; transition: transform 0.1s; 
-}
-.c-btn.primary:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000000; }
-.c-btn.ghost { 
-  background: var(--surface); width: 44px; /* Square Google Button */
-  box-shadow: 3px 3px 0px #000000; transition: transform 0.1s; 
-}
-.c-btn.ghost:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000000; }
+.tab-row { display:flex; gap:1rem; margin-bottom:1.5rem; }
+.tab-btn { flex:1; padding:0.7rem; font-family:var(--sans); font-size:0.95rem; font-weight:800; text-transform: uppercase; cursor:pointer; border:2px solid var(--border); background:var(--surface); color:var(--text-muted); box-shadow: 3px 3px 0px #000000; transition: transform 0.1s; border-radius: 0; }
+.tab-btn:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0px #000000; }
+.tab-btn.active { background:var(--text); color:#fff; border-color:var(--text); transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000000;}
+.divider-text { text-align:center; margin:1.2rem 0; font-size:0.8rem; color:var(--text-muted); text-transform: uppercase; font-weight: 800; background: var(--surface); border: 2px solid var(--border); padding: 0.4rem; box-shadow: 2px 2px 0px #000000; }
 
-.c-error { 
-  color: var(--accent); font-size: 0.75rem; font-family: var(--sans); 
-  font-weight: 800; min-height: 16px; margin-bottom: 0.5rem; text-transform: uppercase; 
-}
-  
 /* ── TOAST ── */
 #toast {
   position:fixed; bottom:2rem; left:2rem; transform: translateY(150px);
@@ -679,7 +636,7 @@ footer {
 </head>
 <body>
 
-<!-- <div id="support-popup-overlay">
+<div id="support-popup-overlay">
   <div class="support-popup-card">
       <button id="support-popup-close" class="support-popup-close-btn">&times;</button>
       <img src="images/wangchuk-support.webp" alt="Support Sonam Wangchuk and NEET Aspirants" class="support-popup-img">
@@ -688,7 +645,7 @@ footer {
           <p>We stand in solidarity with Sonam Wangchuk and everyone fighting for transparency and fairness.</p>
       </div>
   </div>
-</div> -->
+</div>
 
 <header class="nav" id="navbar">
   <div class="wrap nav-inner">
@@ -715,10 +672,10 @@ footer {
 </header>
 
 <section class="hero">
-  <div class="hero-badge">JEE • NEET • MHTCET • BITSAT</div>
+  <div class="hero-badge">PAPER &amp; INK EDITION</div>
   
-  <h1>CRACK YOUR EXAM<br/>TRAIN WITH <em style="transform: rotate(-2deg); display: inline-block; padding: 0 0.5rem; border: 4px solid var(--border); background: var(--accent); color: var(--surface); box-shadow: 6px 6px 0px #000000; font-style: normal;">PRESSURE</em></h1>
-  <p class="lede">Timed mock tests, detailed analytics, and leaderboards built for serious aspirants who want to go beyond the textbook.</p>
+  <h1>CRACK YOUR EXAM.<br/>TRAIN WITH <em style="transform: rotate(-2deg); display: inline-block; padding: 0 0.5rem; border: 4px solid var(--border); background: var(--accent); color: var(--surface); box-shadow: 6px 6px 0px #000000; font-style: normal;">PRESSURE</em>.</h1>
+  <p class="lede">Timed mock tests, detailed analytics, and leaderboards — built for serious aspirants who want to go beyond the textbook.</p>
   
   <div class="hero-actions">
     <button class="btn-big primary" onclick="window.location.href='/courses'">Browse Courses</button>
@@ -726,7 +683,7 @@ footer {
   </div>
 
   <div class="hero-perks">
-    <span><span style="color:var(--accent3);">✓</span> Accurate Test Interface</span>
+    <span><span style="color:var(--accent3);">✓</span> No credit card required</span>
     <span style="color:var(--text-muted)">·</span>
     <span><span style="color:var(--accent3);">✓</span> Free tests forever</span>
   </div>
@@ -878,7 +835,7 @@ footer {
 
 <hr class="cutline" />
 
-<!-- <section>
+<section>
   <div class="wrap">
     <header class="sec-head reveal">
       <span class="kicker">// Under the hood</span>
@@ -990,7 +947,7 @@ footer {
       </div>
     </div>
   </div>
-</section> -->
+</section>
 
 <footer>
   <div class="wrap">
@@ -1007,6 +964,7 @@ footer {
       </nav>
     </div>
     <div class="f-bottom">
+      <span>⚡ JEE · NEET · MHTCET · BITSAT · ADVANCED</span>
       <span>© 2026 Quizable. All rights reserved.</span>
     </div>
   </div>
@@ -1024,14 +982,6 @@ footer {
     </div>
 
     <div id="loginForm">
-      <button class="modal-btn" id="google-login-btn" onclick="handleGoogleAuth()"
-              style="background:var(--surface);color:var(--text);border:2px solid var(--border); margin-top: 0;">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Auth with Google
-      </button>
-      
-      <div class="divider-text">OR CONTINUE WITH EMAIL</div>
-
       <div class="form-group">
         <label class="form-label">Email Address</label>
         <input class="form-input" type="email" id="login-email" placeholder="user@domain.com"
@@ -1044,17 +994,15 @@ footer {
       </div>
       <div id="login-error" style="color:var(--accent);font-size:0.9rem;min-height:18px;margin-bottom:0.5rem;font-weight:bold;font-family: var(--sans); text-transform: uppercase;"></div>
       <button class="modal-btn" id="login-btn" onclick="handleLogin()">Execute Login</button>
+      <div class="divider-text">OR USE PROVIDER</div>
+      <button class="modal-btn" id="google-login-btn" onclick="handleGoogleAuth()"
+              style="background:var(--surface);color:var(--text);border:2px solid var(--border);">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Auth with Google
+      </button>
     </div>
 
     <div id="signupForm" style="display:none">
-      <button class="modal-btn" onclick="handleGoogleAuth()"
-              style="background:var(--surface);color:var(--text);border:2px solid var(--border); margin-top: 0;">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Sign up with Google
-      </button>
-
-      <div class="divider-text">OR REGISTER WITH EMAIL</div>
-
       <div class="form-group">
         <label class="form-label">Full Name</label>
         <input class="form-input" type="text" id="signup-name" placeholder="User Name"/>
@@ -1080,6 +1028,13 @@ footer {
       </div>
       <div id="signup-error" style="color:var(--accent);font-size:0.9rem;min-height:18px;margin-bottom:0.5rem;font-weight:bold;font-family: var(--sans); text-transform: uppercase;"></div>
       <button class="modal-btn" id="signup-btn" onclick="handleSignup()">Initialize User</button>
+      
+      <div class="divider-text">OR USE PROVIDER</div>
+      <button class="modal-btn" onclick="handleGoogleAuth()"
+              style="background:var(--surface);color:var(--text);border:2px solid var(--border);">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Sign up with Google
+      </button>
     </div>
   </div>
 </div>
@@ -1308,17 +1263,17 @@ window.closeModal = () => {
 window.closeModalOutside = (e) => {
   if (e.target === document.querySelector('.modal-overlay')) closeModal();
 };
+
 window.switchTab = (tab) => {
   clearErrors();
   const isLogin = tab === 'login';
   document.getElementById('loginForm').style.display  = isLogin ? '' : 'none';
   document.getElementById('signupForm').style.display = isLogin ? 'none' : '';
+  
   document.getElementById('tabLogin').className  = 'tab-btn' + (isLogin ? ' active' : '');
   document.getElementById('tabSignup').className = 'tab-btn' + (!isLogin ? ' active' : '');
   document.getElementById('modalTitle').textContent = isLogin ? 'Welcome Back' : 'Create Account';
-  document.getElementById('modalSub').textContent   = isLogin
-    ? 'Authenticate to continue'
-    : 'Provide parameters';
+  document.getElementById('modalSub').textContent   = isLogin ? 'Authenticate to continue' : 'Provide parameters';
 };
 
 let toastTimer;
