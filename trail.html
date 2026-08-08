@@ -572,8 +572,18 @@ footer {
 /* ============ Auth Modal ============ */
 .modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; }
 .modal-overlay.open { display:flex; }
-.modal-card { background:var(--bg); border:4px solid var(--border); padding:3rem; width:100%; max-width:480px; position:relative; box-shadow: 12px 12px 0px #000000; animation:pop .25s ease; border-radius: 0; }
-@keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal-card { 
+  background:var(--bg); 
+  border:4px solid var(--border); 
+  padding:2rem; /* Reduced from 3rem */
+  width:100%; 
+  max-width:380px; /* Reduced from 480px */
+  position:relative; 
+  box-shadow: 8px 8px 0px #000000; /* Slightly smaller shadow to match the smaller card */
+  animation:pop .25s ease; 
+  border-radius: 0; 
+}
+  @keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
 .modal-close { position:absolute; top:1rem; right:1rem; background:var(--surface); border: 2px solid var(--border); width: 36px; height: 36px; cursor:pointer; color:var(--text); font-size:1.2rem; font-weight: bold; box-shadow: 2px 2px 0px #000000; border-radius: 0; }
 .modal-close:hover { background: var(--accent); color: #fff; }
 .modal-title { font-family:var(--sans); font-size:2rem; font-weight:800; margin-bottom:0.5rem; text-transform: uppercase; color: var(--text); background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
