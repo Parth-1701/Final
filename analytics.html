@@ -234,10 +234,10 @@
     </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // 1. FIREBASE CONFIGURATION
+        // 1. FIREBASE CONFIGURATION (Paste your config here again)
         const firebaseConfig = {
             apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
     authDomain: "sigmascore300.firebaseapp.com",
@@ -253,15 +253,33 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        // 2. LISTEN FOR DROPDOWN CHANGES
+        // 2. VERIFY ADMIN LOGIN
+        let currentUserEmail = null;
+        
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUserEmail = user.email;
+                console.log("Verified as:", currentUserEmail);
+                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">Admin verified. Select a test to view data.</td></tr>';
+            } else {
+                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);"><b>Access Denied:</b> You must log in to Quizable to view this page.</td></tr>';
+            }
+        });
+
+        // 3. LISTEN FOR DROPDOWN CHANGES
         document.getElementById('testFilter').addEventListener('change', (e) => {
+            if (!currentUserEmail) {
+                alert("Please log in first!");
+                return;
+            }
             if(e.target.value !== "test_1") {
                 fetchAnalytics(e.target.value);
             }
         });
 
-        // 3. THE DATA ENGINE (Fetches Results & Stitches Names)
+        // 4. THE DATA ENGINE
         async function fetchAnalytics(testId) {
             document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">Loading secure data from Firebase...</td></tr>';
             
@@ -281,15 +299,12 @@
                 let highScore = 0;
                 let studentsPromises = []; 
 
-                // Process each result document
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    
                     const numericScore = data.score || 0;
                     totalScoreAcc += numericScore;
                     if (numericScore > highScore) highScore = numericScore;
 
-                    // Calculate Accuracy
                     const correct = data.correct || 0;
                     const wrong = data.wrong || 0;
                     const attempted = correct + wrong;
@@ -297,14 +312,11 @@
 
                     const rawId = data.userId;
 
-                    // Create a task to fetch this specific student's name from the 'users' collection
                     const studentTask = db.collection('users').doc(rawId).get().then(userDoc => {
-                        let displayName = "Student_" + rawId.substring(0, 5); // Fallback
-
+                        let displayName = "Student_" + rawId.substring(0, 5); 
                         if (userDoc.exists && userDoc.data().user_name) {
                             displayName = userDoc.data().user_name; 
                         }
-
                         return {
                             name: displayName,
                             score: numericScore,
@@ -312,7 +324,6 @@
                             time: formatTime(data.timeTaken || 0)
                         };
                     }).catch(err => {
-                        // If fetching fails, return fallback
                         return {
                             name: "Student_" + rawId.substring(0, 5),
                             score: numericScore,
@@ -324,13 +335,9 @@
                     studentsPromises.push(studentTask);
                 });
 
-                // Wait for all the user names to be fetched from the database
                 let students = await Promise.all(studentsPromises);
-
-                // Sort students by highest score (Rank 1 at the top)
                 students.sort((a, b) => b.score - a.score);
 
-                // Build Final Data Object
                 const batchData = {
                     overview: {
                         totalStudents: students.length,
@@ -341,12 +348,11 @@
                     students: students
                 };
 
-                // Render to the UI
                 renderDashboard(batchData);
 
             } catch (error) {
                 console.error("Error fetching analytics:", error);
-                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);">Error loading data. Check console.</td></tr>';
+                document.getElementById('studentTableBody').innerHTML = `<tr><td colspan="5" style="color:var(--danger);"><b>Error:</b> Firebase blocked the read. Make sure <b>${currentUserEmail}</b> is the exact email saved in your Rules.</td></tr>`;
             }
         }
 
@@ -374,7 +380,6 @@
             document.getElementById('avgScore').innerText = data.overview.avgScore;
             document.getElementById('highScore').innerText = data.overview.highScore;
 
-            // Render Students Table
             const studentBody = document.getElementById('studentTableBody');
             studentBody.innerHTML = ''; 
             
@@ -388,11 +393,9 @@
                 </tr>`;
             });
 
-            // Display placeholder message for Questions Table
-            const questionBody = document.getElementById('questionTableBody');
-            questionBody.innerHTML = `<tr>
+            document.getElementById('questionTableBody').innerHTML = `<tr>
                 <td colspan="5" style="text-align: center; opacity: 0.6; padding: 2rem;">
-                    Question analysis is currently offline. <br>To enable this, update the CBT engine to save a <code>responses</code> array.
+                    Question analysis is currently offline. Update the CBT engine to save a <code>responses</code> array.
                 </td>
             </tr>`;
         }
