@@ -268,7 +268,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   font-weight:800; text-transform: uppercase; cursor:pointer; transition:all 0.1s; 
   border: 2px solid var(--border); text-decoration: none; display:inline-block; 
 }
-.btn-big.primary { background:var(--text); color:#fff; box-shadow: 6px 6px 0px #000000; }
+.btn-big.primary { background:var(--accent); color:#fff; box-shadow: 6px 6px 0px #000000; }
 .btn-big.primary:hover { transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; color:#fff;}
 .btn-big.outline { background:var(--surface); color:var(--text); box-shadow: 6px 6px 0px #000000; }
 .btn-big.outline:hover { background:var(--surface2); transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; }
@@ -537,30 +537,27 @@ section{padding:4.6rem 0}
 .row.you a:hover{text-decoration:underline}
 
 /* ============ Footer ============ */
-footer{
-  background:var(--ink);color:var(--paper);
-  padding:3.6rem 0 2rem;margin-top:2rem;
-  background-image:
-    linear-gradient(rgba(243,238,225,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(243,238,225,.04) 1px, transparent 1px);
-  background-size:34px 34px;
+footer {
+  background: #211E17 !important; color: #F3EEE1 !important;
+  padding: 3.6rem 0 2rem; margin-top: 2rem;
+  background-image: linear-gradient(rgba(243,238,225,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(243,238,225,.04) 1px, transparent 1px) !important;
+  background-size: 34px 34px !important; border: none !important;
 }
-.f-grid{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;align-items:flex-start}
-.f-logo{font-family:var(--serif);font-size:2rem;font-weight:700}
-.f-logo span{color:var(--yellow)}
-.f-tag{font-family:var(--mono);font-size:.72rem;color:rgba(243,238,225,.6);margin-top:.5rem;max-width:20rem}
-.f-links{display:flex;gap:1.6rem;flex-wrap:wrap}
-.f-links a{
-  color:var(--paper);text-decoration:none;font-family:var(--mono);font-size:.8rem;
-  border-bottom:1px solid transparent;
+.f-grid { display:flex; justify-content:space-between; gap:2rem; flex-wrap:wrap; align-items:flex-start; }
+.f-logo { font-family:var(--serif) !important; font-size:2.2rem !important; font-weight:700 !important; text-transform:none !important; background:transparent !important; border:none !important; padding:0 !important; box-shadow:none !important; display:block; }
+.f-logo span { color:#F0B429 !important; }
+.f-tag { font-family:var(--mono) !important; font-size:.75rem !important; color:rgba(243,238,225,.6) !important; margin-top:.5rem; max-width:20rem; font-weight:normal !important; line-height:1.5 !important; }
+.f-links { display:flex; gap:1.6rem; flex-wrap:wrap; }
+.f-links a {
+  color:#F3EEE1 !important; text-decoration:none !important; font-family:var(--mono) !important; font-size:.85rem !important;
+  border:none !important; padding:0 !important; font-weight:normal !important; text-transform:none !important; border-bottom:1px solid transparent !important; box-shadow:none !important; background:transparent !important;
 }
-.f-links a:hover{border-bottom-color:var(--yellow);color:var(--yellow)}
-.f-bottom{
-  margin-top:2.6rem;padding-top:1.4rem;border-top:1px solid rgba(243,238,225,.15);
-  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
-  font-family:var(--mono);font-size:.68rem;color:rgba(243,238,225,.55);
+.f-links a:hover { border-bottom-color:#F0B429 !important; color:#F0B429 !important; background:transparent !important; box-shadow:none !important; transform:none !important; }
+.f-bottom {
+  margin-top:2.6rem; padding-top:1.4rem; border-top:1px solid rgba(243,238,225,.15) !important;
+  display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  font-family:var(--mono) !important; font-size:.7rem !important; color:rgba(243,238,225,.55) !important; font-weight:normal !important;
 }
-
 /* ============ Auth Modal (Mobile Safe) ============ */
 .modal-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding: 1rem; }
 .modal-overlay.open { display:flex; }
@@ -964,10 +961,11 @@ footer{
       </nav>
     </div>
     <div class="f-bottom">
-   <span>© 2026 Quizable. All rights reserved.</span>
+      <span>© 2026 Quizable. All rights reserved.</span>
     </div>
   </div>
 </footer>
+
 
 <div class="modal-overlay" id="authModal" onclick="closeModalOutside(event)">
   <div class="modal-card">
