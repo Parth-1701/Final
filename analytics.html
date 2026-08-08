@@ -168,7 +168,7 @@
             </div>
             <select class="filter-select" id="testFilter">
                 <option value="test_1">Select a Test...</option>
-                <option value="NEET_MOCK_1">NEET Full Mock - Alpha</option>
+                <option value="Phmv6nwZ3mhWfs3c7ee7">NEET Full Mock - Alpha</option>
                 <option value="JEE_MAINS_PHASE1">JEE Mains - Phase 1</option>
             </select>
         </header>
@@ -268,7 +268,7 @@
             try {
                 // Fetch the test results
                 const snapshot = await db.collection('results')
-                                         .where('testId', 'Phmv6nwZ3mhWfs3c7ee7', testId)
+                                         .where('testId', '==', testId)
                                          .get();
 
                 if (snapshot.empty) {
