@@ -1,416 +1,259 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard | Quizable Business</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg: #F4F2EC;
-            --text: #111111;
-            --border: #111111;
-            --surface: #ffffff;
-            --accent: #0ea5e9; /* Cyan for data highlights */
-            --danger: #ef4444; /* Red for missed questions */
-            --shadow: 4px 4px 0px #111111;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'DM Mono', monospace;
-            background-image: radial-gradient(rgba(17, 17, 17, 0.15) 1px, transparent 0);
-            background-size: 20px 20px;
-            padding: 2rem;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Space Grotesk', sans-serif;
-            text-transform: uppercase;
-        }
-
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .filter-select {
-            padding: 0.5rem 1rem;
-            font-family: 'DM Mono', monospace;
-            font-weight: 500;
-            border: 2px solid var(--border);
-            background: var(--surface);
-            box-shadow: 2px 2px 0px var(--border);
-            outline: none;
-            cursor: pointer;
-        }
-
-        /* KPI Metrics Grid */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .metric-card {
-            background: var(--surface);
-            border: 2px solid var(--border);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .metric-title {
-            font-size: 0.9rem;
-            font-weight: 500;
-            opacity: 0.8;
-        }
-
-        .metric-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-        }
-
-        /* Data Tables */
-        .data-section {
-            margin-bottom: 3rem;
-            background: var(--surface);
-            border: 2px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-
-        .data-section-header {
-            background: var(--border);
-            color: var(--bg);
-            padding: 1rem;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        .data-table th, .data-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .data-table th {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            background-color: rgba(0,0,0,0.02);
-            border-right: 1px solid var(--border);
-        }
-        
-        .data-table td {
-            border-right: 1px solid var(--border);
-        }
-
-        .data-table th:last-child, .data-table td:last-child {
-            border-right: none;
-        }
-
-        .data-table tbody tr:hover {
-            background-color: rgba(14, 165, 233, 0.05);
-        }
-
-        .tag {
-            padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-            border: 1px solid var(--border);
-            background: var(--bg);
-        }
-
-        .tag.danger {
-            background: #fee2e2;
-            color: var(--danger);
-            border-color: var(--danger);
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 1rem; }
-            .header-section { flex-direction: column; align-items: flex-start; gap: 1rem; }
-            .data-table { display: block; overflow-x: auto; white-space: nowrap; }
-        }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Test Analytics · Quizable</title>
+<style>
+  :root{--bg:#0d1020;--panel:#151a2e;--panel2:#1b2138;--border:#272e4a;--text:#eef1ff;
+        --muted:#8f97b8;--accent:#6c8cff;--green:#3ddc97;--red:#ff6b81}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);
+        font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 22px;
+        border-bottom:1px solid var(--border);background:var(--panel)}
+  .brand{font-weight:700;font-size:18px} .brand span{color:var(--muted);font-weight:500;margin-left:8px;font-size:13px}
+  .chip{background:var(--panel2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--muted)}
+  .wrap{max-width:1080px;margin:24px auto;padding:0 16px}
+  .state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:80px 0;color:var(--muted)}
+  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .field{display:flex;flex-direction:column;gap:6px} .field.grow{flex:1;min-width:220px}
+  label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  select,input,button{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit}
+  select:focus,input:focus{outline:2px solid var(--accent)}
+  .btn{cursor:pointer;background:var(--accent);border-color:var(--accent);color:#08102a;font-weight:600}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .card .v{font-size:22px;font-weight:700} .card .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+  .panel h3{margin:0 0 12px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .chart{display:flex;gap:10px;align-items:flex-end;height:160px}
+  .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+  .bar-fill{width:100%;max-width:56px;min-height:4px;background:linear-gradient(180deg,var(--accent),#4a6ae0);border-radius:8px 8px 2px 2px}
+  .bar-label{font-size:11px;color:var(--muted)} .bar-count{font-size:11px;color:var(--muted)}
+  .tablewrap{padding:0;overflow-x:auto} .tablewrap h3{padding:16px 16px 0}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  th.sortable{cursor:pointer;user-select:none} th.sortable:hover{color:var(--text)}
+  tbody tr:hover{background:var(--panel2)}
+  .num,th.num{text-align:right} .strong{font-weight:700} .muted{color:var(--muted)}
+  .sname{font-weight:600} .semail{font-size:12px} #emptyMsg{padding:18px;text-align:center}
+</style>
 </head>
 <body>
+<header class="topbar">
+  <div class="brand">Quizable <span>Admin · Test Analytics</span></div>
+  <div id="userChip" class="chip"></div>
+</header>
 
-    <div class="dashboard-container">
-        
-        <header class="header-section">
-            <div>
-                <h1>Batch Analytics</h1>
-                <p>Real-time performance data for your students</p>
-            </div>
-            <select class="filter-select" id="testFilter">
-                <option value="test_1">Select a Test...</option>
-                <option value="Phmv6nwZ3mhWfs3c7ee7">NEET Full Mock - Alpha</option>
-                <option value="JEE_MAINS_PHASE1">JEE Mains - Phase 1</option>
-            </select>
-        </header>
+<main class="wrap">
+  <div id="stateBox" class="state">
+    <div class="spinner"></div>
+    <p id="stateMsg">Checking permissions…</p>
+  </div>
 
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <span class="metric-title">Total Students Appeared</span>
-                <span class="metric-value" id="totalStudents">--</span>
-            </div>
-            <div class="metric-card">
-                <span class="metric-title">Batch Average Score</span>
-                <span class="metric-value" id="avgScore">--</span>
-            </div>
-            <div class="metric-card">
-                <span class="metric-title">Avg Time Taken</span>
-                <span class="metric-value" id="avgTime">--</span>
-            </div>
-            <div class="metric-card">
-                <span class="metric-title">Highest Score</span>
-                <span class="metric-value" id="highScore" style="color: var(--accent);">--</span>
-            </div>
-        </div>
-
-        <section class="data-section">
-            <div class="data-section-header">
-                <h2>Student Performance</h2>
-            </div>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Student Name</th>
-                        <th>Total Score</th>
-                        <th>Accuracy</th>
-                        <th>Time Taken</th>
-                    </tr>
-                </thead>
-                <tbody id="studentTableBody">
-                    <tr><td colspan="5">Select a test from the dropdown to load data.</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <section class="data-section">
-            <div class="data-section-header">
-                <h2>Most Missed/Skipped Questions</h2>
-            </div>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Question ID</th>
-                        <th>Subject</th>
-                        <th>Wrong %</th>
-                        <th>Skipped %</th>
-                        <th>Action Needed</th>
-                    </tr>
-                </thead>
-                <tbody id="questionTableBody">
-                    </tbody>
-            </table>
-        </section>
-
+  <section id="dash" hidden>
+    <div class="controls">
+      <div class="field grow"><label for="testSelect">Test</label><select id="testSelect"></select></div>
+      <div class="field grow"><label for="search">Search student</label><input id="search" type="search" placeholder="Name or email…"/></div>
+      <div class="field"><label>&nbsp;</label><button id="exportBtn" class="btn">Export CSV</button></div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <div class="stats" id="stats"></div>
 
-    <script>
-        // 1. FIREBASE CONFIGURATION
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+    <div class="panel"><h3>Score distribution</h3><div id="chart" class="chart"></div></div>
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+    <div class="panel tablewrap">
+      <h3>Individual attempts</h3>
+      <table>
+        <thead><tr>
+          <th>#</th><th>Student</th>
+          <th class="num sortable" data-key="score">Score ⇅</th>
+          <th class="num">Correct</th><th class="num">Wrong</th><th class="num">Accuracy</th>
+          <th class="num sortable" data-key="timeTaken">Time ⇅</th>
+          <th class="sortable" data-key="submittedAt">Submitted ⇅</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <p id="emptyMsg" class="muted" hidden>No attempts yet for this test.</p>
+    </div>
+  </section>
+</main>
 
-        // 2. VERIFY ADMIN ROLE
-        let isAdminVerified = false;
-        
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    // Check the database to see if this user has role: "admin"
-                    const userDoc = await db.collection('users').doc(user.uid).get();
-                    
-                    if (userDoc.exists && userDoc.data().role === 'admin') {
-                        isAdminVerified = true;
-                        document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">Admin verified. Select a test to view data.</td></tr>';
-                    } else {
-                        isAdminVerified = false;
-                        document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);"><b>Access Denied:</b> You do not have Teacher/Admin privileges.</td></tr>';
-                    }
-                } catch (error) {
-                    console.error("Auth check error:", error);
-                    document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);"><b>Error verifying permissions.</b></td></tr>';
-                }
-            } else {
-                isAdminVerified = false;
-                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);"><b>Access Denied:</b> You must log in to view this page.</td></tr>';
-            }
-        });
+<script type="module">
+// Use the same Firebase SDK version / config as your other pages.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, query, where, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // 3. LISTEN FOR DROPDOWN CHANGES
-        document.getElementById('testFilter').addEventListener('change', (e) => {
-            if (!isAdminVerified) {
-                alert("You do not have permission to view this data.");
-                return;
-            }
-            if(e.target.value !== "test_1") {
-                fetchAnalytics(e.target.value);
-            }
-        });
+const firebaseConfig = { /* paste your project's config here (same as other pages) */ };
 
-        // 4. THE DATA ENGINE
-        async function fetchAnalytics(testId) {
-            document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">Loading secure data from Firebase...</td></tr>';
-            
-            try {
-                const snapshot = await db.collection('results')
-                                         .where('testId', '==', testId)
-                                         .get();
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
 
-                if (snapshot.empty) {
-                    document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">No data found for this test.</td></tr>';
-                    resetMetrics();
-                    return;
-                }
+const USERS_COL = 'users', RESULTS_COL = 'results', TESTS_COL = 'tests';
 
-                let totalScoreAcc = 0;
-                let highScore = 0;
-                let studentsPromises = []; 
+const $ = id => document.getElementById(id);
+const stateBox=$('stateBox'), stateMsg=$('stateMsg'), dash=$('dash'), userChip=$('userChip'),
+      testSelect=$('testSelect'), search=$('search'), exportBtn=$('exportBtn'),
+      stats=$('stats'), chart=$('chart'), tbody=$('tbody'), emptyMsg=$('emptyMsg');
 
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const numericScore = data.score || 0;
-                    totalScoreAcc += numericScore;
-                    if (numericScore > highScore) highScore = numericScore;
+const num  = v => Number(v) || 0;
+const esc  = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const csvE = v => { v = String(v ?? ''); return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
 
-                    const correct = data.correct || 0;
-                    const wrong = data.wrong || 0;
-                    const attempted = correct + wrong;
-                    const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) + "%" : "0%";
+function fmtTime(s){ s = Math.max(0, Math.round(num(s)));
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return h ? `${h}h ${m}m ${sec}s` : m ? `${m}m ${sec}s` : `${sec}s`; }
+function fmtDate(ts){ try { return ts?.toDate ? ts.toDate().toLocaleString() : ts ? new Date(ts).toLocaleString() : '—'; } catch { return '—'; } }
 
-                    const rawId = data.userId;
+let usersMap = new Map(), testsList = [], allRows = [], unsub = null;
+let sortKey = 'score', sortDir = -1, filterText = '';
 
-                    // Fetch actual name from the users collection
-                    const studentTask = db.collection('users').doc(rawId).get().then(userDoc => {
-                        let displayName = "Student_" + rawId.substring(0, 5); 
-                        if (userDoc.exists && userDoc.data().user_name) {
-                            displayName = userDoc.data().user_name; 
-                        }
-                        return {
-                            name: displayName,
-                            score: numericScore,
-                            accuracy: accuracy,
-                            time: formatTime(data.timeTaken || 0)
-                        };
-                    }).catch(err => {
-                        return {
-                            name: "Student_" + rawId.substring(0, 5),
-                            score: numericScore,
-                            accuracy: accuracy,
-                            time: formatTime(data.timeTaken || 0)
-                        };
-                    });
+/* ---------- ADMIN GATE (UX layer; real enforcement = Firestore rules below) ---------- */
+onAuthStateChanged(auth, async user => {
+  if (!user) return deny('Sign in with an admin account to view analytics.');
+  let profile = null;
+  try {
+    const u = await getDoc(doc(db, USERS_COL, user.uid));
+    if (u.exists()) profile = u.data();
+  } catch (e) { console.error(e); }
+  if ((profile?.role || '') !== 'admin') return deny('Access restricted: this page is visible only to admin accounts.');
+  userChip.textContent = profile?.displayName || profile?.name || user.email || 'Admin';
+  stateBox.hidden = true; dash.hidden = false;
+  init();
+});
 
-                    studentsPromises.push(studentTask);
-                });
+function deny(msg){ const sp = stateBox.querySelector('.spinner'); if (sp) sp.remove(); stateMsg.textContent = msg; }
 
-                let students = await Promise.all(studentsPromises);
-                students.sort((a, b) => b.score - a.score);
+/* ---------- AUTO-FETCH TESTS + USERS ---------- */
+async function init(){
+  try {
+    const uSnap = await getDocs(collection(db, USERS_COL));
+    uSnap.forEach(d => { const x = d.data(); usersMap.set(d.id, { name: x.displayName || x.name || '', email: x.email || '' }); });
+  } catch (e) { console.warn('users fetch failed', e); }
 
-                const batchData = {
-                    overview: {
-                        totalStudents: students.length,
-                        avgScore: Math.round(totalScoreAcc / students.length).toString(),
-                        avgTime: "--", 
-                        highScore: highScore.toString()
-                    },
-                    students: students
-                };
+  testsList = await loadTests();
+  if (!testsList.length) { dash.hidden = true; stateBox.hidden = false; stateMsg.textContent = 'No tests available for analysis yet.'; return; }
 
-                renderDashboard(batchData);
+  testSelect.innerHTML = testsList.map(t => `<option value="${esc(t.id)}">${esc(t.title)}</option>`).join('');
+  selectTest(testsList[0].id);
+}
 
-            } catch (error) {
-                console.error("Error fetching analytics:", error);
-                document.getElementById('studentTableBody').innerHTML = `<tr><td colspan="5" style="color:var(--danger);"><b>Error:</b> Firebase blocked the read. Ensure your role is set to 'admin'.</td></tr>`;
-            }
-        }
+async function loadTests(){
+  let list = [];
+  try {
+    const t = await getDocs(collection(db, TESTS_COL));
+    t.forEach(d => { const x = d.data();
+      list.push({ id: d.id, title: x.title || x.testTitle || x.name || x.testName || 'Untitled test' }); });
+  } catch (e) { console.warn('tests fetch failed', e); }
+  if (!list.length) { // fallback: derive test list from results
+    const r = await getDocs(collection(db, RESULTS_COL));
+    const seen = new Map();
+    r.forEach(d => { const x = d.data();
+      if (x.testId && !seen.has(x.testId)) seen.set(x.testId, x.testTitle || ('Test ' + x.testId.slice(0,6))); });
+    list = [...seen.entries()].map(([id, title]) => ({ id, title }));
+  }
+  return list.sort((a,b) => a.title.localeCompare(b.title));
+}
 
-        // --- HELPER FUNCTIONS ---
-        function resetMetrics() {
-            document.getElementById('totalStudents').innerText = "--";
-            document.getElementById('avgScore').innerText = "--";
-            document.getElementById('avgTime').innerText = "--";
-            document.getElementById('highScore').innerText = "--";
-            document.getElementById('questionTableBody').innerHTML = '';
-        }
+function selectTest(id){
+  if (unsub) unsub();
+  const q = query(collection(db, RESULTS_COL), where('testId', '==', id));
+  unsub = onSnapshot(q, snap => {           // live: new submissions appear automatically
+    allRows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderStats(); renderChart(); renderTable();
+  }, err => {
+    console.error(err);
+    if (err.code === 'permission-denied') deny('Permission denied — update your Firestore security rules (see notes).');
+  });
+}
 
-        function formatTime(seconds) {
-            if (!seconds) return "--";
-            const h = Math.floor(seconds / 3600);
-            const m = Math.floor((seconds % 3600) / 60);
-            const s = seconds % 60;
-            if (h > 0) return `${h}h ${m}m`;
-            return `${m}m ${s}s`;
-        }
+/* ---------- RENDER ---------- */
+const card = (k,v) => `<div class="card"><div class="v">${v}</div><div class="k">${k}</div></div>`;
 
-        // --- RENDER ENGINE ---
-        function renderDashboard(data) {
-            document.getElementById('totalStudents').innerText = data.overview.totalStudents;
-            document.getElementById('avgScore').innerText = data.overview.avgScore;
-            document.getElementById('highScore').innerText = data.overview.highScore;
+function renderStats(){
+  const n = allRows.length;
+  const scores = allRows.map(r => num(r.score));
+  const times  = allRows.map(r => num(r.timeTaken));
+  const sum = a => a.reduce((x,y) => x+y, 0);
+  stats.innerHTML =
+    card('Attempts', n) +
+    card('Average score', n ? (sum(scores)/n).toFixed(1) : '—') +
+    card('Highest', n ? Math.max(...scores) : '—') +
+    card('Lowest',  n ? Math.min(...scores) : '—') +
+    card('Avg time', n ? fmtTime(sum(times)/n) : '—');
+}
 
-            const studentBody = document.getElementById('studentTableBody');
-            studentBody.innerHTML = ''; 
-            
-            data.students.forEach((student, index) => {
-                studentBody.innerHTML += `<tr>
-                    <td>#${index + 1}</td>
-                    <td><strong style="font-family: 'DM Mono', monospace;">${student.name}</strong></td>
-                    <td>${student.score}</td>
-                    <td>${student.accuracy}</td>
-                    <td>${student.time}</td>
-                </tr>`;
-            });
+function renderChart(){
+  const scores = allRows.map(r => num(r.score));
+  if (!scores.length) { chart.innerHTML = '<p class="muted">No data yet.</p>'; return; }
+  const min = Math.min(...scores), max = Math.max(...scores), span = Math.max(1, max - min), B = 6;
+  const counts = Array(B).fill(0);
+  scores.forEach(s => { let i = Math.floor((s - min) / span * B); i = Math.min(B-1, Math.max(0, i)); counts[i]++; });
+  const peak = Math.max(...counts, 1);
+  chart.innerHTML = counts.map((c,i) => {
+    const lo = Math.round(min + span*i/B), hi = Math.round(min + span*(i+1)/B);
+    return `<div class="bar" title="${c} student(s) scored ${lo}–${hi}">
+      <span class="bar-count">${c}</span>
+      <div class="bar-fill" style="height:${Math.round(c/peak*110)}px"></div>
+      <span class="bar-label">${lo}–${hi}</span></div>`;
+  }).join('');
+}
 
-            document.getElementById('questionTableBody').innerHTML = `<tr>
-                <td colspan="5" style="text-align: center; opacity: 0.6; padding: 2rem;">
-                    Question analysis is currently offline. Update the CBT engine to save a <code>responses</code> array.
-                </td>
-            </tr>`;
-        }
-    </script>
+function prepareRows(){
+  let rows = allRows.map(r => {
+    const u = usersMap.get(r.userId) || {};
+    return { ...r, _name: u.name || 'Unknown student', _email: u.email || '' };
+  });
+  if (filterText) rows = rows.filter(r => `${r._name} ${r._email}`.toLowerCase().includes(filterText));
+  const val = r => sortKey === 'timeTaken' ? num(r.timeTaken)
+                 : sortKey === 'submittedAt' ? (r.submittedAt?.toMillis?.() || 0)
+                 : num(r.score);
+  rows.sort((a,b) => { const va = val(a), vb = val(b); return va === vb ? 0 : (va < vb ? -1 : 1) * sortDir; });
+  return rows;
+}
+
+function renderTable(){
+  const rows = prepareRows();
+  tbody.innerHTML = rows.map((r,i) => {
+    const attempted = num(r.correct) + num(r.wrong);
+    return `<tr>
+      <td>${i+1}</td>
+      <td><div class="sname">${esc(r._name)}</div><div class="semail muted">${esc(r._email)}</div></td>
+      <td class="num strong">${num(r.score)}</td>
+      <td class="num">${num(r.correct)}</td>
+      <td class="num">${num(r.wrong)}</td>
+      <td class="num">${attempted ? Math.round(num(r.correct)/attempted*100) + '%' : '—'}</td>
+      <td class="num">${fmtTime(r.timeTaken)}</td>
+      <td>${fmtDate(r.submittedAt)}</td>
+    </tr>`;
+  }).join('');
+  emptyMsg.hidden = rows.length > 0;
+}
+
+/* ---------- EVENTS ---------- */
+testSelect.addEventListener('change', e => selectTest(e.target.value));
+search.addEventListener('input', e => { filterText = e.target.value.trim().toLowerCase(); renderTable(); });
+document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => {
+  const k = th.dataset.key;
+  if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; }
+  renderTable();
+}));
+exportBtn.addEventListener('click', () => {
+  const rows = prepareRows();
+  const head = ['Name','Email','Score','Correct','Wrong','Time taken (s)','Submitted at'];
+  const lines = [head.join(',')].concat(rows.map(r =>
+    [csvE(r._name), csvE(r._email), num(r.score), num(r.correct), num(r.wrong), num(r.timeTaken), csvE(fmtDate(r.submittedAt))].join(',')));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
+  a.download = 'quizable-analytics-' + (testSelect.selectedOptions[0]?.textContent || 'test').replace(/\s+/g,'-') + '.csv';
+  a.click(); URL.revokeObjectURL(a.href);
+});
+</script>
 </body>
 </html>
