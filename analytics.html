@@ -3,49 +3,53 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex"/>
 <title>Test Analytics · Quizable</title>
 <style>
-  :root{--bg:#0d1020;--panel:#151a2e;--panel2:#1b2138;--border:#272e4a;--text:#eef1ff;
-        --muted:#8f97b8;--accent:#6c8cff;--green:#3ddc97;--red:#ff6b81}
-  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);
-        font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-  .topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 22px;
-        border-bottom:1px solid var(--border);background:var(--panel)}
-  .brand{font-weight:700;font-size:18px} .brand span{color:var(--muted);font-weight:500;margin-left:8px;font-size:13px}
+  :root{--bg:#0d1020;--panel:#151a2e;--panel2:#1b2138;--border:#272e4a;--text:#eef1ff;--muted:#8f97b8;--accent:#6c8cff}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--panel)}
+  .brand{font-weight:700;font-size:18px}.brand span{color:var(--muted);font-weight:500;margin-left:8px;font-size:13px}
+  .right{display:flex;align-items:center;gap:10px}
+  .back{color:var(--muted);text-decoration:none;font-size:13px}
   .chip{background:var(--panel2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--muted)}
   .wrap{max-width:1080px;margin:24px auto;padding:0 16px}
   .state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:80px 0;color:var(--muted)}
   .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+  .lock{font-size:34px}
   @keyframes spin{to{transform:rotate(360deg)}}
   .controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-  .field{display:flex;flex-direction:column;gap:6px} .field.grow{flex:1;min-width:220px}
+  .field{display:flex;flex-direction:column;gap:6px}.field.grow{flex:1;min-width:220px}
   label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   select,input,button{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit}
   select:focus,input:focus{outline:2px solid var(--accent)}
   .btn{cursor:pointer;background:var(--accent);border-color:var(--accent);color:#08102a;font-weight:600}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
   .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
-  .card .v{font-size:22px;font-weight:700} .card .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+  .card .v{font-size:22px;font-weight:700}.card .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
   .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
   .panel h3{margin:0 0 12px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-  .chart{display:flex;gap:10px;align-items:flex-end;height:160px}
-  .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
-  .bar-fill{width:100%;max-width:56px;min-height:4px;background:linear-gradient(180deg,var(--accent),#4a6ae0);border-radius:8px 8px 2px 2px}
-  .bar-label{font-size:11px;color:var(--muted)} .bar-count{font-size:11px;color:var(--muted)}
-  .tablewrap{padding:0;overflow-x:auto} .tablewrap h3{padding:16px 16px 0}
+  .chart{display:flex;gap:10px;align-items:flex-end;min-height:160px}
+  .bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px}
+  .bar-fill{width:100%;max-width:56px;background:linear-gradient(180deg,var(--accent),#4a6ae0);border-radius:8px 8px 2px 2px}
+  .bar-label{font-size:11px;color:var(--muted)}.bar-count{font-size:11px;color:var(--muted)}
+  .tablewrap{padding:0;overflow-x:auto}
+  .tablewrap h3{padding:16px 16px 8px}
   table{width:100%;border-collapse:collapse;font-size:14px}
   th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
   th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
-  th.sortable{cursor:pointer;user-select:none} th.sortable:hover{color:var(--text)}
+  th.sortable{cursor:pointer;user-select:none}th.sortable:hover{color:var(--text)}
   tbody tr:hover{background:var(--panel2)}
-  .num,th.num{text-align:right} .strong{font-weight:700} .muted{color:var(--muted)}
-  .sname{font-weight:600} .semail{font-size:12px} #emptyMsg{padding:18px;text-align:center}
+  .num{text-align:right}.strong{font-weight:700}.muted{color:var(--muted)}
+  .sname{font-weight:600}.semail{font-size:12px}
+  #emptyMsg{padding:18px;text-align:center}
 </style>
 </head>
 <body>
 <header class="topbar">
   <div class="brand">Quizable <span>Admin · Test Analytics</span></div>
-  <div id="userChip" class="chip"></div>
+  <div class="right"><a class="back" href="/">← Back to site</a><span id="userChip" class="chip"></span></div>
 </header>
 
 <main class="wrap">
@@ -56,25 +60,42 @@
 
   <section id="dash" hidden>
     <div class="controls">
-      <div class="field grow"><label for="testSelect">Test</label><select id="testSelect"></select></div>
-      <div class="field grow"><label for="search">Search student</label><input id="search" type="search" placeholder="Name or email…"/></div>
-      <div class="field"><label>&nbsp;</label><button id="exportBtn" class="btn">Export CSV</button></div>
+      <div class="field grow">
+        <label for="testSelect">Test</label>
+        <select id="testSelect"></select>
+      </div>
+      <div class="field grow">
+        <label for="search">Search student</label>
+        <input id="search" type="search" placeholder="Name or email…"/>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button id="exportBtn" class="btn">Export CSV</button>
+      </div>
     </div>
 
     <div class="stats" id="stats"></div>
 
-    <div class="panel"><h3>Score distribution</h3><div id="chart" class="chart"></div></div>
+    <div class="panel">
+      <h3>Score distribution</h3>
+      <div id="chart" class="chart"></div>
+    </div>
 
     <div class="panel tablewrap">
       <h3>Individual attempts</h3>
       <table>
-        <thead><tr>
-          <th>#</th><th>Student</th>
-          <th class="num sortable" data-key="score">Score ⇅</th>
-          <th class="num">Correct</th><th class="num">Wrong</th><th class="num">Accuracy</th>
-          <th class="num sortable" data-key="timeTaken">Time ⇅</th>
-          <th class="sortable" data-key="submittedAt">Submitted ⇅</th>
-        </tr></thead>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th class="num sortable" data-key="score">Score <span class="arrow">⇅</span></th>
+            <th class="num">Correct</th>
+            <th class="num">Wrong</th>
+            <th class="num">Accuracy</th>
+            <th class="num sortable" data-key="timeTaken">Time <span class="arrow">⇅</span></th>
+            <th class="sortable" data-key="submittedAt">Submitted <span class="arrow">⇅</span></th>
+          </tr>
+        </thead>
         <tbody id="tbody"></tbody>
       </table>
       <p id="emptyMsg" class="muted" hidden>No attempts yet for this test.</p>
@@ -83,98 +104,117 @@
 </main>
 
 <script type="module">
-// Use the same Firebase SDK version / config as your other pages.
+// ===== Firebase (use the SAME config object as your other pages) =====
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, query, where, onSnapshot }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig = { /* paste your project's config here (same as other pages) */ };
+const firebaseConfig = {
+  apiKey: "PASTE_YOURS", authDomain: "PASTE_YOURS", projectId: "PASTE_YOURS",
+  storageBucket: "PASTE_YOURS", messagingSenderId: "PASTE_YOURS", appId: "PASTE_YOURS"
+};
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-const USERS_COL = 'users', RESULTS_COL = 'results', TESTS_COL = 'tests';
+const USERS_COL = "users", TESTS_COL = "tests", RESULTS_COL = "results";
 
 const $ = id => document.getElementById(id);
-const stateBox=$('stateBox'), stateMsg=$('stateMsg'), dash=$('dash'), userChip=$('userChip'),
-      testSelect=$('testSelect'), search=$('search'), exportBtn=$('exportBtn'),
-      stats=$('stats'), chart=$('chart'), tbody=$('tbody'), emptyMsg=$('emptyMsg');
+const stateBox = $("stateBox"), stateMsg = $("stateMsg"), dash = $("dash"), userChip = $("userChip"),
+      testSelect = $("testSelect"), search = $("search"), exportBtn = $("exportBtn"),
+      stats = $("stats"), chart = $("chart"), tbody = $("tbody"), emptyMsg = $("emptyMsg");
+
+let usersMap = new Map(), testsList = [], allRows = [];
+let unsub = null, sortKey = "score", sortDir = -1, filterText = "";
 
 const num  = v => Number(v) || 0;
-const esc  = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const csvE = v => { v = String(v ?? ''); return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
+const esc  = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const csv  = v => { v = String(v ?? ""); return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
+const card = (k, v) => `<div class="card"><div class="v">${v}</div><div class="k">${k}</div></div>`;
 
-function fmtTime(s){ s = Math.max(0, Math.round(num(s)));
+function fmtTime(s){ // assumes timeTaken is stored in SECONDS (4642 -> 1h 17m 22s)
+  s = Math.max(0, Math.round(num(s)));
   const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-  return h ? `${h}h ${m}m ${sec}s` : m ? `${m}m ${sec}s` : `${sec}s`; }
-function fmtDate(ts){ try { return ts?.toDate ? ts.toDate().toLocaleString() : ts ? new Date(ts).toLocaleString() : '—'; } catch { return '—'; } }
+  return h ? `${h}h ${m}m ${sec}s` : m ? `${m}m ${sec}s` : `${sec}s`;
+}
+function fmtDate(ts){
+  try {
+    if (ts && typeof ts.toDate === "function") return ts.toDate().toLocaleString();
+    if (ts) return new Date(ts).toLocaleString();
+  } catch(e){}
+  return "—";
+}
 
-let usersMap = new Map(), testsList = [], allRows = [], unsub = null;
-let sortKey = 'score', sortDir = -1, filterText = '';
-
-/* ---------- ADMIN GATE (UX layer; real enforcement = Firestore rules below) ---------- */
+// ===== ADMIN GATE (UX layer; the Firestore rules are the real enforcement) =====
 onAuthStateChanged(auth, async user => {
-  if (!user) return deny('Sign in with an admin account to view analytics.');
+  if (!user) return deny("You must be signed in to view this page.");
   let profile = null;
   try {
     const u = await getDoc(doc(db, USERS_COL, user.uid));
     if (u.exists()) profile = u.data();
-  } catch (e) { console.error(e); }
-  if ((profile?.role || '') !== 'admin') return deny('Access restricted: this page is visible only to admin accounts.');
-  userChip.textContent = profile?.displayName || profile?.name || user.email || 'Admin';
-  stateBox.hidden = true; dash.hidden = false;
+  } catch(e){ console.error(e); }
+  if ((profile && profile.role) !== "admin")
+    return deny("Access denied — this page is restricted to admin accounts.");
+  userChip.textContent = (profile && (profile.displayName || profile.name)) || user.email || "Admin";
+  stateBox.hidden = true;
+  dash.hidden = false;
   init();
 });
 
-function deny(msg){ const sp = stateBox.querySelector('.spinner'); if (sp) sp.remove(); stateMsg.textContent = msg; }
+function deny(msg){
+  stateMsg.textContent = msg;
+  const sp = stateBox.querySelector(".spinner");
+  if (sp) sp.outerHTML = '<div class="lock">🔒</div>';
+}
 
-/* ---------- AUTO-FETCH TESTS + USERS ---------- */
+// ===== AUTO-FETCH TESTS =====
 async function init(){
-  try {
-    const uSnap = await getDocs(collection(db, USERS_COL));
-    uSnap.forEach(d => { const x = d.data(); usersMap.set(d.id, { name: x.displayName || x.name || '', email: x.email || '' }); });
-  } catch (e) { console.warn('users fetch failed', e); }
+  try { // name/email lookup for the table
+    const u = await getDocs(collection(db, USERS_COL));
+    u.forEach(d => { const x = d.data(); usersMap.set(d.id, { name: x.displayName || x.name || "", email: x.email || "" }); });
+  } catch(e){ console.warn("users fetch failed", e); }
 
   testsList = await loadTests();
-  if (!testsList.length) { dash.hidden = true; stateBox.hidden = false; stateMsg.textContent = 'No tests available for analysis yet.'; return; }
-
-  testSelect.innerHTML = testsList.map(t => `<option value="${esc(t.id)}">${esc(t.title)}</option>`).join('');
+  if (!testsList.length){
+    dash.hidden = true; stateBox.hidden = false;
+    stateMsg.textContent = "No tests found yet. Upload a test first.";
+    return;
+  }
+  testSelect.innerHTML = testsList.map(t => `<option value="${esc(t.id)}">${esc(t.title)}</option>`).join("");
   selectTest(testsList[0].id);
 }
 
 async function loadTests(){
-  let list = [];
-  try {
+  const map = new Map();
+  try { // primary source: tests collection
     const t = await getDocs(collection(db, TESTS_COL));
     t.forEach(d => { const x = d.data();
-      list.push({ id: d.id, title: x.title || x.testTitle || x.name || x.testName || 'Untitled test' }); });
-  } catch (e) { console.warn('tests fetch failed', e); }
-  if (!list.length) { // fallback: derive test list from results
+      map.set(d.id, x.title || x.testTitle || x.name || x.testName || "Untitled test"); });
+  } catch(e){ console.warn("tests fetch failed", e); }
+  try { // fallback: any test that has attempts but is missing from tests collection
     const r = await getDocs(collection(db, RESULTS_COL));
-    const seen = new Map();
     r.forEach(d => { const x = d.data();
-      if (x.testId && !seen.has(x.testId)) seen.set(x.testId, x.testTitle || ('Test ' + x.testId.slice(0,6))); });
-    list = [...seen.entries()].map(([id, title]) => ({ id, title }));
-  }
-  return list.sort((a,b) => a.title.localeCompare(b.title));
+      if (x.testId && !map.has(x.testId)) map.set(x.testId, x.testTitle || "Test " + x.testId.slice(0,6)); });
+  } catch(e){ console.warn("results fetch failed", e); }
+  return [...map.entries()].map(([id, title]) => ({ id, title }))
+                           .sort((a,b) => a.title.localeCompare(b.title));
 }
 
+// ===== LIVE RESULTS PER TEST =====
 function selectTest(id){
-  if (unsub) unsub();
-  const q = query(collection(db, RESULTS_COL), where('testId', '==', id));
-  unsub = onSnapshot(q, snap => {           // live: new submissions appear automatically
+  if (unsub) { unsub(); unsub = null; }
+  tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:24px">Loading attempts…</td></tr>';
+  const q = query(collection(db, RESULTS_COL), where("testId", "==", id));
+  unsub = onSnapshot(q, snap => {
     allRows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderStats(); renderChart(); renderTable();
   }, err => {
     console.error(err);
-    if (err.code === 'permission-denied') deny('Permission denied — update your Firestore security rules (see notes).');
+    tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:24px">Could not load results (permission-denied?). Check rules.</td></tr>';
   });
 }
-
-/* ---------- RENDER ---------- */
-const card = (k,v) => `<div class="card"><div class="v">${v}</div><div class="k">${k}</div></div>`;
 
 function renderStats(){
   const n = allRows.length;
@@ -182,76 +222,92 @@ function renderStats(){
   const times  = allRows.map(r => num(r.timeTaken));
   const sum = a => a.reduce((x,y) => x+y, 0);
   stats.innerHTML =
-    card('Attempts', n) +
-    card('Average score', n ? (sum(scores)/n).toFixed(1) : '—') +
-    card('Highest', n ? Math.max(...scores) : '—') +
-    card('Lowest',  n ? Math.min(...scores) : '—') +
-    card('Avg time', n ? fmtTime(sum(times)/n) : '—');
+    card("Attempts", n) +
+    card("Average score", n ? (sum(scores)/n).toFixed(1) : "–") +
+    card("Highest", n ? Math.max(...scores) : "–") +
+    card("Lowest",  n ? Math.min(...scores) : "–") +
+    card("Avg time", n ? fmtTime(sum(times)/n) : "–");
 }
 
 function renderChart(){
   const scores = allRows.map(r => num(r.score));
-  if (!scores.length) { chart.innerHTML = '<p class="muted">No data yet.</p>'; return; }
-  const min = Math.min(...scores), max = Math.max(...scores), span = Math.max(1, max - min), B = 6;
-  const counts = Array(B).fill(0);
-  scores.forEach(s => { let i = Math.floor((s - min) / span * B); i = Math.min(B-1, Math.max(0, i)); counts[i]++; });
+  if (!scores.length){ chart.innerHTML = '<p class="muted">No attempts yet.</p>'; return; }
+  const min = Math.min(...scores), max = Math.max(...scores);
+  const B = 6, span = Math.max(1, max - min);
+  const counts = new Array(B).fill(0);
+  scores.forEach(s => { let i = Math.floor(((s-min)/span)*B); if (i>=B) i=B-1; if (i<0) i=0; counts[i]++; });
   const peak = Math.max(...counts, 1);
   chart.innerHTML = counts.map((c,i) => {
     const lo = Math.round(min + span*i/B), hi = Math.round(min + span*(i+1)/B);
-    return `<div class="bar" title="${c} student(s) scored ${lo}–${hi}">
-      <span class="bar-count">${c}</span>
-      <div class="bar-fill" style="height:${Math.round(c/peak*110)}px"></div>
+    const h  = Math.max(4, Math.round((c/peak)*120));
+    return `<div class="bar" title="${c} student${c===1?"":"s"} scored ${lo}–${hi}">
+      <span class="bar-count">${c || ""}</span>
+      <div class="bar-fill" style="height:${h}px"></div>
       <span class="bar-label">${lo}–${hi}</span></div>`;
-  }).join('');
+  }).join("");
 }
 
 function prepareRows(){
   let rows = allRows.map(r => {
     const u = usersMap.get(r.userId) || {};
-    return { ...r, _name: u.name || 'Unknown student', _email: u.email || '' };
+    return { ...r, _name: u.name || ("Unknown · " + String(r.userId||"").slice(0,8)), _email: u.email || "" };
   });
-  if (filterText) rows = rows.filter(r => `${r._name} ${r._email}`.toLowerCase().includes(filterText));
-  const val = r => sortKey === 'timeTaken' ? num(r.timeTaken)
-                 : sortKey === 'submittedAt' ? (r.submittedAt?.toMillis?.() || 0)
-                 : num(r.score);
-  rows.sort((a,b) => { const va = val(a), vb = val(b); return va === vb ? 0 : (va < vb ? -1 : 1) * sortDir; });
+  if (filterText) rows = rows.filter(r => (r._name + " " + r._email).toLowerCase().includes(filterText));
+  rows.sort((a,b) => { const va = sortVal(a), vb = sortVal(b); return va === vb ? 0 : (va < vb ? -1 : 1) * sortDir; });
   return rows;
+}
+function sortVal(r){
+  if (sortKey === "timeTaken")  return num(r.timeTaken);
+  if (sortKey === "submittedAt")return (r.submittedAt && r.submittedAt.toMillis) ? r.submittedAt.toMillis() : 0;
+  return num(r.score);
 }
 
 function renderTable(){
   const rows = prepareRows();
   tbody.innerHTML = rows.map((r,i) => {
-    const attempted = num(r.correct) + num(r.wrong);
+    const c = num(r.correct), w = num(r.wrong);
+    const acc = c + w > 0 ? Math.round((c/(c+w))*100) + "%" : "—";
     return `<tr>
-      <td>${i+1}</td>
+      <td class="muted">${i+1}</td>
       <td><div class="sname">${esc(r._name)}</div><div class="semail muted">${esc(r._email)}</div></td>
       <td class="num strong">${num(r.score)}</td>
-      <td class="num">${num(r.correct)}</td>
-      <td class="num">${num(r.wrong)}</td>
-      <td class="num">${attempted ? Math.round(num(r.correct)/attempted*100) + '%' : '—'}</td>
+      <td class="num">${c}</td>
+      <td class="num">${w}</td>
+      <td class="num">${acc}</td>
       <td class="num">${fmtTime(r.timeTaken)}</td>
-      <td>${fmtDate(r.submittedAt)}</td>
+      <td class="muted">${fmtDate(r.submittedAt)}</td>
     </tr>`;
-  }).join('');
-  emptyMsg.hidden = rows.length > 0;
+  }).join("");
+  emptyMsg.textContent = allRows.length === 0 ? "No attempts yet for this test." : "No students match your search.";
+  emptyMsg.hidden = rows.length !== 0;
+  document.querySelectorAll("th.sortable").forEach(th => {
+    const a = th.querySelector(".arrow");
+    if (a) a.textContent = th.dataset.key === sortKey ? (sortDir === -1 ? "▼" : "▲") : "⇅";
+  });
 }
 
-/* ---------- EVENTS ---------- */
-testSelect.addEventListener('change', e => selectTest(e.target.value));
-search.addEventListener('input', e => { filterText = e.target.value.trim().toLowerCase(); renderTable(); });
-document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => {
+// ===== EVENTS =====
+testSelect.addEventListener("change", e => selectTest(e.target.value));
+search.addEventListener("input", e => { filterText = e.target.value.trim().toLowerCase(); renderTable(); });
+document.querySelectorAll("th.sortable").forEach(th => th.addEventListener("click", () => {
   const k = th.dataset.key;
   if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; }
   renderTable();
 }));
-exportBtn.addEventListener('click', () => {
+exportBtn.addEventListener("click", () => {
   const rows = prepareRows();
-  const head = ['Name','Email','Score','Correct','Wrong','Time taken (s)','Submitted at'];
-  const lines = [head.join(',')].concat(rows.map(r =>
-    [csvE(r._name), csvE(r._email), num(r.score), num(r.correct), num(r.wrong), num(r.timeTaken), csvE(fmtDate(r.submittedAt))].join(',')));
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
-  a.download = 'quizable-analytics-' + (testSelect.selectedOptions[0]?.textContent || 'test').replace(/\s+/g,'-') + '.csv';
+  const head = ["Name","Email","Score","Correct","Wrong","Accuracy %","Time taken (s)","Submitted at"];
+  const lines = [head.join(",")];
+  rows.forEach(r => {
+    const c = num(r.correct), w = num(r.wrong);
+    lines.push([csv(r._name), csv(r._email), num(r.score), c, w,
+      c + w > 0 ? Math.round((c/(c+w))*100) : "", num(r.timeTaken), csv(fmtDate(r.submittedAt))].join(","));
+  });
+  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+  const a = document.createElement("a");
+  const t = (testSelect.selectedOptions[0]?.textContent || "test").replace(/[^\w]+/g,"-").toLowerCase();
+  a.href = URL.createObjectURL(blob);
+  a.download = `quizable-analytics-${t}.csv`;
   a.click(); URL.revokeObjectURL(a.href);
 });
 </script>
