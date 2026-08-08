@@ -233,45 +233,57 @@
 
     </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // 1. FIREBASE CONFIGURATION (Paste your config here again)
+        // 1. FIREBASE CONFIGURATION
         const firebaseConfig = {
-            apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
-    authDomain: "sigmascore300.firebaseapp.com",
-    projectId: "sigmascore300",
-    storageBucket: "sigmascore300.firebasestorage.app",
-    messagingSenderId: "293195338803",
-    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
-    measurementId: "G-MLZYWG2EEM"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // 2. VERIFY ADMIN LOGIN
-        let currentUserEmail = null;
+        // 2. VERIFY ADMIN ROLE
+        let isAdminVerified = false;
         
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
-                currentUserEmail = user.email;
-                console.log("Verified as:", currentUserEmail);
-                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">Admin verified. Select a test to view data.</td></tr>';
+                try {
+                    // Check the database to see if this user has role: "admin"
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    
+                    if (userDoc.exists && userDoc.data().role === 'admin') {
+                        isAdminVerified = true;
+                        document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">Admin verified. Select a test to view data.</td></tr>';
+                    } else {
+                        isAdminVerified = false;
+                        document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);"><b>Access Denied:</b> You do not have Teacher/Admin privileges.</td></tr>';
+                    }
+                } catch (error) {
+                    console.error("Auth check error:", error);
+                    document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);"><b>Error verifying permissions.</b></td></tr>';
+                }
             } else {
-                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);"><b>Access Denied:</b> You must log in to Quizable to view this page.</td></tr>';
+                isAdminVerified = false;
+                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);"><b>Access Denied:</b> You must log in to view this page.</td></tr>';
             }
         });
 
         // 3. LISTEN FOR DROPDOWN CHANGES
         document.getElementById('testFilter').addEventListener('change', (e) => {
-            if (!currentUserEmail) {
-                alert("Please log in first!");
+            if (!isAdminVerified) {
+                alert("You do not have permission to view this data.");
                 return;
             }
             if(e.target.value !== "test_1") {
@@ -284,7 +296,6 @@
             document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">Loading secure data from Firebase...</td></tr>';
             
             try {
-                // Fetch the test results
                 const snapshot = await db.collection('results')
                                          .where('testId', '==', testId)
                                          .get();
@@ -312,6 +323,7 @@
 
                     const rawId = data.userId;
 
+                    // Fetch actual name from the users collection
                     const studentTask = db.collection('users').doc(rawId).get().then(userDoc => {
                         let displayName = "Student_" + rawId.substring(0, 5); 
                         if (userDoc.exists && userDoc.data().user_name) {
@@ -352,7 +364,7 @@
 
             } catch (error) {
                 console.error("Error fetching analytics:", error);
-                document.getElementById('studentTableBody').innerHTML = `<tr><td colspan="5" style="color:var(--danger);"><b>Error:</b> Firebase blocked the read. Make sure <b>${currentUserEmail}</b> is the exact email saved in your Rules.</td></tr>`;
+                document.getElementById('studentTableBody').innerHTML = `<tr><td colspan="5" style="color:var(--danger);"><b>Error:</b> Firebase blocked the read. Ensure your role is set to 'admin'.</td></tr>`;
             }
         }
 
