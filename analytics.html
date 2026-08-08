@@ -233,11 +233,11 @@
 
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // 1. PASTE YOUR FIREBASE CONFIG HERE
+        // 1. FIREBASE CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
     authDomain: "sigmascore300.firebaseapp.com",
@@ -261,14 +261,12 @@
             }
         });
 
-        // 3. FETCH AND PROCESS DATA
+        // 3. THE DATA ENGINE (Fetches Results & Stitches Names)
         async function fetchAnalytics(testId) {
-            // Show loading state
             document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5">Loading secure data from Firebase...</td></tr>';
-            document.getElementById('questionTableBody').innerHTML = '';
             
             try {
-                // CHANGE 'results' to your exact collection name if different!
+                // Fetch the test results
                 const snapshot = await db.collection('results')
                                          .where('testId', '==', testId)
                                          .get();
@@ -280,50 +278,56 @@
                 }
 
                 let totalScoreAcc = 0;
-                let totalTimeAcc = 0;
                 let highScore = 0;
-                let students = [];
-                let questionStats = {};
+                let studentsPromises = []; 
 
-                // Process each document
+                // Process each result document
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     
-                    const numericScore = parseInt(data.score) || 0;
+                    const numericScore = data.score || 0;
                     totalScoreAcc += numericScore;
                     if (numericScore > highScore) highScore = numericScore;
 
-                    // Handle time logic depending on how you store it
-                    let rawTime = data.timeTaken || 0;
-                    
-                    students.push({
-                        name: data.userName || data.studentName || "Anonymous",
-                        score: numericScore,
-                        accuracy: calculateAccuracy(data.score, data.totalQuestions),
-                        time: formatTime(rawTime), 
-                        rawResponses: data.responses || []
+                    // Calculate Accuracy
+                    const correct = data.correct || 0;
+                    const wrong = data.wrong || 0;
+                    const attempted = correct + wrong;
+                    const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) + "%" : "0%";
+
+                    const rawId = data.userId;
+
+                    // Create a task to fetch this specific student's name from the 'users' collection
+                    const studentTask = db.collection('users').doc(rawId).get().then(userDoc => {
+                        let displayName = "Student_" + rawId.substring(0, 5); // Fallback
+
+                        if (userDoc.exists && userDoc.data().user_name) {
+                            displayName = userDoc.data().user_name; 
+                        }
+
+                        return {
+                            name: displayName,
+                            score: numericScore,
+                            accuracy: accuracy,
+                            time: formatTime(data.timeTaken || 0)
+                        };
+                    }).catch(err => {
+                        // If fetching fails, return fallback
+                        return {
+                            name: "Student_" + rawId.substring(0, 5),
+                            score: numericScore,
+                            accuracy: accuracy,
+                            time: formatTime(data.timeTaken || 0)
+                        };
                     });
 
-                    // Track Question Analytics
-                    if (data.responses && Array.isArray(data.responses)) {
-                        data.responses.forEach(resp => {
-                            const qId = resp.questionId || "Unknown";
-                            if (!questionStats[qId]) {
-                                questionStats[qId] = { subject: resp.subject || 'Unknown', wrong: 0, skipped: 0, total: 0 };
-                            }
-                            
-                            questionStats[qId].total++;
-                            
-                            if (resp.selectedOption === null || resp.selectedOption === "") {
-                                questionStats[qId].skipped++;
-                            } else if (resp.isCorrect === false) {
-                                questionStats[qId].wrong++;
-                            }
-                        });
-                    }
+                    studentsPromises.push(studentTask);
                 });
 
-                // Sort students by highest score
+                // Wait for all the user names to be fetched from the database
+                let students = await Promise.all(studentsPromises);
+
+                // Sort students by highest score (Rank 1 at the top)
                 students.sort((a, b) => b.score - a.score);
 
                 // Build Final Data Object
@@ -331,19 +335,18 @@
                     overview: {
                         totalStudents: students.length,
                         avgScore: Math.round(totalScoreAcc / students.length).toString(),
-                        avgTime: "--", // You can average out totalTimeAcc here if needed
+                        avgTime: "--", 
                         highScore: highScore.toString()
                     },
-                    students: students,
-                    questions: analyzeQuestions(questionStats, students.length)
+                    students: students
                 };
 
-                // Render to UI
+                // Render to the UI
                 renderDashboard(batchData);
 
             } catch (error) {
                 console.error("Error fetching analytics:", error);
-                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:red;">Error loading data. Check console.</td></tr>';
+                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger);">Error loading data. Check console.</td></tr>';
             }
         }
 
@@ -356,89 +359,42 @@
             document.getElementById('questionTableBody').innerHTML = '';
         }
 
-        function calculateAccuracy(score, total) {
-            if(!total) return "N/A";
-            // Update this based on how you grade. Assuming score isn't straightforward percentage.
-            return "Calculated%"; 
-        }
-
-        function formatTime(timeVal) {
-            if (!timeVal) return "--";
-            if (typeof timeVal === 'string') return timeVal;
-            const h = Math.floor(timeVal / 3600);
-            const m = Math.floor((timeVal % 3600) / 60);
-            return `${h > 0 ? h + 'h ' : ''}${m}m`;
-        }
-
-        function analyzeQuestions(stats, totalStudents) {
-            let qArray = [];
-            for (let qId in stats) {
-                let q = stats[qId];
-                if (q.total === 0) continue;
-
-                let wrongPercent = Math.round((q.wrong / q.total) * 100);
-                let skippedPercent = Math.round((q.skipped / q.total) * 100);
-                
-                let status = "On Track";
-                if (wrongPercent > 50) status = "Revise Concept";
-                if (skippedPercent > 40) status = "Time Sink";
-
-                qArray.push({
-                    id: qId,
-                    subject: q.subject,
-                    wrong: wrongPercent + "%",
-                    skipped: skippedPercent + "%",
-                    status: status,
-                    rawWrong: wrongPercent // Hidden field for sorting
-                });
-            }
-            
-            // Sort by worst performing questions first
-            qArray.sort((a, b) => b.rawWrong - a.rawWrong);
-            return qArray.slice(0, 10); // Show top 10 worst
+        function formatTime(seconds) {
+            if (!seconds) return "--";
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            if (h > 0) return `${h}h ${m}m`;
+            return `${m}m ${s}s`;
         }
 
         // --- RENDER ENGINE ---
         function renderDashboard(data) {
             document.getElementById('totalStudents').innerText = data.overview.totalStudents;
             document.getElementById('avgScore').innerText = data.overview.avgScore;
-            // document.getElementById('avgTime').innerText = data.overview.avgTime;
             document.getElementById('highScore').innerText = data.overview.highScore;
 
-            // Render Students
+            // Render Students Table
             const studentBody = document.getElementById('studentTableBody');
             studentBody.innerHTML = ''; 
             
             data.students.forEach((student, index) => {
                 studentBody.innerHTML += `<tr>
                     <td>#${index + 1}</td>
-                    <td><strong>${student.name}</strong></td>
+                    <td><strong style="font-family: 'DM Mono', monospace;">${student.name}</strong></td>
                     <td>${student.score}</td>
                     <td>${student.accuracy}</td>
                     <td>${student.time}</td>
                 </tr>`;
             });
 
-            // Render Questions
+            // Display placeholder message for Questions Table
             const questionBody = document.getElementById('questionTableBody');
-            questionBody.innerHTML = '';
-
-            if(data.questions.length === 0) {
-                questionBody.innerHTML = '<tr><td colspan="5">No question data available.</td></tr>';
-                return;
-            }
-
-            data.questions.forEach(q => {
-                const wrongVal = parseInt(q.wrong);
-                const tagClass = wrongVal > 50 ? 'tag danger' : 'tag';
-                questionBody.innerHTML += `<tr>
-                    <td><strong>${q.id}</strong></td>
-                    <td>${q.subject}</td>
-                    <td style="color: var(--danger); font-weight: 700;">${q.wrong}</td>
-                    <td>${q.skipped}</td>
-                    <td><span class="${tagClass}">${q.status}</span></td>
-                </tr>`;
-            });
+            questionBody.innerHTML = `<tr>
+                <td colspan="5" style="text-align: center; opacity: 0.6; padding: 2rem;">
+                    Question analysis is currently offline. <br>To enable this, update the CBT engine to save a <code>responses</code> array.
+                </td>
+            </tr>`;
         }
     </script>
 </body>
