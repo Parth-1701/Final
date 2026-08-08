@@ -35,53 +35,17 @@
       background-size: 24px 24px;
     }
 
-    /* ── NAV ── */
-    nav {
-      position: fixed; top:0; left:0; right:0; z-index:100;
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 0 2.5rem;
-      height: 64px;
-      background: var(--bg);
-      border-bottom: 2px solid var(--border);
-    }
-    .nav-logo {
-      font-family:'Space Grotesk', sans-serif; font-size:1.3rem; font-weight:700;
-      display:flex; align-items:center; gap:0.5rem; text-decoration: none; 
-      color: var(--text); text-transform: uppercase;
-    }
+ /* Navigation */
+    nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:flex-start; gap: 1rem; padding: 0 2.5rem; height: 64px; background: var(--bg); border-bottom: 2px solid var(--border); }
+    .nav-logo { font-family:'Space Grotesk', sans-serif; font-size:1.3rem; font-weight:700; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); text-transform: uppercase; }
     .logo-dot { width: 10px; height: 10px; background: var(--accent); border: 2px solid var(--border); }
 
-    .nav-links { display:flex; gap:2rem; }
-    .nav-links a {
-      font-family: 'DM Mono', monospace; color:var(--text-muted); text-decoration:none;
-      font-size:0.875rem; font-weight:600; transition: color 0.2s; text-transform: uppercase;
-    }
-    .nav-links a:hover, .nav-links a.active { color:var(--text); }
-
-    .nav-cta { display:flex; gap:1rem; align-items:center; }
-    .btn-ghost {
-      background:var(--bg); border:2px solid var(--border); color:var(--text); 
-      padding:0.45rem 1.1rem; border-radius:0; font-family:'Space Grotesk',sans-serif; 
-      font-size:0.875rem; font-weight:600; cursor:pointer; box-shadow: var(--btn-shadow); transition: all 0.1s;
-    }
-    .btn-ghost:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--border); }
-    .btn-ghost:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--border); }
-    
-    .btn-primary {
-      background:var(--accent); border:2px solid var(--border); color:#fff; 
-      padding:0.45rem 1.2rem; border-radius:0; font-family:'Space Grotesk',sans-serif; 
-      font-size:0.875rem; font-weight:600; cursor:pointer; box-shadow: var(--btn-shadow); transition: all 0.1s;
-    }
-    .btn-primary:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--border); }
-    .btn-primary:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--border); }
-
     /* ── PAGE CONTENT ── */
-    .page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; }
-    .container { max-width: 1000px; margin: 0 auto; }
-
-    .page-header { text-align: center; margin-bottom: 4rem; }
-    .section-label { font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--accent); font-weight: 600; text-transform:uppercase; margin-bottom:0.75rem; }
-    .page-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(2rem, 5vw, 3.5rem); font-weight:700; text-transform: uppercase; margin-bottom: 1rem; }
+.page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .page-header { text-align: center; margin-bottom: 3rem; }
+    .section-label { font-family:'DM Mono', monospace; font-size:0.85rem; color: var(--accent); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.75rem; font-weight: 600; }
+    .page-title { font-family:'Space Grotesk', sans-serif; font-size:clamp(2.5rem, 5vw, 4rem); font-weight:700; text-transform: uppercase; letter-spacing:-0.02em; margin-bottom: 1rem; }
     .page-sub { color:var(--text-muted); font-size:1.1rem; max-width:540px; margin: 0 auto; line-height:1.7; font-weight: 500;}
 
     /* ── CONTACT CARDS ── */
@@ -117,12 +81,12 @@
     .info-section p { color: var(--text-muted); font-size: 1.05rem; font-weight: 500; line-height: 1.6; max-width: 700px; margin: 0 auto; }
 
     /* ── FOOTER ── */
-    footer { position:relative; z-index:1; border-top:2px solid var(--border); background: var(--surface); padding:2rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-top: auto; }
+    footer { position:relative; z-index:1; border-top: 2px solid var(--border); background: var(--surface); padding: 2rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-top: auto; }
     .footer-logo { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.1rem; text-transform: uppercase; }
     .footer-links { display:flex; gap:2rem; }
-    .footer-links a { font-family:'DM Mono', monospace; color:var(--text); font-size:0.875rem; font-weight: 500; text-decoration:none; transition:color 0.2s; }
+    .footer-links a { font-family: 'DM Mono', monospace; color:var(--text); font-size:0.875rem; text-decoration:none; font-weight: 500; transition:color 0.2s; }
     .footer-links a:hover { color:var(--accent); }
-    .footer-copy { font-family:'DM Mono', monospace; color:var(--text-muted); font-size:0.8rem; }
+    .footer-copy { font-family: 'DM Mono', monospace; color:var(--text-muted); font-size:0.8rem; }
 
     /* ── MODAL ── */
     .modal-overlay { display:none; position:fixed; inset:0; z-index:200; background:rgba(244,242,236,0.9); align-items:center; justify-content:center; }
@@ -161,23 +125,11 @@
 <body>
 
 <nav>
-  <a href="/index" class="nav-logo">
-    <div class="logo-dot"></div>
-    Quizable
-  </a>
+  <a href="/" class="nav-logo"><div class="logo-dot"></div> Quizable</a>
   <div style="height: 24px; width: 2px; background: var(--border); margin: 0 10px;"></div>
   <a href="/" style="font-family: 'DM Mono', monospace; color: var(--text); text-decoration: none; font-size: 0.875rem; font-weight: 500;">← Back</a>
-  
-<!-- ss
-  ss class="nav-links">
-    <a href="index#exams">Exams</a>
-    <a href="index#features">Features</a>
-    <a href="/soon">Courses</a>
-    <a href="/contact" class="active" style="color: var(--accent);">Contact</a>
-  </div>
-  <div class="nav-cta"> -->
-    </div>
 </nav>
+
 
 <div class="page-wrapper">
   <div class="container">
