@@ -3,9 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Quizable — Mock Test Platform for JEE · NEET · MHTCET · BITSAT</title>
+<title>Quizable — Mock Test Platform</title>
 <meta name="description" content="Timed mock tests, detailed analytics and leaderboards for JEE Mains, JEE Advanced, NEET, MHT CET and BITSAT. Train with real pressure." />
-
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Quizable",
+  "url": "https://quizable.online/"
+}
+  <link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+</script>
+   
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
@@ -15,7 +25,7 @@
    QUIZABLE — Hybrid Theme 
    ============================================================ */
 :root {
-  /* Neo-Brutalist "Print" Palette (Gemini) */
+  /* Neo-Brutalist "Print" Palette */
   --bg: #F4F2EC;
   --surface: #FFFFFF;
   --surface2: #EAE8E1;
@@ -26,7 +36,7 @@
   --text-muted: #555555;
   --accent3: #10B981;
 
-  /* Qwen Variable Mappings (Ensuring seamless integration) */
+  /* Variable Mappings (Ensuring seamless integration) */
   --paper: var(--bg);
   --paper-hi: var(--surface);
   --paper-lo: var(--surface2);
@@ -69,7 +79,7 @@ body{
 img{max-width:100%}
 a{color:inherit}
 
-/* ============ Gemini Support Popup ============ */
+/* ============ Support Popup ============ */
 #support-popup-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.7);
@@ -109,7 +119,7 @@ a{color:inherit}
 .support-popup-content h3 { color: var(--accent); margin: 0 0 10px 0; font-size: 1.2rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; }
 .support-popup-content p { color: var(--text); font-size: 14px; margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
 
-/* ============ Qwen Type Helpers ============ */
+/* ============ Type Helpers ============ */
 .kicker{
   font-family:var(--mono);
   font-size:.8rem;
@@ -131,7 +141,7 @@ mark.hl{
   color:inherit;
 }
 
-/* ============ Qwen Base Buttons ============ */
+/* ============ Base Buttons ============ */
 .btn{
   display:inline-flex;align-items:center;gap:.5rem;
   font-family:var(--sans);font-weight:600;font-size:.95rem;
@@ -162,7 +172,7 @@ mark.hl{
   background:var(--bg);padding:0 8px;
 }
 
-/* ============ Header & Gemini Nav Integration ============ */
+/* ============ Header & Nav Integration ============ */
 header.nav{
   position:sticky;top:0;z-index:900;
   background:var(--surface);
@@ -233,7 +243,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
 }
 .btn-primary:hover { background: var(--accent-hover); transform:translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
 
-/* ============ Gemini Hero & Actions ============ */
+/* ============ Hero & Actions ============ */
 .hero {
   position:relative; z-index:1; min-height: 85vh; /* Reduced height to remove empty space */
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -268,7 +278,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   font-weight:800; text-transform: uppercase; cursor:pointer; transition:all 0.1s; 
   border: 2px solid var(--border); text-decoration: none; display:inline-block; 
 }
-.btn-big.primary { background:var(--text); color:#fff; box-shadow: 6px 6px 0px #000000; }
+.btn-big.primary { background:var(--accent); color:#fff; box-shadow: 6px 6px 0px #000000; }
 .btn-big.primary:hover { transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; color:#fff;}
 .btn-big.outline { background:var(--surface); color:var(--text); box-shadow: 6px 6px 0px #000000; }
 .btn-big.outline:hover { background:var(--surface2); transform:translate(3px, 3px); box-shadow: 3px 3px 0px #000000; }
@@ -279,7 +289,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   color: var(--text-muted); text-transform: uppercase; 
 }
 
-/* ============ Qwen Hall Ticket (Strictly Square) ============ */
+/* ============ Hall Ticket ============ */
 .hall-ticket{
   background:var(--paper-hi);
   border:1.5px solid var(--ink);
