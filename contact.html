@@ -165,13 +165,13 @@
     <div class="logo-dot"></div>
     Quizable
   </a>
-  <div class="nav-links">
+<!--  <div class="nav-links">
     <a href="index#exams">Exams</a>
     <a href="index#features">Features</a>
     <a href="/soon">Courses</a>
     <a href="/contact" class="active" style="color: var(--accent);">Contact</a>
   </div>
-  <div class="nav-cta">
+  <div class="nav-cta"> -->
     </div>
 </nav>
 
@@ -227,15 +227,15 @@
 <footer>
   <div class="footer-logo">Quizable</div>
   <div class="footer-links">
-    <a href="#">Privacy</a>
-    <a href="#">Terms</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/refunds">Refunds</a>
     <a href="/contact">Contact</a>
-    <a href="#">About</a>
   </div>
   <div class="footer-copy">© 2026 QUIZABLE. ALL RIGHTS RESERVED.</div>
 </footer>
 
-<div class="modal-overlay" id="authModal" onclick="closeModalOutside(event)">
+<!-- <div class="modal-overlay" id="authModal" onclick="closeModalOutside(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title" id="modalTitle">Welcome back</div>
@@ -305,8 +305,8 @@
 </div>
 
 <div id="toast" style="position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);border:2px solid var(--border);border-radius:0;padding:0.75rem 1.25rem;font-size:0.9rem;font-weight:600;font-family:'Space Grotesk', sans-serif;color:var(--surface);transition:transform 0.2s ease;z-index:500;box-shadow:4px 4px 0px var(--border);white-space:nowrap;pointer-events:none;"></div>
-
-<script type="module">
+-->
+<!-- <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -379,6 +379,6 @@ window.showToast = (msg) => {
   const el = document.getElementById('toast'); el.textContent = msg; el.style.transform = 'translateX(-50%) translateY(0)';
   clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.style.transform = 'translateX(-50%) translateY(80px)'; }, 3000);
 };
-</script>
+</script> -->
 </body>
 </html>
