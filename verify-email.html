@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forgot Password — Quizable</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F2EC; --surface: #FFFFFF; --border: #000000;
+    --accent: #FF4500; --accent-hover: #E03E00; --text: #000000;
+    --text-muted: #555555;
+    --sans: "Space Grotesk", sans-serif; --mono: "DM Mono", monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--sans); color: var(--text); background-color: var(--bg);
+    background-image: radial-gradient(#D1CDBE 1px, transparent 1px); background-size: 24px 24px;
+    display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem;
+  }
+  .auth-card {
+    background: var(--surface); border: 4px solid var(--border); padding: 2.5rem;
+    width: 100%; max-width: 460px; box-shadow: 10px 10px 0px #000000; border-radius: 0;
+  }
+  .modal-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; text-transform: uppercase; background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
+  .modal-sub { color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem; margin-bottom: 2rem; text-transform: uppercase; border-bottom: 2px dashed var(--border); padding-bottom: 1rem; font-weight: 700; }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-label { font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
+  .form-input { width: 100%; background: var(--surface); border: 2px solid var(--border); padding: 0.9rem; font-family: var(--mono); font-size: 0.95rem; outline: none; font-weight: 700; box-shadow: 3px 3px 0px #000000; transition: transform 0.1s; border-radius: 0; }
+  .form-input:focus { border-color: var(--accent); transform: translate(1px, 1px); box-shadow: 2px 2px 0px #000000; }
+  .modal-btn { width: 100%; background: var(--accent); color: #fff; border: 2px solid var(--border); padding: 0.9rem; font-family: var(--sans); font-size: 1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 0.5rem; box-shadow: 4px 4px 0px #000000; transition: transform 0.1s; border-radius: 0; }
+  .modal-btn:hover { background: var(--accent-hover); transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
+  .back-link { display: block; text-align: center; margin-top: 1.5rem; font-family: var(--mono); font-weight: 700; color: var(--text); text-decoration: none; font-size: 0.9rem; }
+  .back-link:hover { color: var(--accent); text-decoration: underline; }
+  #status-msg { margin-bottom: 1rem; font-family: var(--sans); font-weight: bold; text-transform: uppercase; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<div class="auth-card">
+  <div class="modal-title">Reset Password</div>
+  <div class="modal-sub">Enter your email to receive a recovery link</div>
+
+  <div class="form-group">
+    <label class="form-label">Email Address</label>
+    <input class="form-input" type="email" id="reset-email" placeholder="user@domain.com" />
+  </div>
+  
+  <div id="status-msg"></div>
+  <button class="modal-btn" id="reset-btn" onclick="handleReset()">Send Reset Link</button>
+  <a href="/" class="back-link">← Back to Login</a>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+      apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+      authDomain: "sigmascore300.firebaseapp.com",
+      projectId: "sigmascore300",
+      storageBucket: "sigmascore300.firebasestorage.app",
+      messagingSenderId: "293195338803",
+      appId: "1:293195338803:web:b2a45a3b48a378dd99ff46"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  window.handleReset = async () => {
+    const email = document.getElementById('reset-email').value.trim();
+    const statusMsg = document.getElementById('status-msg');
+    const btn = document.getElementById('reset-btn');
+
+    if (!email) {
+      statusMsg.style.color = "var(--accent)";
+      statusMsg.textContent = "! EMAIL PARAMETER MISSING";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "SENDING...";
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      statusMsg.style.color = "#10B981"; // success green
+      statusMsg.textContent = "RESET LINK DISPATCHED TO INBOX.";
+    } catch (error) {
+      statusMsg.style.color = "var(--accent)";
+      statusMsg.textContent = "! " + error.code.replace('auth/', '').replace(/-/g, ' ');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Send Reset Link";
+    }
+  };
+</script>
+</body>
+</html>
