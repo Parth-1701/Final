@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Action Verification — Quizable</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Reusing the exact same CSS styles from above -->
+<style>
+  :root { --bg: #F4F2EC; --surface: #FFFFFF; --border: #000000; --accent: #FF4500; --accent-hover: #E03E00; --text: #000000; --text-muted: #555555; --sans: "Space Grotesk", sans-serif; --mono: "DM Mono", monospace; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--sans); color: var(--text); background-color: var(--bg); background-image: radial-gradient(#D1CDBE 1px, transparent 1px); background-size: 24px 24px; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+  .auth-card { background: var(--surface); border: 4px solid var(--border); padding: 2.5rem; width: 100%; max-width: 460px; box-shadow: 10px 10px 0px #000000; border-radius: 0; }
+  .modal-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; text-transform: uppercase; background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
+  .modal-sub { color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem; margin-bottom: 2rem; text-transform: uppercase; border-bottom: 2px dashed var(--border); padding-bottom: 1rem; font-weight: 700; }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-label { font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; background: var(--surface); display: inline-block; padding: 0.2rem 0.5rem; border: 2px solid var(--border); box-shadow: 2px 2px 0px #000000; }
+  .form-input { width: 100%; background: var(--surface); border: 2px solid var(--border); padding: 0.9rem; font-family: var(--mono); font-size: 0.95rem; outline: none; font-weight: 700; box-shadow: 3px 3px 0px #000000; transition: transform 0.1s; border-radius: 0; }
+  .form-input:focus { border-color: var(--accent); transform: translate(1px, 1px); box-shadow: 2px 2px 0px #000000; }
+  .modal-btn { width: 100%; background: var(--accent); color: #fff; border: 2px solid var(--border); padding: 0.9rem; font-family: var(--sans); font-size: 1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 0.5rem; box-shadow: 4px 4px 0px #000000; transition: transform 0.1s; border-radius: 0; }
+  .modal-btn:hover { background: var(--accent-hover); transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
+  #status-msg { margin-bottom: 1rem; font-family: var(--sans); font-weight: bold; text-transform: uppercase; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<div class="auth-card" id="processing-card">
+  <div class="modal-title">Processing Request</div>
+  <div class="modal-sub">Validating Security Token...</div>
+</div>
+
+<div class="auth-card" id="reset-card" style="display: none;">
+  <div class="modal-title">Set New Password</div>
+  <div class="modal-sub">Create a new secure password</div>
+
+  <div class="form-group">
+    <label class="form-label">New Password</label>
+    <input class="form-input" type="password" id="new-password" placeholder="Min 6 Chars" />
+  </div>
+  
+  <div id="reset-status-msg"></div>
+  <button class="modal-btn" id="confirm-reset-btn" onclick="handleConfirmReset()">Confirm Password</button>
+</div>
+
+<div class="auth-card" id="success-card" style="display: none; text-align: center;">
+  <div class="modal-title" style="color: #10B981; border-color: #10B981;">SUCCESS</div>
+  <div class="modal-sub" id="success-msg" style="border-bottom: none;">Action Completed Successfully</div>
+  <button class="modal-btn" onclick="window.location.href='/'">Return to Platform</button>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, verifyPasswordResetCode, confirmPasswordReset, applyActionCode } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const app = initializeApp({
+      apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+      authDomain: "sigmascore300.firebaseapp.com",
+      projectId: "sigmascore300",
+      appId: "1:293195338803:web:b2a45a3b48a378dd99ff46"
+  });
+  const auth = getAuth(app);
+
+  // Parse URL Parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  const actionCode = urlParams.get('oobCode');
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (!actionCode) {
+      showError("Invalid or missing security token.");
+      return;
+    }
+
+    if (mode === 'resetPassword') {
+      try {
+        await verifyPasswordResetCode(auth, actionCode);
+        document.getElementById('processing-card').style.display = 'none';
+        document.getElementById('reset-card').style.display = 'block';
+      } catch (error) {
+        showError("Token expired or invalid. Please request a new link.");
+      }
+    } else if (mode === 'verifyEmail') {
+      try {
+        await applyActionCode(auth, actionCode);
+        showSuccess("Email successfully verified. You can now access your account.");
+      } catch (error) {
+        showError("Verification failed. The link may have expired.");
+      }
+    } else {
+      showError("Unknown operation requested.");
+    }
+  });
+
+  window.handleConfirmReset = async () => {
+    const newPassword = document.getElementById('new-password').value;
+    const statusMsg = document.getElementById('reset-status-msg');
+    const btn = document.getElementById('confirm-reset-btn');
+
+    if (newPassword.length < 6) {
+      statusMsg.style.color = "var(--accent)";
+      statusMsg.textContent = "! PASSWORD MUST BE AT LEAST 6 CHARACTERS";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "UPDATING...";
+
+    try {
+      await confirmPasswordReset(auth, actionCode, newPassword);
+      showSuccess("Password updated successfully. You can now log in.");
+    } catch (error) {
+      statusMsg.style.color = "var(--accent)";
+      statusMsg.textContent = "! " + error.code.replace('auth/', '');
+      btn.disabled = false;
+      btn.textContent = "Confirm Password";
+    }
+  };
+
+  function showError(msg) {
+    const card = document.getElementById('processing-card');
+    card.querySelector('.modal-title').textContent = "ERROR";
+    card.querySelector('.modal-title').style.color = "var(--accent)";
+    card.querySelector('.modal-title').style.borderColor = "var(--accent)";
+    card.querySelector('.modal-sub').textContent = msg;
+    card.innerHTML += `<button class="modal-btn" onclick="window.location.href='/'">Return Home</button>`;
+  }
+
+  function showSuccess(msg) {
+    document.getElementById('processing-card').style.display = 'none';
+    document.getElementById('reset-card').style.display = 'none';
+    document.getElementById('success-card').style.display = 'block';
+    document.getElementById('success-msg').textContent = msg;
+  }
+</script>
+</body>
+</html>
