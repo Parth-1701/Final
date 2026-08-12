@@ -4,82 +4,246 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quizable — My Profile</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
-      --border: #2a2a3d; --accent: #6c63ff; --accent-hover: #5a52d5;
-      --text: #e8e8f0; --text-muted: #6b6b8a; --text-dim: #9999b8;
+      /* Light Neo-Brutalist "Print" Palette */
+      --bg: #F4F2EC;
+      --surface: #FFFFFF;
+      --surface2: #EAE8E1;
+      --border: #111111;
+      
+      --accent: #8b5cf6; 
+      
+      --green: #10b981;
+      --red: #ef4444;
+      --red-soft: #fee2e2;
+      
+      --text: #111111;
+      --text-dim: #333333;
+      --text-muted: #555555;
     }
     
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     
-    body::before {
-      content:''; position:fixed; inset:0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events:none; z-index:0;
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(#d5d3ce 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* ── MINIMAL NAV ── */
-    nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding: 0 2.5rem; height: 64px; background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
-    .nav-left { display: flex; align-items: center; gap: 1rem; }
-    .nav-logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:0.5rem; text-decoration: none; color: var(--text); }
-    .nav-logo span { color:var(--accent); }
-    .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px var(--accent); }
-    .nav-back { color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: 0.2s; }
-    .nav-back:hover { color: var(--accent); }
-    .btn-logout { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; transition: all 0.2s; }
-    .btn-logout:hover { border-color: #ff6b6b; color: #ff6b6b; }
+    /* ── NAV ── */
+    nav { 
+      position: sticky; top: 0; z-index: 100; 
+      background: var(--bg); 
+      border-bottom: 2px solid var(--border); 
+      display: flex; align-items: center; padding: 0 2rem; height: 60px; gap: 1rem; 
+    }
+    .nav-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.2rem; text-transform: uppercase; text-decoration: none; color: var(--text); }
+    .nav-logo span { color: var(--accent); }
+    .nav-sep { color: var(--text-muted); font-size: 1.2rem; }
+    .nav-page { font-size: 0.9rem; color: var(--text-dim); font-weight: 500; }
+    .nav-spacer { flex: 1; }
+    .btn-logout { 
+      background: var(--surface); 
+      border: 2px solid var(--border); 
+      color: var(--text); 
+      padding: 0.4rem 1rem; 
+      cursor: pointer; 
+      font-family: 'DM Mono', monospace; 
+      font-size: 0.85rem; 
+      font-weight: 700;
+      text-transform: uppercase;
+      box-shadow: 2px 2px 0 var(--border);
+      transition: all 0.1s; 
+    }
+    .btn-logout:hover { 
+      background: var(--red); 
+      color: #fff; 
+      box-shadow: 4px 4px 0 var(--border); 
+      transform: translate(-2px, -2px); 
+    }
 
-    /* ── PROFILE LAYOUT ── */
-    .page-wrapper { position: relative; z-index: 1; flex: 1; padding: 120px 2rem 4rem; display: flex; justify-content: center; }
-    .profile-container { width: 100%; max-width: 600px; animation: fadeUp 0.6s ease both; }
+    /* ── PROFILE HERO & LAYOUT ── */
+    .page-wrapper { flex: 1; padding: 3rem 2rem 4rem; display: flex; justify-content: center; }
+    .profile-container { width: 100%; max-width: 600px; }
     
-    .profile-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2.5rem; }
-    .avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #a78bfa); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: #fff; box-shadow: 0 8px 20px rgba(108,99,255,0.3); }
-    .header-info h1 { font-family: 'Syne', sans-serif; font-size: 2rem; margin-bottom: 0.2rem; }
-    .header-info p { color: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 0.9rem; }
+    .back-crumb { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-muted); font-size: 0.85rem; text-decoration: none; margin-bottom: 2rem; transition: color 0.1s; border-bottom: 1px dashed transparent; font-weight: 500; }
+    .back-crumb:hover { color: var(--border); border-bottom-color: var(--border); }
+
+    .profile-header { 
+      display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2.5rem; 
+      background: var(--surface);
+      border: 2px solid var(--border);
+      padding: 1.5rem;
+      box-shadow: 6px 6px 0 var(--accent);
+    }
+    .avatar { 
+      width: 80px; height: 80px; 
+      background: var(--surface2); 
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center; 
+      font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; font-weight: 800; color: var(--text); 
+      box-shadow: 4px 4px 0 var(--border); 
+    }
+    .header-info { display: flex; flex-direction: column; align-items: flex-start; }
+    .header-info h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; text-transform: uppercase; line-height: 1.1; margin-bottom: 0.3rem; }
+    .header-info p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.8rem; }
     
     /* ── STATUS BADGES ── */
-    .status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 99px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.5rem; }
-    .status-free { background: rgba(107, 107, 138, 0.1); color: var(--text-muted); border: 1px solid rgba(107, 107, 138, 0.3); }
-    .status-gold { background: rgba(255, 215, 0, 0.1); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.4); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); }
-    .status-platinum { background: rgba(229, 228, 226, 0.1); color: #e5e4e2; border: 1px solid rgba(229, 228, 226, 0.4); box-shadow: 0 0 15px rgba(229, 228, 226, 0.2); }
+    .status-badge { 
+      display: inline-block; padding: 0.25rem 0.9rem; 
+      font-family: 'DM Mono', monospace; font-size: 0.75rem; font-weight: 700; 
+      text-transform: uppercase; letter-spacing: 0.05em; 
+      border: 2px solid var(--border);
+      box-shadow: 3px 3px 0 var(--border);
+    }
+    .status-free { background: var(--surface); color: var(--text); }
+    .status-gold { background: #fcd34d; color: #111; }
+    .status-platinum { background: #e5e7eb; color: #111; }
 
     /* ── EDIT FORM ── */
-    .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-    .form-group { margin-bottom: 1.5rem; }
-    .form-group label { display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
-    .form-control { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 0.8rem 1rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; transition: border-color 0.2s; }
-    .form-control:focus { outline: none; border-color: var(--accent); }
-    .form-control:disabled { opacity: 0.6; cursor: not-allowed; }
+    .profile-card { 
+      background: var(--surface); 
+      border: 2px solid var(--border); 
+      padding: 2.5rem; 
+      position: relative;
+    }
     
-    .btn-save { width: 100%; background: var(--accent); color: #fff; border: none; padding: 1rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 1rem; }
-    .btn-save:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(108,99,255,0.25); }
-    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
+    .profile-card::before {
+      content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+      width: 80px; height: 20px; background: rgba(0,0,0,0.1);
+      border: 1px dashed var(--text-muted);
+    }
 
-    #update-msg { margin-top: 1rem; text-align: center; font-size: 0.9rem; font-weight: 500; display: none; }
-    .msg-success { color: #43e97b; }
-    .msg-error { color: #ff6b6b; }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; color: var(--text); font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 700; text-transform: uppercase; }
+    
+    .form-control { 
+      width: 100%; 
+      background: var(--bg); 
+      border: 2px solid var(--border); 
+      color: var(--text); 
+      padding: 0.8rem 1rem; 
+      border-radius: 0; 
+      font-family: 'DM Mono', monospace; 
+      font-size: 1rem; 
+      transition: all 0.15s; 
+    }
+    .form-control:focus { outline: none; box-shadow: 4px 4px 0 var(--accent); transform: translate(-2px, -2px); }
+    .form-control:disabled { opacity: 0.6; cursor: not-allowed; background: var(--surface2); }
+    
+    .btn-save { 
+      width: 100%; 
+      background: var(--accent); 
+      color: #fff; 
+      border: 2px solid var(--border); 
+      padding: 1rem; 
+      border-radius: 0; 
+      font-family: 'DM Mono', monospace; 
+      font-size: 1rem; 
+      font-weight: 700; 
+      text-transform: uppercase;
+      cursor: pointer; 
+      transition: all 0.15s; 
+      margin-top: 1rem; 
+      box-shadow: 4px 4px 0 var(--border);
+    }
+    .btn-save:hover { background: #7c3aed; transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--border); }
+    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: 4px 4px 0 var(--border); }
 
-    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    #update-msg { 
+      margin-top: 1.5rem; 
+      padding: 1rem;
+      text-align: center; 
+      font-size: 0.9rem; 
+      font-weight: 700; 
+      display: none; 
+      border: 2px solid var(--border);
+      text-transform: uppercase;
+    }
+    .msg-success { background: #d1fae5; color: var(--green); box-shadow: 4px 4px 0 var(--green); }
+    .msg-error { background: #fee2e2; color: var(--red); box-shadow: 4px 4px 0 var(--red); }
+
+    /* ── DANGER ZONE ── */
+    .danger-zone {
+      margin-top: 3rem;
+      background: var(--red-soft);
+      border: 2px solid var(--red);
+      padding: 2.5rem;
+      position: relative;
+    }
+    .danger-zone::before {
+      content: '⚠️ WARNING';
+      position: absolute;
+      top: -12px;
+      left: 24px;
+      background: var(--red);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border: 2px solid var(--border);
+      text-transform: uppercase;
+    }
+    .danger-zone h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .danger-zone p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .danger-zone .form-control {
+      background: var(--surface);
+      border-color: var(--red);
+    }
+    .danger-zone .form-control:focus {
+      box-shadow: 4px 4px 0 var(--red);
+    }
+    .btn-danger {
+      width: 100%; 
+      background: var(--red); 
+      color: #fff; 
+      border: 2px solid var(--border); 
+      padding: 1rem; 
+      font-family: 'DM Mono', monospace; 
+      font-size: 1rem; 
+      font-weight: 700; 
+      text-transform: uppercase;
+      cursor: pointer; 
+      transition: all 0.15s; 
+      margin-top: 0.5rem; 
+      box-shadow: 4px 4px 0 var(--border);
+    }
+    .btn-danger:hover { background: #dc2626; transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--border); }
   </style>
 </head>
 <body>
 
 <nav>
-  <div class="nav-left">
-    <a href="/" class="nav-logo"><div class="logo-dot"></div> Quizable<span>.</span></a>
-    <div style="height: 20px; width: 1px; background: var(--border); margin: 0 10px;"></div>
-    <a href="/" class="nav-back">← Dashboard</a>
-  </div>
+  <a class="nav-logo" href="/index.html"><span>Quizable</span></a>
+  <span class="nav-sep">/</span>
+  <span class="nav-page">Profile</span>
+  <div class="nav-spacer"></div>
   <button class="btn-logout" onclick="logoutUser()">Log Out</button>
 </nav>
 
 <div class="page-wrapper">
   <div class="profile-container">
     
+    <a href="/" class="back-crumb">← Back to dashboard</a>
+
     <div class="profile-header">
       <div class="avatar" id="user-avatar">?</div>
       <div class="header-info">
@@ -124,6 +288,23 @@
       </form>
     </div>
 
+    <div class="danger-zone">
+      <h2>Danger Zone</h2>
+      <p>Deleting your account is a permanent action. All your test attempts, scores, and personal data will be completely erased from our servers.</p>
+      
+      <div class="form-group">
+        <label style="color: var(--red);">Confirm Registered Email</label>
+        <input type="email" id="delete-email" class="form-control" placeholder="Enter your email to confirm">
+      </div>
+      
+      <div class="form-group">
+        <label style="color: var(--red);">Reason for Deletion (Optional)</label>
+        <input type="text" id="delete-reason" class="form-control" placeholder="Why are you leaving?">
+      </div>
+
+      <button class="btn-danger" onclick="requestAccountDeletion()">Request Account Deletion</button>
+    </div>
+
   </div>
 </div>
 
@@ -166,7 +347,6 @@
         if (data.phone) document.getElementById('input-phone').value = data.phone;
         if (data.targetExam) document.getElementById('input-exam').value = data.targetExam;
 
-        // NEW TIER LOGIC
         const userPlan = data.plan || "free"; 
         const statusBadge = document.getElementById('premium-status');
         
@@ -221,6 +401,47 @@
 
     btn.disabled = false;
     btn.textContent = "Save Changes";
+  };
+
+  // --- DANGER ZONE LOGIC ---
+  window.requestAccountDeletion = function() {
+    const emailField = document.getElementById('delete-email');
+    const reasonField = document.getElementById('delete-reason');
+    
+    const email = emailField.value.trim();
+    const reason = reasonField.value.trim() || 'No reason specified';
+
+    if (!email) {
+      alert("Please enter your registered email address to confirm deletion.");
+      emailField.focus();
+      return;
+    }
+
+    // Checking if it roughly matches the logged-in user's email if possible
+    const currentEmail = document.getElementById('input-email').value;
+    if (currentEmail && email.toLowerCase() !== currentEmail.toLowerCase()) {
+      const confirmMismatch = confirm("The email entered does not match your currently logged-in email. Are you sure you want to proceed?");
+      if (!confirmMismatch) return;
+    }
+
+    const supportEmail = "support@quizable.online";
+    const subject = encodeURIComponent("Request for Account and Data Deletion");
+    const body = encodeURIComponent(
+      `Hello Quizable Support,\n\n` +
+      `I would like to request the permanent deletion of my account and all associated data from your platform.\n\n` +
+      `Here are my details:\n` +
+      `Registered Email: ${email}\n` +
+      `Reason for Deletion: ${reason}\n\n` +
+      `Please confirm once the deletion process is complete.\n\n` +
+      `Thank you.`
+    );
+
+    // Redirect to mail client
+    window.location.href = `mailto:${supportEmail}?subject=${subject}&body=${body}`;
+    
+    // Clear fields after clicking
+    emailField.value = '';
+    reasonField.value = '';
   };
 
   window.logoutUser = function() {
