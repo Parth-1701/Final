@@ -6,169 +6,332 @@
   <title>Quizable | Test Results</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
   <style>
-  :root {
-    /* Light Neo-Brutalist Palette */
-    --bg: #F4F2EC;
-    --surface: #FFFFFF;
-    --surface2: #EAE8E1;
-    --border: #111111;
-    --accent: #8b5cf6; 
-    --green: #10b981;
-    --red: #ef4444;
-    --text: #111111;
-    --text-dim: #333333;
-    --text-muted: #555555;
-  }
+    :root {
+      /* Light Neo-Brutalist "Print" Palette */
+      --bg: #F4F2EC;
+      --surface: #FFFFFF;
+      --surface2: #EAE8E1;
+      --border: #111111;
+      
+      --accent: #8b5cf6; 
+      
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      
+      --text: #111111;
+      --text-dim: #333333;
+      --text-muted: #555555;
+    }
 
-  * { 
-    box-sizing: border-box; 
-    margin: 0; 
-    padding: 0; 
-  }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(#d5d3ce 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-  body { 
-    background-color: var(--bg); 
-    background-image: radial-gradient(#d5d3ce 1.5px, transparent 1.5px);
-    background-size: 24px 24px;
-    color: var(--text); 
-    font-family: 'DM Mono', monospace; 
-    min-height: 100vh; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: center; 
-    padding: 20px; 
-  }
+    /* ── NAV ── */
+    nav { 
+      position: sticky; top: 0; z-index: 100; 
+      background: var(--bg); 
+      border-bottom: 2px solid var(--border); 
+      display: flex; align-items: center; padding: 0 2rem; height: 60px; gap: 1rem; 
+    }
+    .nav-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.2rem; text-transform: uppercase; text-decoration: none; color: var(--text); }
+    .nav-logo span { color: var(--accent); }
+    .nav-sep { color: var(--text-muted); font-size: 1.2rem; }
+    .nav-page { font-size: 0.9rem; color: var(--text-dim); font-weight: 500; }
+    .nav-spacer { flex: 1; }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--text);
-  }
+    /* ── LAYOUT ── */
+    .page-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      width: 100%;
+    }
 
-  /* Core Cards */
-  .result-card { 
-    background: var(--surface); 
-    border: 2px solid var(--border); 
-    border-radius: 0; 
-    padding: 50px; 
-    width: 100%;
-    max-width: 800px;
-    box-shadow: 6px 6px 0 var(--border);
-    margin-bottom: 2rem;
-  }
+    .header-section {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .header-section h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .header-section p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
 
-  /* Any internal stat boxes you used */
-  .stat-box, .stat-item {
-    background: var(--surface2);
-    border: 2px solid var(--border);
-    box-shadow: 3px 3px 0 var(--border);
-    border-radius: 0;
-    padding: 1.5rem;
-    margin: 10px 0;
-  }
+    /* ── BRUTAL CARDS ── */
+    .brutal-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      box-shadow: 6px 6px 0 var(--border);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
 
-  /* Leaderboard Styling */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--surface);
-    border: 2px solid var(--border);
-    margin-top: 1.5rem;
-    text-align: left;
-  }
+    /* ── RESULTS GRID ── */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 768px) {
+      .results-grid { grid-template-columns: 1fr; }
+    }
 
-  th, td {
-    padding: 1rem;
-    border-bottom: 2px solid var(--border);
-    border-right: 2px solid var(--border);
-    font-family: 'DM Mono', monospace;
-  }
+    /* Left: Chart */
+    .chart-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .chart-container {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin-bottom: 1.5rem;
+    }
+    .chart-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .score-main {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text);
+    }
+    .score-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-top: 0.25rem;
+    }
 
-  th {
-    background: var(--surface2);
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
+    /* Right: Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .stat-item {
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+    
+    .stat-item.correct { background: #d1fae5; }
+    .stat-item.correct .stat-value { color: var(--green); }
+    .stat-item.incorrect { background: #fee2e2; }
+    .stat-item.incorrect .stat-value { color: var(--red); }
+    
+    /* ── ACTIONS ── */
+    .action-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .btn {
+      flex: 1;
+      text-align: center;
+      background: var(--surface);
+      color: var(--text);
+      border: 2px solid var(--border);
+      padding: 0.8rem 1.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--border);
+      transition: all 0.1s;
+    }
+    .btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 var(--border);
+    }
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn.primary:hover { box-shadow: 5px 5px 0 var(--border); background: #7c3aed; }
 
-  th:last-child, td:last-child {
-    border-right: none;
-  }
+    /* ── LEADERBOARD ── */
+    .leaderboard-header {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .leaderboard-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border: 2px solid var(--border);
+      background: var(--surface);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th, td {
+      padding: 1rem;
+      border-bottom: 2px solid var(--border);
+      font-size: 0.9rem;
+    }
+    th {
+      background: var(--surface2);
+      font-weight: 700;
+      text-transform: uppercase;
+      border-right: 2px solid var(--border);
+    }
+    th:last-child { border-right: none; }
+    td {
+      border-right: 2px solid var(--border);
+      font-weight: 500;
+    }
+    td:last-child { border-right: none; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: var(--bg); }
 
-  tr:last-child td {
-    border-bottom: none;
-  }
+    .current-user-row td {
+      background: rgba(139, 92, 246, 0.1);
+      font-weight: 700;
+    }
 
-  tr:hover {
-    background: var(--bg);
-  }
+    .rank-badge {
+      display: inline-block;
+      width: 28px; height: 28px;
+      line-height: 24px;
+      text-align: center;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      font-weight: 800;
+      background: var(--surface);
+    }
+    .rank-1 { background: #fcd34d; color: #111; box-shadow: 2px 2px 0 var(--border); }
+    .rank-2 { background: #e5e7eb; color: #111; box-shadow: 2px 2px 0 var(--border); }
+    .rank-3 { background: #fdba74; color: #111; box-shadow: 2px 2px 0 var(--border); }
 
-  /* Highlight Ranks based on your JS classes */
-  .rank-1 td { background: #fcd34d; font-weight: bold; color: #111; }
-  .rank-2 td { background: #e5e7eb; font-weight: bold; color: #111; }
-  .rank-3 td { background: #fdba74; font-weight: bold; color: #111; }
-
-  /* Buttons */
-  button, .btn {
-    background: var(--surface);
-    color: var(--text);
-    border: 2px solid var(--border);
-    padding: 0.8rem 1.5rem;
-    font-family: 'DM Mono', monospace;
-    font-weight: 700;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    box-shadow: 3px 3px 0 var(--border);
-    transition: all 0.1s;
-    border-radius: 0;
-  }
-
-  button:hover, .btn:hover {
-    background: var(--accent);
-    color: #fff;
-    transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0 var(--border);
-  }
-
-  /* Correct/Wrong color overrides if needed */
-  .text-green { color: var(--green) !important; }
-  .text-red { color: var(--red) !important; }
+    .pro-tag {
+      font-size: 0.65rem;
+      background: #fcd34d;
+      color: #111;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 99px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-left: 0.5rem;
+    }
   </style>
+  
 </head>
 <body>
+  <nav>
+  <a class="nav-logo" href="/index.html"><span>Quizable</span></a>
+  <span class="nav-sep">/</span>
+  <span class="nav-page">Result</span>
+  <div class="nav-spacer"></div>
+</nav>
 
-  <div class="result-card">
-    <div class="header-tag" id="exam-tag">Exam Completed</div>
-    <h1>Your Score</h1>
+  
+<div class="page-wrapper">
+
+  
+  <div class="header-section">
+    <h1>Test Complete</h1>
+    <p id="test-title">Loading test details...</p>
+  </div>
+
+  <div class="results-grid">
     
-    <div class="score-display" id="score-display">--</div>
-    
+    <div class="brutal-card chart-box">
+      <div class="chart-container">
+        <canvas id="scoreChart"></canvas>
+        <div class="chart-center">
+          <div class="score-main" id="score-val">0</div>
+          <div class="score-sub">out of <span id="max-marks">0</span></div>
+        </div>
+      </div>
+      <div class="action-row" style="width: 100%;">
+        <button class="btn primary" onclick="reviewAnswers()">Review</button>
+        <button class="btn" onclick="retakeTest()">Retake</button>
+      </div>
+      <div class="action-row" style="width: 100%; margin-top: 0.5rem;">
+        <button class="btn" onclick="goHome()" style="background: var(--bg);">Back to Home</button>
+      </div>
+    </div>
+
     <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-value correct" id="correct-display">--</div>
-        <div class="stat-label">Correct Answers</div>
+      <div class="stat-item correct">
+        <div class="stat-label">Correct</div>
+        <div class="stat-value" id="correct-display">0</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-value wrong" id="wrong-display">--</div>
-        <div class="stat-label">Incorrect Answers</div>
+      <div class="stat-item incorrect">
+        <div class="stat-label">Incorrect</div>
+        <div class="stat-value" id="wrong-display">0</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-value neutral" id="accuracy-display">--%</div>
+      <div class="stat-item">
+        <div class="stat-label">Unattempted</div>
+        <div class="stat-value" id="unattempted-val">0</div>
+      </div>
+      <div class="stat-item">
         <div class="stat-label">Accuracy</div>
+        <div class="stat-value" id="accuracy-display">0%</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-value" id="time-display" style="color: white;">--:--</div>
-        <div class="stat-label">Time Taken</div>
+      <div class="stat-item" style="grid-column: 1 / -1; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+        <div class="stat-label" style="margin: 0;">Time Taken</div>
+        <div class="stat-value" id="time-display">00:00</div>
       </div>
     </div>
 
-    <div style="display: flex; gap: 15px; width: 100%;">
-      <button class="btn" style="background: var(--surface2); color: white; border: 1px solid var(--border);" onclick="window.location.href='index.html'">Dashboard</button>
-      <button class="btn" onclick="window.location.href='analysis.html'">View Detailed Analysis →</button>
-    </div>
   </div>
 
   <div class="leaderboard-container">
