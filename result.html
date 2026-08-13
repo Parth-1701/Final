@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quizable — Test Results</title>
+  <title>Quizable — Results</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -261,6 +261,18 @@
     .rank-1 { background: #fcd34d; color: #111; box-shadow: 2px 2px 0 var(--border); }
     .rank-2 { background: #e5e7eb; color: #111; box-shadow: 2px 2px 0 var(--border); }
     .rank-3 { background: #fdba74; color: #111; box-shadow: 2px 2px 0 var(--border); }
+
+    .pro-tag {
+      font-size: 0.65rem;
+      background: #fcd34d;
+      color: #111;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 99px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-left: 0.5rem;
+    }
   </style>
 </head>
 <body>
@@ -275,8 +287,8 @@
 <div class="page-wrapper">
   
   <div class="header-section">
-    <h1>Test Complete, <span id="name">Aspirant</span>!</h1>
-    <p id="test-title">Your Results</p>
+    <h1>Test Complete</h1>
+    <p id="test-title">Loading test details...</p>
   </div>
 
   <div class="results-grid">
@@ -285,32 +297,39 @@
       <div class="chart-container">
         <canvas id="scoreChart"></canvas>
         <div class="chart-center">
-          <div class="score-main" id="score">0</div>
-          <div class="score-sub">Total Score</div>
+          <div class="score-main" id="score-val">0</div>
+          <div class="score-sub">out of <span id="max-marks">0</span></div>
         </div>
       </div>
       <div class="action-row" style="width: 100%;">
-        <button class="btn primary" onclick="window.location.href='/'">Go Home</button>
+        <button class="btn primary" onclick="reviewAnswers()">Review</button>
+        <button class="btn" onclick="retakeTest()">Retake</button>
+      </div>
+      <div class="action-row" style="width: 100%; margin-top: 0.5rem;">
+        <button class="btn" onclick="goHome()" style="background: var(--bg);">Back to Home</button>
       </div>
     </div>
 
     <div class="stats-grid">
       <div class="stat-item correct">
         <div class="stat-label">Correct</div>
-        <div class="stat-value" id="correct">0</div>
+        <div class="stat-value" id="correct-val">0</div>
       </div>
       <div class="stat-item incorrect">
-        <div class="stat-label">Wrong</div>
-        <div class="stat-value" id="wrong">0</div>
+        <div class="stat-label">Incorrect</div>
+        <div class="stat-value" id="incorrect-val">0</div>
       </div>
-      
       <div class="stat-item">
         <div class="stat-label">Unattempted</div>
-        <div class="stat-value" id="unattempted">0</div>
+        <div class="stat-value" id="unattempted-val">0</div>
       </div>
-      <div class="stat-item" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+      <div class="stat-item">
+        <div class="stat-label">Accuracy</div>
+        <div class="stat-value" id="acc-val">0%</div>
+      </div>
+      <div class="stat-item" style="grid-column: 1 / -1; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
         <div class="stat-label" style="margin: 0;">Time Taken</div>
-        <div class="stat-value" id="time">00:00</div>
+        <div class="stat-value" id="time-val">00:00</div>
       </div>
     </div>
 
@@ -318,7 +337,7 @@
 
   <div class="brutal-card">
     <div class="leaderboard-header">
-      🏆 Leaderboard (Top 10)
+      🏆 Leaderboard (First Attempts)
     </div>
     <div class="leaderboard-table-wrapper">
       <table>
@@ -327,10 +346,11 @@
             <th>Rank</th>
             <th>Name</th>
             <th>Score</th>
+            <th>Time Taken</th>
           </tr>
         </thead>
         <tbody id="leaderboard-body">
-          <tr><td colspan="3" style="text-align: center;">Loading...</td></tr>
+          <tr><td colspan="4" style="text-align: center;">Loading leaderboard...</td></tr>
         </tbody>
       </table>
     </div>
@@ -341,7 +361,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
       apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
@@ -357,22 +377,84 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // YOUR EXISTING JAVASCRIPT WILL NOW AUTOMATICALLY BIND TO THE IDS:
-  // document.getElementById('name').textContent = ...
-  // document.getElementById('score').textContent = ...
-  // document.getElementById('correct').textContent = ...
-  // document.getElementById('wrong').textContent = ...
-  // document.getElementById('time').textContent = ...
+  const urlParams = new URLSearchParams(window.location.search);
+  const testId = urlParams.get('testId');
+  const resultId = urlParams.get('resultId');
 
-  // To initialize the chart immediately once data populates:
-  window.initChart = function(correct, wrong, unattempted) {
+  let currentUserId = null;
+  let testData = null;
+  let resultData = null;
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "/";
+      return;
+    }
+    currentUserId = user.uid;
+    loadResultData();
+  });
+
+  async function loadResultData() {
+    try {
+      const resDoc = await getDoc(doc(db, "results", resultId));
+      if (!resDoc.exists()) {
+        alert("Result not found.");
+        return;
+      }
+      resultData = resDoc.data();
+
+      if (resultData.userId !== currentUserId) {
+        alert("Unauthorized access.");
+        window.location.href = "/";
+        return;
+      }
+
+      const testDoc = await getDoc(doc(db, "tests", testId));
+      if (testDoc.exists()) {
+        testData = testDoc.data();
+        document.getElementById('test-title').textContent = testData.title;
+        document.getElementById('max-marks').textContent = testData.totalMarks || 300;
+      }
+
+      populateUI();
+      loadLeaderboard();
+    } catch (e) {
+      console.error("Error loading result:", e);
+    }
+  }
+
+  function populateUI() {
+    document.getElementById('score-val').textContent = resultData.score;
+    
+    let totalQs = resultData.stats.totalQuestions;
+    let correct = resultData.stats.correct;
+    let incorrect = resultData.stats.incorrect;
+    let unattempted = resultData.stats.unattempted;
+
+    document.getElementById('correct-val').textContent = correct;
+    document.getElementById('incorrect-val').textContent = incorrect;
+    document.getElementById('unattempted-val').textContent = unattempted;
+
+    let accuracy = 0;
+    if ((correct + incorrect) > 0) {
+      accuracy = Math.round((correct / (correct + incorrect)) * 100);
+    }
+    document.getElementById('acc-val').textContent = `${accuracy}%`;
+
+    let timeUsed = resultData.timeSpent || 0;
+    let mins = Math.floor(timeUsed / 60);
+    let secs = timeUsed % 60;
+    document.getElementById('time-val').textContent = 
+      `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+    // Initialize Chart.js with Brutalist styling
     const ctx = document.getElementById('scoreChart').getContext('2d');
     new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Correct', 'Wrong', 'Unattempted'],
+        labels: ['Correct', 'Incorrect', 'Unattempted'],
         datasets: [{
-          data: [correct, wrong, unattempted],
+          data: [correct, incorrect, unattempted],
           backgroundColor: ['#10b981', '#ef4444', '#EAE8E1'],
           borderColor: '#111111',
           borderWidth: 2,
@@ -397,44 +479,83 @@
     });
   }
 
-  // --- Exact renderLeaderboard function from your old file ---
-  window.renderLeaderboard = async function(testId) {
-      const tbody = document.getElementById("leaderboard-body");
-      if (!tbody) return; 
+  async function loadLeaderboard() {
+    try {
+      const q = query(
+        collection(db, "results"),
+        where("testId", "==", testId),
+        where("metadata.isFirstAttempt", "==", true),
+        orderBy("score", "desc"),
+        orderBy("timeSpent", "asc"),
+        limit(20)
+      );
 
-      try {
-          const entriesRef = collection(db, "leaderboards", testId, "entries");
-          const q = query(entriesRef, orderBy("score", "desc"), orderBy("timestamp", "asc"), limit(10));
-          const querySnapshot = await getDocs(q);
-          
-          if (querySnapshot.empty) {
-              tbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">No attempts yet.</td></tr>`;
-              return;
-          }
+      const querySnapshot = await getDocs(q);
+      const tbody = document.getElementById('leaderboard-body');
+      tbody.innerHTML = '';
 
-          tbody.innerHTML = ""; 
-          let rank = 1;
-
-          querySnapshot.forEach((doc) => {
-              const rowData = doc.data();
-              let rowClass = rank === 1 ? "rank-1" : rank === 2 ? "rank-2" : rank === 3 ? "rank-3" : "";
-              
-              tbody.innerHTML += `
-                  <tr class="${rowClass}">
-                      <td><span class="rank-badge ${rowClass}">${rank}</span></td>
-                      <td>${rowData.userName}</td>
-                      <td><strong>${rowData.score}</strong></td>
-                  </tr>
-              `;
-              rank++;
-          });
-      } catch (error) {
-          console.error("Failed to load leaderboard:", error);
-          tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--red);">Failed to load rankings.</td></tr>`;
+      if (querySnapshot.empty) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No first attempts recorded yet.</td></tr>`;
+        return;
       }
+
+      let rank = 1;
+      for (const docSnap of querySnapshot.docs) {
+        const rowData = docSnap.data();
+        
+        let rankHtml = `<span class="rank-badge">${rank}</span>`;
+        if (rank === 1) rankHtml = `<span class="rank-badge rank-1">1</span>`;
+        if (rank === 2) rankHtml = `<span class="rank-badge rank-2">2</span>`;
+        if (rank === 3) rankHtml = `<span class="rank-badge rank-3">3</span>`;
+
+        let timeStr = "--:--";
+        if (rowData.timeSpent) {
+          let m = Math.floor(rowData.timeSpent / 60);
+          let s = rowData.timeSpent % 60;
+          timeStr = `${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
+        }
+
+        const isMe = (rowData.userId === currentUserId);
+        
+        // Fetch user plan for PRO tag
+        let proTag = "";
+        try {
+            const uDoc = await getDoc(doc(db, "users", rowData.userId));
+            if(uDoc.exists() && uDoc.data().plan === "platinum") {
+                proTag = `<span class="pro-tag">Pro</span>`;
+            }
+        } catch(e) {}
+
+        const tr = document.createElement('tr');
+        if (isMe) tr.className = 'current-user-row';
+
+        tr.innerHTML = `
+          <td>${rankHtml}</td>
+          <td>${rowData.userName || 'Anonymous'} ${isMe ? '(You)' : ''} ${proTag}</td>
+          <td><strong>${rowData.score}</strong></td>
+          <td>${timeStr}</td>
+        `;
+        tbody.appendChild(tr);
+        rank++;
+      }
+    } catch (e) {
+      console.error("Leaderboard error:", e);
+      document.getElementById('leaderboard-body').innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--red);">Error loading leaderboard.</td></tr>`;
+    }
   }
 
-  // NOTE: Simply trigger renderLeaderboard('YOUR_TEST_ID') and initChart() from your local grading logic script!
+  window.reviewAnswers = function() {
+    window.location.href = `/review.html?testId=${testId}&resultId=${resultId}`;
+  };
+
+  window.retakeTest = function() {
+    window.location.href = `/test.html?testId=${testId}&title=${encodeURIComponent(testData?.title || 'Retake Test')}`;
+  };
+
+  window.goHome = function() {
+    window.location.href = "/";
+  };
 </script>
+
 </body>
 </html>
