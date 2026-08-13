@@ -4,79 +4,138 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quizable | Test Results</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26; --border: #2a2a3d; 
-      --accent: #6c63ff; --green: #3ecf8e; --red: #ff6b6b; --text: #e8e8f0; --text-dim: #9999b8;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+  :root {
+    /* Light Neo-Brutalist Palette */
+    --bg: #F4F2EC;
+    --surface: #FFFFFF;
+    --surface2: #EAE8E1;
+    --border: #111111;
+    --accent: #8b5cf6; 
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #111111;
+    --text-dim: #333333;
+    --text-muted: #555555;
+  }
 
-    .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 50px; width: 100%; max-width: 600px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: slideUp 0.5s ease-out; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+  }
 
-    .header-tag { display: inline-block; background: rgba(108,99,255,0.15); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px; border: 1px solid rgba(108,99,255,0.3); }
-    
-    h1 { font-family: 'Syne', sans-serif; font-size: 2.5rem; margin-bottom: 5px; }
-    .score-display { font-family: 'DM Mono', monospace; font-size: 5rem; font-weight: bold; color: white; margin: 20px 0; text-shadow: 0 0 30px rgba(108,99,255,0.4); line-height: 1; }
-    
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 30px; margin-bottom: 40px; }
-    .stat-box { background: var(--surface2); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; }
-    .stat-value { font-family: 'DM Mono', monospace; font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; }
-    .stat-label { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
-    
-    .correct { color: var(--green); }
-    .wrong { color: var(--red); }
-    .neutral { color: var(--accent); }
+  body { 
+    background-color: var(--bg); 
+    background-image: radial-gradient(#d5d3ce 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    color: var(--text); 
+    font-family: 'DM Mono', monospace; 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 20px; 
+  }
 
-    .btn { display: inline-block; width: 100%; background: var(--accent); color: white; text-decoration: none; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 1.1rem; transition: 0.2s; border: none; cursor: pointer; }
-    .btn:hover { background: #5a52d5; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(108,99,255,0.2); }
-
-    .leaderboard-container {
-    background-color: var(--surface); /* Inherits your #12121a */
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-top: 2rem;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-}
+  }
 
-.leaderboard-header h2 {
-    font-family: 'Syne', sans-serif;
-    color: var(--accent); /* Inherits your purple/cyan */
-    margin-bottom: 0.2rem;
-}
+  /* Core Cards */
+  .result-card { 
+    background: var(--surface); 
+    border: 2px solid var(--border); 
+    border-radius: 0; 
+    padding: 50px; 
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 6px 6px 0 var(--border);
+    margin-bottom: 2rem;
+  }
 
-.leaderboard-header p {
-    font-size: 0.85rem;
-    color: #888;
-    margin-bottom: 1.5rem;
-}
+  /* Any internal stat boxes you used */
+  .stat-box, .stat-item {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    box-shadow: 3px 3px 0 var(--border);
+    border-radius: 0;
+    padding: 1.5rem;
+    margin: 10px 0;
+  }
 
-.leaderboard-table {
+  /* Leaderboard Styling */
+  table {
     width: 100%;
     border-collapse: collapse;
-}
-
-.leaderboard-table th, .leaderboard-table td {
-    padding: 1rem;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    margin-top: 1.5rem;
     text-align: left;
-    border-bottom: 1px solid var(--border);
-}
+  }
 
-.leaderboard-table th {
+  th, td {
+    padding: 1rem;
+    border-bottom: 2px solid var(--border);
+    border-right: 2px solid var(--border);
+    font-family: 'DM Mono', monospace;
+  }
+
+  th {
+    background: var(--surface2);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 1px;
-    color: #a0a0b0;
-}
+  }
 
-/* Gold, Silver, Bronze highlighting for Top 3 */
-.rank-1 td { color: #FFD700; font-weight: bold; }
-.rank-2 td { color: #C0C0C0; font-weight: bold; }
-.rank-3 td { color: #CD7F32; font-weight: bold; }
+  th:last-child, td:last-child {
+    border-right: none;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover {
+    background: var(--bg);
+  }
+
+  /* Highlight Ranks based on your JS classes */
+  .rank-1 td { background: #fcd34d; font-weight: bold; color: #111; }
+  .rank-2 td { background: #e5e7eb; font-weight: bold; color: #111; }
+  .rank-3 td { background: #fdba74; font-weight: bold; color: #111; }
+
+  /* Buttons */
+  button, .btn {
+    background: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--border);
+    padding: 0.8rem 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--border);
+    transition: all 0.1s;
+    border-radius: 0;
+  }
+
+  button:hover, .btn:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--border);
+  }
+
+  /* Correct/Wrong color overrides if needed */
+  .text-green { color: var(--green) !important; }
+  .text-red { color: var(--red) !important; }
   </style>
 </head>
 <body>
