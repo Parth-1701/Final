@@ -313,24 +313,24 @@
     <div class="stats-grid">
       <div class="stat-item correct">
         <div class="stat-label">Correct</div>
-        <div class="stat-value" id="correct-val">0</div>
+        <div class="stat-value" id="correct-display">0</div>
       </div>
       <div class="stat-item incorrect">
         <div class="stat-label">Incorrect</div>
-        <div class="stat-value" id="incorrect-val">0</div>
+        <div class="stat-value" id="wrong-display">0</div>
       </div>
       <div class="stat-item">
-        <div class="stat-label">Unattempted</div>
-        <div class="stat-value" id="unattempted-val">0</div>
+        <div class="stat-label">Time Taken</div>
+        <div class="stat-value" id="time-display">0</div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Accuracy</div>
-        <div class="stat-value" id="acc-val">0%</div>
+        <div class="stat-value" id="accuracy-display">0%</div>
       </div>
-      <div class="stat-item" style="grid-column: 1 / -1; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+  <!--    <div class="stat-item" style="grid-column: 1 / -1; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
         <div class="stat-label" style="margin: 0;">Time Taken</div>
         <div class="stat-value" id="time-val">00:00</div>
-      </div>
+      </div> -->
     </div>
 
   </div>
@@ -431,20 +431,20 @@
     let incorrect = resultData.stats.incorrect;
     let unattempted = resultData.stats.unattempted;
 
-    document.getElementById('correct-val').textContent = correct;
-    document.getElementById('incorrect-val').textContent = incorrect;
+    document.getElementById('correct-display').textContent = correct;
+    document.getElementById('wrong-display').textContent = incorrect;
     document.getElementById('unattempted-val').textContent = unattempted;
 
     let accuracy = 0;
     if ((correct + incorrect) > 0) {
       accuracy = Math.round((correct / (correct + incorrect)) * 100);
     }
-    document.getElementById('acc-val').textContent = `${accuracy}%`;
+    document.getElementById('accuracy-display').textContent = `${accuracy}%`;
 
     let timeUsed = resultData.timeSpent || 0;
     let mins = Math.floor(timeUsed / 60);
     let secs = timeUsed % 60;
-    document.getElementById('time-val').textContent = 
+    document.getElementById('time-display').textContent = 
       `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 
     // Initialize Chart.js with Brutalist styling
