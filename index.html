@@ -1117,11 +1117,11 @@ footer {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
          createUserWithEmailAndPassword, GoogleAuthProvider,
-         signInWithPopup, signOut, updateProfile }
+         signInWithPopup, signOut, updateProfile, sendEmailVerification } // <-- Added here
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+  
 const firebaseConfig = {
     apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
     authDomain: "sigmascore300.firebaseapp.com",
@@ -1244,9 +1244,20 @@ window.handleLogin = async () => {
   const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   if (!email || !password) { showError('login-error', 'Parameters missing.'); return; }
+  
   setLoading('login-btn', true, 'Execute Login');
+  
   try {
     const cred = await signInWithEmailAndPassword(auth, email, password);
+    
+    // --- NEW VERIFICATION CHECK ---
+    if (!cred.user.emailVerified) {
+      await signOut(auth); // Kick them out
+      showError('login-error', 'Please verify your email address before logging in.');
+      return; // Stop execution here
+    }
+    // ------------------------------
+
     onAuthSuccess(cred.user);
   } catch(e) {
     showError('login-error', friendlyError(e.code));
@@ -1262,12 +1273,22 @@ window.handleSignup = async () => {
   const password = document.getElementById('signup-password').value;
   const exam     = document.getElementById('signup-exam').value;
   if (!name || !email || !password) { showError('signup-error', 'Parameters missing.'); return; }
+  
   setLoading('signup-btn', true, 'Initialize User');
+  
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName: name });
     await saveUserProfile(cred.user, { displayName: name, targetExam: exam });
-    onAuthSuccess(cred.user);
+    
+    // --- NEW VERIFICATION LOGIC ---
+    await sendEmailVerification(cred.user);
+    await signOut(auth); // Immediately sign them out so they can't bypass the check
+    
+    showToast('Account created! Please check your inbox and verify your email.');
+    switchTab('login'); // Flip the modal back to the login screen
+    // ------------------------------
+    
   } catch(e) {
     showError('signup-error', friendlyError(e.code));
   } finally {
