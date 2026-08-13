@@ -297,7 +297,7 @@
       <div class="chart-container">
         <canvas id="scoreChart"></canvas>
         <div class="chart-center">
-          <div class="score-main" id="score-val">0</div>
+          <div class="score-main" id="score-display">0</div>
           <div class="score-sub">out of <span id="max-marks">0</span></div>
         </div>
       </div>
@@ -313,11 +313,11 @@
     <div class="stats-grid">
       <div class="stat-item correct">
         <div class="stat-label">Correct</div>
-        <div class="stat-value" id="correct-val">0</div>
+        <div class="stat-value" id="correct-display">0</div>
       </div>
       <div class="stat-item incorrect">
         <div class="stat-label">Incorrect</div>
-        <div class="stat-value" id="incorrect-val">0</div>
+        <div class="stat-value" id="wrong-display">0</div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Unattempted</div>
@@ -325,11 +325,11 @@
       </div>
       <div class="stat-item">
         <div class="stat-label">Accuracy</div>
-        <div class="stat-value" id="acc-val">0%</div>
+        <div class="stat-value" id="accuracy-display">0%</div>
       </div>
       <div class="stat-item" style="grid-column: 1 / -1; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
         <div class="stat-label" style="margin: 0;">Time Taken</div>
-        <div class="stat-value" id="time-val">00:00</div>
+        <div class="stat-value" id="time-display">00:00</div>
       </div>
     </div>
 
@@ -374,78 +374,36 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+    const db = getFirestore(app);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const testId = urlParams.get('testId');
-  const resultId = urlParams.get('resultId');
+    document.addEventListener("DOMContentLoaded", () => {
+        // 1. Pull the data we temporarily saved in the browser during submit
+        const resultData = sessionStorage.getItem('examResult');
 
-  let currentUserId = null;
-  let testData = null;
-  let resultData = null;
+        if (!resultData) {
+            console.error("No test data found in session.");
+            document.getElementById('score-display').innerText = "Error";
+            return;
+        }
 
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = "/";
-      return;
-    }
-    currentUserId = user.uid;
-    loadResultData();
-  });
+        const data = JSON.parse(resultData);
 
-  async function loadResultData() {
-    try {
-      const resDoc = await getDoc(doc(db, "results", resultId));
-      if (!resDoc.exists()) {
-        alert("Result not found.");
-        return;
-      }
-      resultData = resDoc.data();
+        // 2. Calculate extra stats
+        // Prevent dividing by zero if they skipped everything
+        const totalAttempted = data.correct + data.wrong;
+        const accuracy = totalAttempted > 0 ? ((data.correct / totalAttempted) * 100).toFixed(1) : 0;
+        
+        // Format seconds into MM:SS
+        const minutes = Math.floor(data.timeTaken / 60);
+        const seconds = data.timeTaken % 60;
+        const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-      if (resultData.userId !== currentUserId) {
-        alert("Unauthorized access.");
-        window.location.href = "/";
-        return;
-      }
-
-      const testDoc = await getDoc(doc(db, "tests", testId));
-      if (testDoc.exists()) {
-        testData = testDoc.data();
-        document.getElementById('test-title').textContent = testData.title;
-        document.getElementById('max-marks').textContent = testData.totalMarks || 300;
-      }
-
-      populateUI();
-      loadLeaderboard();
-    } catch (e) {
-      console.error("Error loading result:", e);
-    }
-  }
-
-  function populateUI() {
-    document.getElementById('score-val').textContent = resultData.score;
-    
-    let totalQs = resultData.stats.totalQuestions;
-    let correct = resultData.stats.correct;
-    let incorrect = resultData.stats.incorrect;
-    let unattempted = resultData.stats.unattempted;
-
-    document.getElementById('correct-val').textContent = correct;
-    document.getElementById('incorrect-val').textContent = incorrect;
-    document.getElementById('unattempted-val').textContent = unattempted;
-
-    let accuracy = 0;
-    if ((correct + incorrect) > 0) {
-      accuracy = Math.round((correct / (correct + incorrect)) * 100);
-    }
-    document.getElementById('acc-val').textContent = `${accuracy}%`;
-
-    let timeUsed = resultData.timeSpent || 0;
-    let mins = Math.floor(timeUsed / 60);
-    let secs = timeUsed % 60;
-    document.getElementById('time-val').textContent = 
-      `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        // 3. Inject into your HTML 
+        document.getElementById('score-display').innerText = data.score;
+        document.getElementById('correct-display').innerText = data.correct;
+        document.getElementById('wrong-display').innerText = data.wrong;
+        document.getElementById('accuracy-display').innerText = `${accuracy}%`;
+        document.getElementById('time-display').innerText = formattedTime;
 
     // Initialize Chart.js with Brutalist styling
     const ctx = document.getElementById('scoreChart').getContext('2d');
