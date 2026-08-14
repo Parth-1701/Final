@@ -1025,6 +1025,12 @@ footer {
       <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
     </div>
 
+    <div id="verify">
+      <div class="modal-title" id="modalTitle">Verify Email</div>
+      <div class="modal-sub" id="modalSub">Click on the verification link sent to your email and login again.</div>
+      <button class="modal-btn" id="tabLogin" onclick="switchTab('login')">Go to Login</button>
+    </div>
+
     <div id="loginForm">
       <button class="modal-btn" id="google-login-btn" onclick="handleGoogleAuth()"
               style="background:var(--surface);color:var(--text);border:2px solid var(--border); margin-top: 0;">
@@ -1286,7 +1292,7 @@ window.handleSignup = async () => {
     await signOut(auth); // Immediately sign them out so they can't bypass the check
     
     showToast('Account created! Please check your inbox and verify your email.');
-    switchTab('login'); // Flip the modal back to the login screen
+    switchTab('verify'); // Flip the modal back to the login screen
     // ------------------------------
     
   } catch(e) {
