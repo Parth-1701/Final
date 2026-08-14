@@ -494,6 +494,50 @@ section{padding:4.6rem 0}
 .marking .chip{font-family:var(--mono);font-size:.7rem;display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:4px !important;padding:.32rem .6rem;background:#fff}
 .chip b.pos{color:var(--green)} .chip b.neg{color:var(--red)}
 
+  /* the live CBT tester */
+.tester{border:1.5px solid var(--ink);background:var(--card);box-shadow:10px 10px 0 rgba(19,34,27,.12);position:relative}
+.tester::before{content:"INTERACTIVE — TRY IT";position:absolute;top:-11px;right:18px;background:var(--gold);color:var(--ink);font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;padding:3px 10px;z-index:2}
+.t-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1.5px solid var(--ink);background:var(--paper2)}
+.t-top .ttl{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;display:flex;align-items:center;gap:10px}
+.t-top .ttl i{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:none}
+.t-timer{font-family:var(--mono);font-size:13px;font-weight:600;background:var(--ink);color:var(--paper);padding:4px 10px;letter-spacing:.1em;font-variant-numeric:tabular-nums}
+.t-body{display:grid;grid-template-columns:1fr 196px;min-height:340px}
+.t-main{padding:20px 22px;border-right:1.5px solid var(--line)}
+.t-qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px}
+.t-qno{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--mut)}
+.chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;border:1px solid var(--line);padding:3px 8px;text-transform:uppercase}
+.chip.subj{border-color:var(--acc);color:var(--acc)}
+.t-mrk{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;border:1px solid var(--line);padding:5px 9px;transition:background .2s,color .2s}
+.t-mrk:hover{background:var(--paper2)}
+.t-mrk.on{background:var(--warn);border-color:var(--warn);color:var(--ink)}
+.t-stem{font-size:.98rem;line-height:1.55;margin-bottom:16px;min-height:70px}
+.t-opt{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line2);margin-bottom:9px;cursor:pointer;transition:border-color .2s,background .2s;font-size:.93rem}
+.t-opt .bub{width:17px;height:17px;border-radius:50%;border:1.6px solid var(--ink2);flex:none;position:relative;transition:border-color .2s}
+.t-opt .key{font-family:var(--mono);font-size:11px;color:var(--mut);width:16px}
+.t-opt:hover{border-color:var(--ink)}
+.t-opt.sel{border-color:var(--ok);background:rgba(30,122,70,.07)}
+.t-opt.sel .bub{border-color:var(--ok)}
+.t-opt.sel .bub::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--ok)}
+.t-foot{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.t-btn{font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:9px 14px;border:1px solid var(--ink);transition:background .2s,color .2s}
+.t-btn:hover{background:var(--ink);color:var(--paper)}
+.t-btn.pri{background:var(--acc);border-color:var(--acc);color:#FFF7EC}
+.t-btn.pri:hover{background:var(--acc2)}
+.t-pal{padding:16px 14px;background:var(--paper);display:flex;flex-direction:column;gap:12px}
+.t-pal h5{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--mut)}
+.leg{display:flex;flex-direction:column;gap:6px}
+.leg span{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9px;color:var(--ink2);letter-spacing:.06em}
+.leg i{width:11px;height:11px;border-radius:2px;flex:none}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pn{aspect-ratio:1;border:1.5px solid var(--ink2);font-family:var(--mono);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s,background .2s;background:var(--card)}
+.pn:hover{transform:scale(1.08)}
+.pn.ans{background:var(--ok);border-color:var(--ok);color:#fff}
+.pn.mrk{background:var(--warn);border-color:var(--warn)}
+.pn.cur{outline:2.5px solid var(--acc);outline-offset:2px}
+.t-submit{margin-top:auto;font-family:var(--mono);font-size:10px;letter-spacing:.14em;border:1px solid var(--ink);padding:9px;text-align:center;transition:background .2s,color .2s}
+.t-submit:hover{background:var(--ink);color:var(--paper)}
+.t-note{font-family:var(--mono);font-size:9px;color:var(--mut);text-align:center;letter-spacing:.08em}
+
 /* ============ Features ============ */
 .feature-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
@@ -873,6 +917,40 @@ footer {
       </div>
     </div>
   </div>
+
+  <div class="tester" data-reveal style="--d:.25s" id="tester" aria-label="Interactive demo of the CBT test interface">
+        <div class="t-top">
+          <span class="ttl"><i></i>NEET MOCK 07 — QUIZABLE ENGINE</span>
+          <span class="t-timer" id="ttimer">02:59:59</span>
+        </div>
+        <div class="t-body">
+          <div class="t-main">
+            <div class="t-qhead">
+              <span class="t-qno" id="qno">QUESTION 1 OF 3</span>
+              <span class="chip subj" id="qsubj">PHYSICS</span>
+              <button class="t-mrk" id="btnMark">◐ MARK FOR REVIEW</button>
+            </div>
+            <p class="t-stem" id="qstem"></p>
+            <div id="qopts"></div>
+            <div class="t-foot">
+              <button class="t-btn" id="btnClear">CLEAR RESPONSE</button>
+              <button class="t-btn pri" id="btnNext">SAVE &amp; NEXT →</button>
+            </div>
+          </div>
+          <aside class="t-pal">
+            <h5>QUESTION PALETTE</h5>
+            <div class="leg">
+              <span><i style="background:var(--ok)"></i>ANSWERED</span>
+              <span><i style="background:var(--warn)"></i>MARKED FOR REVIEW</span>
+              <span><i style="background:var(--card);border:1px solid var(--ink2)"></i>NOT VISITED</span>
+            </div>
+            <div class="pgrid" id="pgrid"></div>
+            <button class="t-submit" id="btnSubmit">SUBMIT TEST</button>
+            <span class="t-note">demo loops at 3 questions</span>
+          </aside>
+        </div>
+      </div>
+</div>
 </section>
 
 <!-- <hr class="cutline" />
