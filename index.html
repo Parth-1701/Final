@@ -494,6 +494,19 @@ section{padding:4.6rem 0}
 .marking .chip{font-family:var(--mono);font-size:.7rem;display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:4px !important;padding:.32rem .6rem;background:#fff}
 .chip b.pos{color:var(--green)} .chip b.neg{color:var(--red)}
 
+  /* ============ HERO ============ */
+.preview{padding:76px 0 84px;position:relative}
+.preview-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:56px;align-items:start}
+.preview .stamp{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.16em;border:1.4px solid var(--acc);color:var(--acc);padding:7px 12px;transform:rotate(-1.6deg);margin-bottom:30px;text-transform:uppercase}
+.preview h1{font-size:clamp(2.7rem,5.6vw,4.5rem)}
+.preview h1 .acc{color:var(--acc);font-style:italic;font-weight:400}
+.preview .lede{margin:28px 0 34px;font-size:1.13rem;color:var(--ink2);max-width:520px}
+.preview .lede strong{color:var(--ink)}
+.preview-cta{display:flex;gap:14px;flex-wrap:wrap}
+.proofline{margin-top:44px;padding-top:24px;border-top:1px dashed var(--line);display:flex;gap:26px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--mut)}
+.proofline b{color:var(--ink);font-weight:600}
+.proofline .dot{color:var(--acc)}
+
   /* the live CBT tester */
 .tester{border:1.5px solid var(--ink);background:var(--card);box-shadow:10px 10px 0 rgba(19,34,27,.12);position:relative}
 .tester::before{content:"INTERACTIVE — TRY IT";position:absolute;top:-11px;right:18px;background:var(--gold);color:var(--ink);font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;padding:3px 10px;z-index:2}
@@ -917,7 +930,9 @@ footer {
       </div>
     </div>
   </div>
+</section>
 
+  <section class="preview">
   <div class="tester" data-reveal style="--d:.25s" id="tester" aria-label="Interactive demo of the CBT test interface">
         <div class="t-top">
           <span class="ttl"><i></i>NEET MOCK 07 — QUIZABLE ENGINE</span>
@@ -928,7 +943,7 @@ footer {
             <div class="t-qhead">
               <span class="t-qno" id="qno">QUESTION 1 OF 3</span>
               <span class="chip subj" id="qsubj">PHYSICS</span>
-              <button class="t-mrk" id="btnMark">◐ MARK FOR REVIEW</button>
+              <button class="t-mrk" id="btnMark">◐ MARK FOR REVsectioheron>
             </div>
             <p class="t-stem" id="qstem"></p>
             <div id="qopts"></div>
