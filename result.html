@@ -7,12 +7,77 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26; --border: #2a2a3d; 
-      --accent: #6c63ff; --green: #3ecf8e; --red: #ff6b6b; --text: #e8e8f0; --text-dim: #9999b8;
+      /* Light Neo-Brutalist "Print" Palette */
+      --bg: #F4F2EC;
+      --surface: #FFFFFF;
+      --surface2: #EAE8E1;
+      --border: #111111;
+      
+      --accent: #8b5cf6; 
+      
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      
+      --text: #111111;
+      --text-dim: #333333;
+      --text-muted: #555555;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(#d5d3ce 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ── */
+    nav { 
+      position: sticky; top: 0; z-index: 100; 
+      background: var(--bg); 
+      border-bottom: 2px solid var(--border); 
+      display: flex; align-items: center; padding: 0 2rem; height: 60px; gap: 1rem; 
+    }
+    .nav-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.2rem; text-transform: uppercase; text-decoration: none; color: var(--text); }
+    .nav-logo span { color: var(--accent); }
+    .nav-sep { color: var(--text-muted); font-size: 1.2rem; }
+    .nav-page { font-size: 0.9rem; color: var(--text-dim); font-weight: 500; }
+    .nav-spacer { flex: 1; }
+
+    /* ── LAYOUT ── */
+    .page-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      width: 100%;
+    }
+
+    .header-section {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .header-section h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .header-section p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    
     .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 50px; width: 100%; max-width: 600px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: slideUp 0.5s ease-out; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
