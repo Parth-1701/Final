@@ -443,11 +443,11 @@
         }
     }
     window.reviewAnswers = function() {
-    window.location.href = `/review.html?testId=${testId}&resultId=${resultId}`;
+    window.location.href = `/analysis.html`;
   };
 
   window.retakeTest = function() {
-    window.location.href = `/test.html?testId=${testId}&title=${encodeURIComponent(testData?.title || 'Retake Test')}`;
+    window.location.href = `/test.html`;
   };
 
   window.goHome = function() {
