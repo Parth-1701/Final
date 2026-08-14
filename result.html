@@ -442,6 +442,17 @@
             tbody.innerHTML = `<tr><td colspan="3" style="text-align: center;">Failed to load rankings.</td></tr>`;
         }
     }
+    window.reviewAnswers = function() {
+    window.location.href = `/review.html?testId=${testId}&resultId=${resultId}`;
+  };
+
+  window.retakeTest = function() {
+    window.location.href = `/test.html?testId=${testId}&title=${encodeURIComponent(testData?.title || 'Retake Test')}`;
+  };
+
+  window.goHome = function() {
+    window.location.href = "/";
+  };
   </script>
 </body>
 </html>
