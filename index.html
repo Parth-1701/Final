@@ -1025,12 +1025,6 @@ footer {
       <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
     </div>
 
-    <div id="verify">
-      <div class="modal-title" id="modalTitle">Verify Email</div>
-      <div class="modal-sub" id="modalSub">Click on the verification link sent to your email and login again.</div>
-      <button class="modal-btn" id="tabLogin" onclick="switchTab('login')">Go to Login</button>
-    </div>
-
     <div id="loginForm">
       <button class="modal-btn" id="google-login-btn" onclick="handleGoogleAuth()"
               style="background:var(--surface);color:var(--text);border:2px solid var(--border); margin-top: 0;">
@@ -1060,6 +1054,12 @@ footer {
       </div>
       <div id="login-error" style="color:var(--accent);font-size:0.9rem;min-height:18px;margin-bottom:0.5rem;font-weight:bold;font-family: var(--sans); text-transform: uppercase;"></div>
       <button class="modal-btn" id="login-btn" onclick="handleLogin()">Execute Login</button>
+    </div>
+
+    <div id="verify">
+      <div class="modal-title" id="modalTitle">Verify Email</div>
+      <div class="modal-sub" id="modalSub">Click on the verification link sent to your email and login again.</div>
+      <button class="modal-btn" id="tabLogin" onclick="switchTab('login')">Go to Login</button>
     </div>
 
     <div id="signupForm" style="display:none">
