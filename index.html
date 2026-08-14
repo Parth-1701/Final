@@ -30,11 +30,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 
 <style>
-/* ============================================================
-   QUIZABLE — Hybrid Theme 
-   ============================================================ */
-:root {
-  /* Neo-Brutalist "Print" Palette (Gemini) */
+
+  :root {
+  /* Neo-Brutalist Palette */
   --bg: #F4F2EC;
   --surface: #FFFFFF;
   --surface2: #EAE8E1;
@@ -45,7 +43,7 @@
   --text-muted: #555555;
   --accent3: #10B981;
 
-  /* Qwen Variable Mappings (Ensuring seamless integration) */
+  /* Variable Mappings */
   --paper: var(--bg);
   --paper-hi: var(--surface);
   --paper-lo: var(--surface2);
@@ -70,7 +68,7 @@ body{
   font-family:var(--sans);
   color:var(--ink);
   
-  /* Gemini Dot Grid Background */
+  /* Background */
   background-color: var(--bg);
   background-image: radial-gradient(#D1CDBE 1px, transparent 1px);
   background-size: 24px 24px;
@@ -88,17 +86,17 @@ body{
 img{max-width:100%}
 a{color:inherit}
 
-/* ============ Gemini Support Popup ============ */
-#support-popup-overlay {
+/* ============ Popup ============ */
+#popup-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.7);
     display: flex; justify-content: center; align-items: center;
     z-index: 9999; opacity: 0; pointer-events: none;
     transition: opacity 0.2s ease;
 }
-#support-popup-overlay.show { opacity: 1; pointer-events: auto; }
+#popup-overlay.show { opacity: 1; pointer-events: auto; }
 
-.support-popup-card {
+.popup-card {
     background: var(--surface);
     border: 2px solid var(--border);
     width: 90%; max-width: 400px;
@@ -109,9 +107,9 @@ a{color:inherit}
     text-align: center;
     border-radius: 0;
 }
-#support-popup-overlay.show .support-popup-card { transform: translateY(0); }
+#popup-overlay.show .support-popup-card { transform: translateY(0); }
 
-.support-popup-close-btn {
+.popup-close-btn {
     position: absolute; top: 10px; right: 10px;
     background: var(--surface); color: var(--border);
     border: 2px solid var(--border);
@@ -119,16 +117,16 @@ a{color:inherit}
     box-shadow: 2px 2px 0px #000000;
     border-radius: 0;
 }
-.support-popup-close-btn:hover { background: var(--accent); color: #fff; }
+.popup-close-btn:hover { background: var(--accent); color: #fff; }
 
-.support-popup-img { width: 100%; height: 220px; object-fit: cover; border-bottom: 2px solid var(--border); filter: grayscale(100%) contrast(1.2); }
-.support-popup-img:hover { filter: none; }
+.popup-img { width: 100%; height: 220px; object-fit: cover; border-bottom: 2px solid var(--border); filter: grayscale(100%) contrast(1.2); }
+.popup-img:hover { filter: none; }
 
-.support-popup-content { padding: 20px; }
-.support-popup-content h3 { color: var(--accent); margin: 0 0 10px 0; font-size: 1.2rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; }
-.support-popup-content p { color: var(--text); font-size: 14px; margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+.popup-content { padding: 20px; }
+.popup-content h3 { color: var(--accent); margin: 0 0 10px 0; font-size: 1.2rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; }
+.popup-content p { color: var(--text); font-size: 14px; margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
 
-/* ============ Qwen Type Helpers ============ */
+/* ============Type Helpers ============ */
 .kicker{
   font-family:var(--mono);
   font-size:.8rem;
@@ -150,7 +148,7 @@ mark.hl{
   color:inherit;
 }
 
-/* ============ Qwen Base Buttons ============ */
+/* ============ Base Buttons ============ */
 .btn{
   display:inline-flex;align-items:center;gap:.5rem;
   font-family:var(--sans);font-weight:600;font-size:.95rem;
@@ -181,7 +179,7 @@ mark.hl{
   background:var(--bg);padding:0 8px;
 }
 
-/* ============ Header & Gemini Nav Integration ============ */
+/* ============ Header & Nav Integration ============ */
 header.nav{
   position:sticky;top:0;z-index:900;
   background:var(--surface);
@@ -212,7 +210,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   padding: 8px 16px; font-family: 'DM Mono', monospace; 
   font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; text-transform: uppercase; 
   box-shadow: 2px 2px 0px #000000; border-radius: 0;
-  margin: 0 4px 4px 0; /* Prevents box-shadow cropping */
+  margin: 0 4px 4px 0; 
 }
 .dropdown-btn:hover { background: var(--surface2); }
 .arrow { font-size: 0.7rem; }
@@ -248,11 +246,11 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   background:var(--accent); border:2px solid var(--border); color:#fff; padding:0.45rem 1.2rem;
   font-family:'Space Grotesk', sans-serif; font-size:0.875rem; font-weight:800; text-transform: uppercase; cursor:pointer;
   box-shadow: 4px 4px 0px #000000; transition: transform 0.1s, box-shadow 0.1s; border-radius: 0;
-  margin: 0 4px 4px 0; /* Prevents box-shadow cropping */
+  margin: 0 4px 4px 0; 
 }
 .btn-primary:hover { background: var(--accent-hover); transform:translate(2px, 2px); box-shadow: 2px 2px 0px #000000; }
 
-/* ============ Gemini Hero & Actions ============ */
+/* ============ Hero & Actions ============ */
 .hero {
   position:relative; z-index:1; min-height: 85vh; /* Reduced height to remove empty space */
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -298,7 +296,7 @@ header.nav.scrolled{box-shadow:0 4px 0 rgba(0,0,0,.08)}
   color: var(--text-muted); text-transform: uppercase; 
 }
 
-/* ============ Qwen Hall Ticket (Strictly Square) ============ */
+/* ============ Hall Ticket  ============ */
 .hall-ticket{
   background:var(--paper-hi);
   border:1.5px solid var(--ink);
@@ -350,7 +348,7 @@ section{padding:4.6rem 0}
 .sec-head{max-width:44rem;margin-bottom:2.6rem}
 .sec-head p{color:var(--ink-2);margin-top:.7rem}
 
-/* ============ Qwen Exam Cards ============ */
+/* ============ Exam Cards ============ */
 .exam-grid{
   display:grid;grid-template-columns:repeat(6,1fr);gap:1.2rem;
 }
@@ -384,10 +382,10 @@ section{padding:4.6rem 0}
   box-shadow: 4px 4px 0px rgba(17,17,17,0.1);
 }
 
-/* Add this new rule for the images */
+/
 .exam-icon img {
-  height: 2.5rem;      /* Locks the height to match the old emojis */
-  width: 4.5rem;       /* Stretches the box into a small landscape */
+  height: 2.5rem;      
+  width: 4.5rem;       
   object-fit: cover;   /* Ensures the image fills the space without squishing */
   display: block;      /* Removes weird spacing under inline images */
 }
@@ -421,7 +419,7 @@ section{padding:4.6rem 0}
 }
 .exam-card:hover .omr i:nth-child(2){background:var(--ink);border-color:var(--ink)}
 
-/* ============ Exact Qwen CBT Demo ============ */
+/* ============ Exact CBT Demo ============ */
 .cbt{background:linear-gradient(transparent, rgba(33,30,23,.03))}
 .exam-window{
   border:1.5px solid var(--ink);border-radius:8px !important;
@@ -496,7 +494,7 @@ section{padding:4.6rem 0}
 .marking .chip{font-family:var(--mono);font-size:.7rem;display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:4px !important;padding:.32rem .6rem;background:#fff}
 .chip b.pos{color:var(--green)} .chip b.neg{color:var(--red)}
 
-/* ============ Qwen Features ============ */
+/* ============ Features ============ */
 .feature-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
   border:1.5px solid var(--ink);border-radius:6px !important;
@@ -530,7 +528,7 @@ section{padding:4.6rem 0}
 .step h4{font-size:1.15rem;font-family:var(--serif);font-weight:600;margin-bottom:.4rem}
 .step p{font-size:.9rem;color:var(--ink-2)}
 
-/* ============ Qwen Leaderboard ============ */
+/* ============ Leaderboard ============ */
 .board{
   background:var(--paper-hi);border:1.5px solid var(--ink);border-radius:6px !important;
   box-shadow:var(--hard-shadow);overflow:hidden;
@@ -670,16 +668,16 @@ footer {
 </head>
 <body>
 
-<!-- <div id="support-popup-overlay">
-  <div class="support-popup-card">
-      <button id="support-popup-close" class="support-popup-close-btn">&times;</button>
-      <img src="images/wangchuk-support.webp" alt="Support Sonam Wangchuk and NEET Aspirants" class="support-popup-img">
-      <div class="support-popup-content">
-          <h3>#SupportSonamWangchuk</h3>
-          <p>We stand in solidarity with Sonam Wangchuk and everyone fighting for transparency and fairness.</p>
+<div id="popup-overlay">
+  <div class="popup-card">
+      <button id="popup-close" class="popup-close-btn">&times;</button>
+   <!--   <img src="images/wangchuk-support.webp" alt="Support Sonam Wangchuk and NEET Aspirants" class="support-popup-img"> -->
+      <div class="popup-content">
+          <h3>🚨 Under Maintenance 🚨</h3>
+          <p>We are currently under maintenance. We apologise for the inconvenience caused.</p>
       </div>
   </div>
-</div> -->
+</div>
 
 <header class="nav" id="navbar">
   <div class="wrap nav-inner">
