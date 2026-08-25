@@ -217,20 +217,17 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    // Added setDoc for the leaderboard logic
     import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // ─── 1. PASTE YOUR EXACT FIREBASE CONFIG HERE ─────────────────
     const firebaseConfig = {
-    apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
-    authDomain: "sigmascore300.firebaseapp.com",
-    projectId: "sigmascore300",
-    storageBucket: "sigmascore300.firebasestorage.app",
-    messagingSenderId: "293195338803",
-    appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
-    measurementId: "G-MLZYWG2EEM"
+      apiKey: "AIzaSyBsMWa4Tup5nj6Xh5ev3FLiftGjWZGwukk",
+      authDomain: "sigmascore300.firebaseapp.com",
+      projectId: "sigmascore300",
+      storageBucket: "sigmascore300.firebasestorage.app",
+      messagingSenderId: "293195338803",
+      appId: "1:293195338803:web:b2a45a3b48a378dd99ff46",
+      measurementId: "G-MLZYWG2EEM"
     };
-    // ──────────────────────────────────────────────────────────────
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -246,15 +243,15 @@
     let sections = [];
     let currentSection = "";
 
-    // Fixed duplicate onAuthStateChanged nesting
+    // ── ANTI-CHEAT GLOBALS ── //
+    window.warningCount = 0;
+    const MAX_WARNINGS = 3;
+
     onAuthStateChanged(auth, async (user) => {
-      // 1. Wait for Firebase to initialize
       if (user) {
-        // Set Student Name safely
         const studentEl = document.getElementById('student-name');
         if (studentEl) studentEl.innerText = user.email ? user.email.split('@')[0].toUpperCase() : "STUDENT";
 
-        // 2. Only proceed to fetch data AFTER user is confirmed
         const params = new URLSearchParams(window.location.search);
         const testId = params.get('testId');
         
@@ -265,7 +262,6 @@
 
         await loadTestData(testId);
       } else {
-        // 3. Only redirect if Firebase explicitly says there is no user
         alert("Session expired or not logged in. Please log in again.");
         window.location.href = 'index.html';
       }
@@ -290,8 +286,20 @@
         window.buildSectionDropdown();
         window.buildPalette();
         window.loadQuestion(0);
-        startTimer();
-        document.getElementById('loader').style.display = 'none';
+        
+        // ── ANTI-CHEAT: SHOW START SCREEN INSTEAD OF AUTO-STARTING ── //
+        document.querySelector('.spinner').style.display = 'none';
+        document.getElementById('load-text').innerHTML = `
+          <div style="text-align: center; max-width: 400px; padding: 20px; background: white; border: 2px solid #d9534f; border-radius: 5px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <p style="margin-bottom: 10px; font-size: 18px; color: #d9534f; font-weight: bold;">🚨 PROCTORING ENABLED 🚨</p>
+            <p style="margin-bottom: 20px; font-size: 14px; font-weight: normal; color: #333; line-height: 1.5;">
+              This exam will run in strict full-screen mode.<br><br>
+              <strong>Do not:</strong> Switch tabs, minimize the browser, or exit full screen. Doing so will issue a warning.<br><br>
+              <span style="color: #d9534f; font-weight: bold;">3 Warnings = Auto-Submit.</span>
+            </p>
+            <button class="btn btn-save" style="padding: 12px 24px; font-size: 16px; width: 100%;" onclick="window.startAntiCheatTest()">Acknowledge & Start Exam</button>
+          </div>
+        `;
 
       } catch (err) {
         console.error(err);
@@ -300,6 +308,52 @@
         document.getElementById('load-text').style.color = "red";
       }
     }
+
+    // ── ANTI-CHEAT ENGINE LOGIC ── //
+    window.startAntiCheatTest = () => {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => console.error("Fullscreen failed:", err));
+      }
+      
+      document.getElementById('loader').style.display = 'none';
+      startTimer();
+      
+      // Attach strict event listeners
+      document.addEventListener("visibilitychange", window.handleVisibilityChange);
+      window.addEventListener("blur", window.handleWindowBlur);
+      document.addEventListener("fullscreenchange", window.handleFullscreenChange);
+    };
+
+    window.handleVisibilityChange = () => {
+      if (document.hidden) window.issueWarning("You switched tabs! Navigating away from the exam is not allowed.");
+    };
+
+    window.handleWindowBlur = () => {
+      window.issueWarning("You clicked outside the test window or opened another app!");
+    };
+
+    window.handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        window.issueWarning("You exited full-screen mode! The test must be taken in full screen.");
+      }
+    };
+
+    window.issueWarning = (message) => {
+      window.warningCount++;
+      
+      if (window.warningCount >= MAX_WARNINGS) {
+        alert("🚨 Maximum warnings exceeded. Your test is being auto-submitted.");
+        window.submitExam(true); // Force submit bypasses the confirm dialog
+      } else {
+        alert(`⚠️ WARNING ${window.warningCount}/${MAX_WARNINGS}:\n${message}\n\nDo not leave the test environment.`);
+        // Attempt to lock them back into full screen
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen().catch(err => console.log(err));
+        }
+      }
+    };
 
     window.buildSectionDropdown = () => {
       const dropdown = document.getElementById('section-dropdown');
@@ -349,7 +403,6 @@
       const posMarks = q.positiveMarks !== undefined ? q.positiveMarks : 4;
       const negPenalty = q.negativePenalty !== undefined ? q.negativePenalty : 2;
       
-      // SAFETY PATCH: Force answers to act as Strings to prevent JSON Number crashes
       const actualAnsStr = String(q.answer || "");
       const isMulti = q.type === 'multi' || actualAnsStr.includes(',');
 
@@ -504,7 +557,7 @@
       const display = document.getElementById('timer');
       timerInterval = setInterval(() => {
         timeRemaining--;
-        if (timeRemaining <= 0) { clearInterval(timerInterval); window.submitExam(); return; }
+        if (timeRemaining <= 0) { clearInterval(timerInterval); window.submitExam(true); return; }
         let h = Math.floor(timeRemaining / 3600);
         let m = Math.floor((timeRemaining % 3600) / 60);
         let s = timeRemaining % 60;
@@ -512,11 +565,25 @@
       }, 1000);
     }
 
-    // THE JEE ADVANCED GRADING ENGINE
-    window.submitExam = async () => {
-      const conf = confirm("Are you sure you want to final submit?");
-      if (!conf && timeRemaining > 0) return;
+    // ── THE JEE ADVANCED GRADING ENGINE ── //
+    // Added the 'force' parameter to bypass confirmation if cheating
+    window.submitExam = async (force = false) => {
+      if (!force) {
+        const conf = confirm("Are you sure you want to final submit?");
+        if (!conf && timeRemaining > 0) return;
+      }
+      
       clearInterval(timerInterval);
+      
+      // ── ANTI-CHEAT: Remove listeners before submission so it doesn't trigger a warning while redirecting ── //
+      document.removeEventListener("visibilitychange", window.handleVisibilityChange);
+      window.removeEventListener("blur", window.handleWindowBlur);
+      document.removeEventListener("fullscreenchange", window.handleFullscreenChange);
+      
+      // Attempt to gracefully exit full screen
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.log(err));
+      }
       
       document.getElementById('loader').style.display = 'flex';
       document.querySelector('.spinner').style.display = 'block'; 
@@ -588,27 +655,21 @@
         const user = auth.currentUser;
         if (user) {
           
-          // 1. Save standard attempt to the student's personal history
           await addDoc(collection(db, 'results'), {
             userId: user.uid, testId: testData.id, testTitle: testData.title, 
             score, correct, wrong, timeTaken, submittedAt: serverTimestamp(),
             responses: responses
           }).catch(e => console.log("History error:", e));
 
-          // 2. Leaderboard First-Attempt Logic
           const leaderboardRef = doc(db, "leaderboards", testData.id, "entries", user.uid);
           const docSnap = await getDoc(leaderboardRef);
 
           if (!docSnap.exists()) {
-             // If document doesn't exist, this is their first attempt. Lock it in.
              await setDoc(leaderboardRef, {
                  userName: user.email ? user.email.split('@')[0].toUpperCase() : "STUDENT",
                  score: score,
-                 timestamp: serverTimestamp() // For tie-breaking
+                 timestamp: serverTimestamp() 
              });
-             console.log("First attempt logged to leaderboard!");
-          } else {
-             console.log("Subsequent attempt. Leaderboard score remains unchanged.");
           }
         }
         
