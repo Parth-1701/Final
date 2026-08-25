@@ -1040,7 +1040,15 @@ footer {
                onkeydown="if(event.key==='Enter') handleLogin()"/>
       </div>
       <div class="form-group">
-        <label class="form-label">Password</label>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.5rem;">
+          <label class="form-label" style="margin-bottom: 0;">Password</label>
+          <a href="/forgot-password.html" 
+             style="font-family: var(--mono); font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-decoration: underline; text-decoration-style: dashed; text-decoration-color: var(--border); text-transform: uppercase; transition: all 0.2s;" 
+             onmouseover="this.style.color='var(--accent)'; this.style.textDecorationColor='var(--accent)';" 
+             onmouseout="this.style.color='var(--text-muted)'; this.style.textDecorationColor='var(--border)';">
+            Forgot Password?
+          </a>
+        </div>
         <input class="form-input" type="password" id="login-password" placeholder="••••••••"
                onkeydown="if(event.key==='Enter') handleLogin()"/>
       </div>
