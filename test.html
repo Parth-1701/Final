@@ -309,7 +309,11 @@
       }
     }
 
-    // ── ANTI-CHEAT ENGINE LOGIC ── //
+// ── ANTI-CHEAT ENGINE LOGIC ── //
+    
+    // Add a cooldown lock to prevent double-counting
+    window.isWarningActive = false; 
+
     window.startAntiCheatTest = () => {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
@@ -340,6 +344,11 @@
     };
 
     window.issueWarning = (message) => {
+      // 1. If a warning is already processing, ignore simultaneous triggers
+      if (window.isWarningActive) return; 
+      
+      // Lock the system
+      window.isWarningActive = true; 
       window.warningCount++;
       
       if (window.warningCount >= MAX_WARNINGS) {
@@ -347,11 +356,17 @@
         window.submitExam(true); // Force submit bypasses the confirm dialog
       } else {
         alert(`⚠️ WARNING ${window.warningCount}/${MAX_WARNINGS}:\n${message}\n\nDo not leave the test environment.`);
+        
         // Attempt to lock them back into full screen
         const elem = document.documentElement;
         if (elem.requestFullscreen) {
           elem.requestFullscreen().catch(err => console.log(err));
         }
+
+        // 2. Add a 2-second cooldown before releasing the lock
+        setTimeout(() => {
+            window.isWarningActive = false;
+        }, 2000);
       }
     };
 
@@ -657,7 +672,7 @@
           
           await addDoc(collection(db, 'results'), {
             userId: user.uid, testId: testData.id, testTitle: testData.title, 
-            score, correct, wrong, timeTaken, submittedAt: serverTimestamp(),
+            score, correct, wrong, unattempted, timeTaken, submittedAt: serverTimestamp(),
             responses: responses
           }).catch(e => console.log("History error:", e));
 
