@@ -285,7 +285,7 @@
   
   <div class="header-section">
     <h1>Test Complete</h1>
-    <p id="test-title">Loading test details...</p>
+    <p id="title-display">Loading test details...</p>
   </div>
 
   <div class="results-grid">
@@ -295,12 +295,11 @@
         <canvas id="scoreChart"></canvas>
         <div class="chart-center">
           <div class="score-main" id="score-display">0</div>
-          <div class="score-sub">out of <span id="max-marks">0</span></div>
         </div>
       </div>
       <div class="action-row" style="width: 100%;">
         <button class="btn primary" onclick="reviewAnswers()">Review</button>
-        <button class="btn" onclick="retakeTest()">Retake</button>
+      <!--  <button class="btn" onclick="retakeTest()">Retake</button> -->
       </div>
       <div class="action-row" style="width: 100%; margin-top: 0.5rem;">
         <button class="btn" onclick="goHome()" style="background: var(--bg);">Back to Home</button>
@@ -400,6 +399,7 @@
         document.getElementById('unattempted-display').innerText = data.unattempted;
         document.getElementById('accuracy-display').innerText = `${accuracy}%`;
         document.getElementById('time-display').innerText = formattedTime;
+        document.getElementById('title-display').innerText = data.testTitle;
 
         // 4. Trigger the leaderboard render
         if(data.testId) {
