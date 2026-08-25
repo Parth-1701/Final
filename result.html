@@ -318,7 +318,7 @@
       </div>
       <div class="stat-item">
         <div class="stat-label">Unattempted</div>
-        <div class="stat-value" id="unattempted-val">0</div>
+        <div class="stat-value" id="unattempted-display">0</div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Accuracy</div>
@@ -397,6 +397,7 @@
         document.getElementById('score-display').innerText = data.score;
         document.getElementById('correct-display').innerText = data.correct;
         document.getElementById('wrong-display').innerText = data.wrong;
+        document.getElementById('unattempted-display').innerText = data.unattempted;
         document.getElementById('accuracy-display').innerText = `${accuracy}%`;
         document.getElementById('time-display').innerText = formattedTime;
 
