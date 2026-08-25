@@ -330,26 +330,7 @@
     </div>
 
   </div>
-  
 
-  <div class="leaderboard-container">
-    <div class="leaderboard-header">
-        <h2>🏆 Top Scorers</h2>
-        <p>Only your first attempt is ranked.</p>
-    </div>
-    <table class="leaderboard-table">
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Student</th>
-                <th>Score</th>
-            </tr>
-        </thead>
-        <tbody id="leaderboard-body">
-            <tr><td colspan="3" style="text-align: center;">Loading rankings...</td></tr>
-        </tbody>
-    </table>
-  </div>
 
   <script type="module">
     // Import Firestore if you are rendering the leaderboard on this page
@@ -382,17 +363,16 @@
 
         const data = JSON.parse(resultData);
 
-        // 2. Calculate extra stats
-        // Prevent dividing by zero if they skipped everything
+        
         const totalAttempted = data.correct + data.wrong;
         const accuracy = totalAttempted > 0 ? ((data.correct / totalAttempted) * 100).toFixed(1) : 0;
         
-        // Format seconds into MM:SS
+        
         const minutes = Math.floor(data.timeTaken / 60);
         const seconds = data.timeTaken % 60;
         const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-        // 3. Inject into your HTML 
+        
         document.getElementById('score-display').innerText = data.score;
         document.getElementById('correct-display').innerText = data.correct;
         document.getElementById('wrong-display').innerText = data.wrong;
