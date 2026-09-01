@@ -355,6 +355,52 @@
       }
     };
 
+// ── ANTI-CHEAT ENGINE LOGIC ── //
+    window.warningCount = 0;
+    const MAX_WARNINGS = 3;
+    window.isWarningActive = false; // Cooldown lock
+
+    window.startAntiCheatTest = () => {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => console.error("Fullscreen failed:", err));
+      }
+      
+      document.getElementById('loader').style.display = 'none';
+      if (!timerInterval) startTimer();
+      
+      // Attach strict event listeners
+      document.addEventListener("visibilitychange", window.handleVisibilityChange);
+      window.addEventListener("blur", window.handleWindowBlur);
+      document.addEventListener("fullscreenchange", window.handleFullscreenChange);
+    };
+
+    // New physical click handler to re-enter full screen
+    window.resumeTest = () => {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => console.error("Fullscreen failed:", err));
+      }
+      document.getElementById('loader').style.display = 'none';
+      
+      // Brief cooldown so it doesn't double-trigger when the window resizes
+      setTimeout(() => { window.isWarningActive = false; }, 1000);
+    };
+
+    window.handleVisibilityChange = () => {
+      if (document.hidden) window.issueWarning("You switched tabs! Navigating away from the exam is not allowed.");
+    };
+
+    window.handleWindowBlur = () => {
+      window.issueWarning("You clicked outside the test window or opened another app!");
+    };
+
+    window.handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        window.issueWarning("You exited full-screen mode! The test must be taken in full screen.");
+      }
+    };
+
     window.issueWarning = (message) => {
       if (window.isWarningActive) return;
       window.isWarningActive = true;
