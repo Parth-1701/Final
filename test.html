@@ -309,7 +309,11 @@
       }
     }
 
-    // ── ANTI-CHEAT ENGINE LOGIC ── //
+// ── ANTI-CHEAT ENGINE LOGIC ── //
+    window.warningCount = 0;
+    const MAX_WARNINGS = 3;
+    window.isWarningActive = false; // Cooldown lock
+
     window.startAntiCheatTest = () => {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
@@ -317,12 +321,24 @@
       }
       
       document.getElementById('loader').style.display = 'none';
-      startTimer();
+      if (!timerInterval) startTimer();
       
       // Attach strict event listeners
       document.addEventListener("visibilitychange", window.handleVisibilityChange);
       window.addEventListener("blur", window.handleWindowBlur);
       document.addEventListener("fullscreenchange", window.handleFullscreenChange);
+    };
+
+    // New physical click handler to re-enter full screen
+    window.resumeTest = () => {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => console.error("Fullscreen failed:", err));
+      }
+      document.getElementById('loader').style.display = 'none';
+      
+      // Brief cooldown so it doesn't double-trigger when the window resizes
+      setTimeout(() => { window.isWarningActive = false; }, 1000);
     };
 
     window.handleVisibilityChange = () => {
@@ -340,20 +356,32 @@
     };
 
     window.issueWarning = (message) => {
+      if (window.isWarningActive) return;
+      window.isWarningActive = true;
       window.warningCount++;
       
       if (window.warningCount >= MAX_WARNINGS) {
         alert("🚨 Maximum warnings exceeded. Your test is being auto-submitted.");
-        window.submitExam(true); // Force submit bypasses the confirm dialog
+        window.submitExam(true); 
       } else {
-        alert(`⚠️ WARNING ${window.warningCount}/${MAX_WARNINGS}:\n${message}\n\nDo not leave the test environment.`);
-        // Attempt to lock them back into full screen
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-          elem.requestFullscreen().catch(err => console.log(err));
-        }
+        // Reuse the loader overlay to block the screen and force a click
+        const loader = document.getElementById('loader');
+        const loadText = document.getElementById('load-text');
+        
+        document.querySelector('.spinner').style.display = 'none';
+        loadText.innerHTML = `
+          <div style="text-align: center; max-width: 400px; padding: 20px; background: white; border: 2px solid #d9534f; border-radius: 5px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <p style="margin-bottom: 10px; font-size: 18px; color: #d9534f; font-weight: bold;">⚠️ WARNING ${window.warningCount}/${MAX_WARNINGS}</p>
+            <p style="margin-bottom: 20px; font-size: 14px; font-weight: normal; color: #333; line-height: 1.5;">
+              ${message}<br><br>
+              You must remain in the test environment at all times.
+            </p>
+            <button class="btn btn-save" style="padding: 12px 24px; font-size: 16px; width: 100%; background: #d9534f; border: none;" onclick="window.resumeTest()">Acknowledge & Resume Exam</button>
+          </div>
+        `;
+        loader.style.display = 'flex';
       }
-    };
+    }; 
 
     window.buildSectionDropdown = () => {
       const dropdown = document.getElementById('section-dropdown');
