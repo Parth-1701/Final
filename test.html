@@ -334,8 +334,7 @@
     };
 
     window.handleWindowBlur = () => {
-      window.issueWarning("<p>You clicked outside the test window or opened another app!</p> <p><button class="btn btn-save" style="padding: 12px 24px; font-size: 16px; width: 100%;" onclick="window.startAntiCheatTest()">Continue Exam</button>
-   ");
+      window.issueWarning("You clicked outside the test window or opened another app!");
     };
 
     window.handleFullscreenChange = () => {
@@ -356,7 +355,7 @@
         alert("🚨 Maximum warnings exceeded. Your test is being auto-submitted.");
         window.submitExam(true); // Force submit bypasses the confirm dialog
       } else {
-        alert(`⚠️ WARNING ${window.warningCount}/${MAX_WARNINGS}:\n${message}\n\nDo not leave the test environment.`);
+        alert(`⚠️ WARNING ${window.warningCount}/${MAX_WARNINGS}:\n${message}\n\nDo not leave the test environment.<button class="btn btn-save" style="padding: 12px 24px; font-size: 16px; width: 100%;" onclick="window.startAntiCheatTest()">Continue Exam</button>`);
         
         // Attempt to lock them back into full screen
         const elem = document.documentElement;
